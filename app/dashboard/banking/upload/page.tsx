@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export default function BankingUploadPage() {
-    const [account, setAccount] = useState<any>(null);
+    const [accounts, setAccounts] = useState<any[]>([]);
+    const [selectedAccountId, setSelectedAccountId] = useState<string>('');
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -16,7 +17,10 @@ export default function BankingUploadPage() {
         fetch('/api/banking/accounts')
             .then(res => res.json())
             .then(data => {
-                setAccount(data.account);
+                setAccounts(data.accounts || []);
+                if (data.accounts?.length > 0) {
+                    setSelectedAccountId(data.accounts[0].id);
+                }
                 setLoading(false);
             })
             .catch(() => setLoading(false));
@@ -53,20 +57,26 @@ export default function BankingUploadPage() {
 
                 {/* Main Card */}
                 <div className="bg-gradient-card backdrop-blur-xl rounded-3xl p-8 border border-slate-700/50 shadow-2xl">
-                    {account ? (
+                    {accounts.length > 0 ? (
                         <div>
                             <div className="mb-8">
                                 <label className="block text-sm font-semibold text-slate-300 mb-3">
                                     Select Bank Account
                                 </label>
-                                <select className="w-full p-4 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white focus:ring-2 focus:ring-uhuru-blue focus:border-uhuru-blue transition-all backdrop-blur-sm">
-                                    <option value={account.id}>
-                                        {account.bankName} - {account.currency} ({account.accountNumber || '****'})
-                                    </option>
+                                <select
+                                    value={selectedAccountId}
+                                    onChange={(e) => setSelectedAccountId(e.target.value)}
+                                    className="w-full p-4 rounded-xl border border-slate-700/50 bg-slate-800/50 text-white focus:ring-2 focus:ring-uhuru-blue focus:border-uhuru-blue transition-all backdrop-blur-sm"
+                                >
+                                    {accounts.map((acc) => (
+                                        <option key={acc.id} value={acc.id}>
+                                            {acc.bank.bankName} - {acc.currency} ({acc.accountNumber || acc.iban || '****'})
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
-                            <UploadDropzone bankAccountId={account.id} />
+                            <UploadDropzone bankAccountId={selectedAccountId} />
                         </div>
                     ) : (
                         <div className="text-center py-16">

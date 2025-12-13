@@ -3,9 +3,16 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const account = await prisma.bankAccount.findFirst();
+        const accounts = await prisma.bankAccount.findMany({
+            include: {
+                bank: true
+            },
+            orderBy: {
+                order: 'asc'
+            }
+        });
 
-        return NextResponse.json({ account });
+        return NextResponse.json({ accounts });
     } catch (error) {
         console.error('Error fetching bank accounts:', error);
         return NextResponse.json({ account: null }, { status: 500 });

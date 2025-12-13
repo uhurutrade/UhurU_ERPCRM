@@ -9,7 +9,13 @@ export default async function BankingPage() {
         take: 50,
         include: {
             bankAccount: {
-                select: { bankName: true }
+                include: {
+                    bank: {
+                        select: {
+                            bankName: true
+                        }
+                    }
+                }
             }
         }
     });

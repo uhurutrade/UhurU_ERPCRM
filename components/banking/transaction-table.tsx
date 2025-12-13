@@ -10,7 +10,9 @@ type Transaction = {
     currency: string;
     category: string | null;
     bankAccount: {
-        bankName: string;
+        bank: {
+            bankName: string;
+        };
     };
 };
 
@@ -48,7 +50,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                 </td>
                                 <td className="py-3 px-4 text-slate-500">
                                     <span className="px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-xs">
-                                        {tx.bankAccount.bankName}
+                                        {tx.bankAccount.bank.bankName}
                                     </span>
                                 </td>
                                 <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'
