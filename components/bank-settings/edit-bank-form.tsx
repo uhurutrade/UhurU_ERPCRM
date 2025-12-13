@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bank } from "@prisma/client";
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 interface EditBankFormProps {
     bank: Bank;
 }
 
 export default function EditBankForm({ bank }: EditBankFormProps) {
     const router = useRouter();
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         bankName: bank.bankName,
@@ -43,20 +46,35 @@ export default function EditBankForm({ bank }: EditBankFormProps) {
                 throw new Error("Failed to update bank");
             }
 
+            // Artificial delay for better UX
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             router.push(`/dashboard/bank-settings`);
             router.refresh();
         } catch (error) {
             console.error("Error updating bank:", error);
-            alert("Error updating bank. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error updating bank. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this bank? This action cannot be undone.")) {
-            return;
-        }
+        const confirmed = await confirm({
+            title: "Delete Bank",
+            message: "Are you sure you want to delete this bank? This action cannot be undone.",
+            type: "danger",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+        });
+
+        if (!confirmed) return;
 
         setLoading(true);
         try {
@@ -72,7 +90,13 @@ export default function EditBankForm({ bank }: EditBankFormProps) {
             router.refresh();
         } catch (error) {
             console.error("Error deleting bank:", error);
-            alert("Error deleting bank. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error deleting bank. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
             setLoading(false);
         }
     };

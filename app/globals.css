@@ -29,3 +29,25 @@ body {
 * {
   scroll-behavior: smooth;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Global Card Hover Effects */
+.bg-gradient-card {
+  @apply transition-all duration-300 ease-in-out cursor-default;
+}
+
+.bg-gradient-card:hover {
+  @apply transform scale-[1.02] border-uhuru-blue shadow-uhuru z-10;
+}

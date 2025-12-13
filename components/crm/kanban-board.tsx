@@ -60,7 +60,7 @@ export function KanbanBoard({ deals, organizations }: { deals: any[], organizati
                                     key={deal.id}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, deal.id)}
-                                    className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 cursor-move hover:shadow-md transition-shadow group"
+                                    className="bg-gradient-card backdrop-blur-xl p-4 rounded-lg border border-slate-700 cursor-move group"
                                 >
                                     <div className="text-sm font-medium text-slate-900 dark:text-white mb-1 group-hover:text-indigo-400 transition-colors">
                                         {deal.title}

@@ -62,7 +62,7 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                     <div key={account.id} className="relative group">
                         <Link
                             href={`/dashboard/bank-settings/account/${account.id}`}
-                            className="block p-4 bg-slate-800 hover:bg-slate-750 rounded-lg border border-slate-700 transition-colors h-full"
+                            className="block p-4 bg-gradient-card backdrop-blur-xl rounded-lg border border-slate-700 transition-colors h-full"
                         >
                             <div className="flex justify-between items-start mb-2">
                                 <span className="font-mono text-lg font-bold text-emerald-400">

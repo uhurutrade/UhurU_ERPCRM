@@ -6,6 +6,8 @@ export const metadata: Metadata = {
     description: "Uhuru Trade Ltd Management System",
 };
 
+import { ModalProvider } from "@/components/providers/modal-provider";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -13,7 +15,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className="antialiased min-h-screen bg-slate-950 text-slate-100">{children}</body>
+            <body className="antialiased min-h-screen bg-slate-950 text-slate-100">
+                <ModalProvider>
+                    {children}
+                </ModalProvider>
+            </body>
         </html>
     );
 }

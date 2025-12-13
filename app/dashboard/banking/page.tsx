@@ -43,24 +43,17 @@ export default async function BankingPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content - Transactions */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Transactions Card */}
-                        <div className="bg-gradient-card backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden">
-                            <div className="p-6 border-b border-slate-700/50">
-                                <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
-                            </div>
-                            <TransactionTable transactions={transactions} />
-                        </div>
-                    </div>
+                <ExchangeRatesWidget />
 
-                    {/* Sidebar - Exchange Rates & Tools */}
-                    <div className="space-y-8">
-                        <ExchangeRatesWidget />
+                {/* Transactions Card */}
+                <div className="bg-gradient-card backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden">
+                    <div className="p-6 border-b border-slate-700/50">
+                        <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
                     </div>
+                    <TransactionTable transactions={transactions} />
                 </div>
             </div>
         </div>
     );
 }
+

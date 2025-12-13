@@ -4,7 +4,7 @@ import { Users, Mail, Phone, Building2 } from 'lucide-react';
 
 export function ContactList({ contacts }: { contacts: any[] }) {
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50 dark:bg-slate-900/50">
                     <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">

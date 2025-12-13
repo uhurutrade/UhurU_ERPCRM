@@ -18,7 +18,7 @@ export default async function CompanySettingsPage() {
             {/* Compliance Overview */}
             <ComplianceOverview />
 
-            <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+            <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
                 <CompanySettingsForm initialData={companySettings} />
             </div>
         </div>

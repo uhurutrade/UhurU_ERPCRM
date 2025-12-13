@@ -6,7 +6,7 @@ export function OrganizationList({ organizations }: { organizations: any[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {organizations.map((org) => (
-                <div key={org.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div key={org.id} className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">

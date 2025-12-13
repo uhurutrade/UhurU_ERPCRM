@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BankAccount } from "@prisma/client";
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 interface EditAccountFormProps {
     account: BankAccount;
     bankName: string;
@@ -11,6 +13,7 @@ interface EditAccountFormProps {
 
 export default function EditAccountForm({ account, bankName }: EditAccountFormProps) {
     const router = useRouter();
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         accountName: account.accountName,
@@ -44,20 +47,35 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
                 throw new Error("Failed to update account");
             }
 
+            // Artificial delay to show "Saving..." state as requested
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             router.push(`/dashboard/bank-settings`);
             router.refresh();
         } catch (error) {
             console.error("Error updating account:", error);
-            alert("Error updating account. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error updating account. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this account? This action cannot be undone.")) {
-            return;
-        }
+        const confirmed = await confirm({
+            title: "Delete Account",
+            message: "Are you sure you want to delete this account? This action cannot be undone.",
+            type: "danger",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+        });
+
+        if (!confirmed) return;
 
         setLoading(true);
         try {
@@ -73,7 +91,13 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
             router.refresh();
         } catch (error) {
             console.error("Error deleting account:", error);
-            alert("Error deleting account. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error deleting account. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
             setLoading(false);
         }
     };
