@@ -3,6 +3,7 @@ import EditAccountForm from "@/components/bank-settings/edit-account-form";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+
 interface EditAccountPageProps {
     params: {
         id: string;
