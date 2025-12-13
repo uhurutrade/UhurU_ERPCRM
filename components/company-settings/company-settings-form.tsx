@@ -1,0 +1,670 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+interface CompanySettingsFormProps {
+    initialData: any;
+}
+
+export default function CompanySettingsForm({ initialData }: CompanySettingsFormProps) {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        // Basic Company Information
+        companyName: initialData?.companyName || "",
+        companyNumber: initialData?.companyNumber || "",
+        incorporationDate: initialData?.incorporationDate
+            ? new Date(initialData.incorporationDate).toISOString().split('T')[0]
+            : "",
+
+        // Registered Office Address
+        registeredAddress: initialData?.registeredAddress || "",
+        registeredCity: initialData?.registeredCity || "",
+        registeredPostcode: initialData?.registeredPostcode || "",
+        registeredCountry: initialData?.registeredCountry || "United Kingdom",
+
+        // Trading Address
+        tradingAddress: initialData?.tradingAddress || "",
+        tradingCity: initialData?.tradingCity || "",
+        tradingPostcode: initialData?.tradingPostcode || "",
+
+        // Company Type & SIC Codes
+        companyType: initialData?.companyType || "",
+        sicCodes: initialData?.sicCodes || "",
+
+        // Financial Year
+        financialYearEnd: initialData?.financialYearEnd || "",
+        accountsNextDueDate: initialData?.accountsNextDueDate
+            ? new Date(initialData.accountsNextDueDate).toISOString().split('T')[0]
+            : "",
+        confirmationNextDueDate: initialData?.confirmationNextDueDate
+            ? new Date(initialData.confirmationNextDueDate).toISOString().split('T')[0]
+            : "",
+
+        // Tax Information
+        vatRegistered: initialData?.vatRegistered || false,
+        vatNumber: initialData?.vatNumber || "",
+        vatRegistrationDate: initialData?.vatRegistrationDate
+            ? new Date(initialData.vatRegistrationDate).toISOString().split('T')[0]
+            : "",
+        vatScheme: initialData?.vatScheme || "",
+        vatReturnFrequency: initialData?.vatReturnFrequency || "",
+
+        // HMRC Information
+        payeReference: initialData?.payeReference || "",
+        corporationTaxReference: initialData?.corporationTaxReference || "",
+        utr: initialData?.utr || "",
+
+        // Directors & Officers
+        directors: initialData?.directors || "",
+        companySecretary: initialData?.companySecretary || "",
+
+        // Share Capital
+        shareCapital: initialData?.shareCapital || "",
+        numberOfShares: initialData?.numberOfShares || "",
+
+        // Accounting Software & Methods
+        accountingSoftware: initialData?.accountingSoftware || "",
+        accountingMethod: initialData?.accountingMethod || "",
+
+        // Contact Information
+        contactEmail: initialData?.contactEmail || "",
+        contactPhone: initialData?.contactPhone || "",
+        website: initialData?.website || "",
+
+        // Additional Notes
+        notes: initialData?.notes || "",
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await fetch("/api/company-settings", {
+                method: initialData ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    id: initialData?.id,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to save company settings");
+            }
+
+            router.refresh();
+            alert("Company settings saved successfully!");
+        } catch (error) {
+            console.error("Error saving company settings:", error);
+            alert("Error saving company settings. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+        }));
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Basic Company Information */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Basic Company Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Company Name <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="companyName"
+                            value={formData.companyName}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Company Number <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="companyNumber"
+                            value={formData.companyNumber}
+                            onChange={handleChange}
+                            required
+                            placeholder="e.g., 12345678"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Incorporation Date <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            name="incorporationDate"
+                            value={formData.incorporationDate}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Company Type <span className="text-rose-400">*</span>
+                        </label>
+                        <select
+                            name="companyType"
+                            value={formData.companyType}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        >
+                            <option value="">Select type...</option>
+                            <option value="Ltd">Private Limited Company (Ltd)</option>
+                            <option value="PLC">Public Limited Company (PLC)</option>
+                            <option value="LLP">Limited Liability Partnership (LLP)</option>
+                            <option value="Sole Trader">Sole Trader</option>
+                            <option value="Partnership">Partnership</option>
+                        </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            SIC Codes
+                        </label>
+                        <input
+                            type="text"
+                            name="sicCodes"
+                            value={formData.sicCodes}
+                            onChange={handleChange}
+                            placeholder="e.g., 62012, 62020 (comma separated)"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Registered Office Address */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Registered Office Address</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Address <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="registeredAddress"
+                            value={formData.registeredAddress}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            City <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="registeredCity"
+                            value={formData.registeredCity}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Postcode <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="registeredPostcode"
+                            value={formData.registeredPostcode}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Country <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="registeredCountry"
+                            value={formData.registeredCountry}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Trading Address */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Trading Address (if different)</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Address
+                        </label>
+                        <input
+                            type="text"
+                            name="tradingAddress"
+                            value={formData.tradingAddress}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            City
+                        </label>
+                        <input
+                            type="text"
+                            name="tradingCity"
+                            value={formData.tradingCity}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Postcode
+                        </label>
+                        <input
+                            type="text"
+                            name="tradingPostcode"
+                            value={formData.tradingPostcode}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Financial Year & Deadlines */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Financial Year & Deadlines</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Financial Year End <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="financialYearEnd"
+                            value={formData.financialYearEnd}
+                            onChange={handleChange}
+                            required
+                            placeholder="DD-MM (e.g., 31-03)"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Next Accounts Due Date
+                        </label>
+                        <input
+                            type="date"
+                            name="accountsNextDueDate"
+                            value={formData.accountsNextDueDate}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Next Confirmation Statement Due
+                        </label>
+                        <input
+                            type="date"
+                            name="confirmationNextDueDate"
+                            value={formData.confirmationNextDueDate}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* VAT Information */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">VAT Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                name="vatRegistered"
+                                checked={formData.vatRegistered}
+                                onChange={handleChange}
+                                className="w-5 h-5 bg-slate-800 border border-slate-700 rounded focus:ring-2 focus:ring-emerald-500"
+                            />
+                            <span className="text-sm font-medium text-slate-300">VAT Registered</span>
+                        </label>
+                    </div>
+
+                    {formData.vatRegistered && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    VAT Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="vatNumber"
+                                    value={formData.vatNumber}
+                                    onChange={handleChange}
+                                    placeholder="GB123456789"
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    VAT Registration Date
+                                </label>
+                                <input
+                                    type="date"
+                                    name="vatRegistrationDate"
+                                    value={formData.vatRegistrationDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    VAT Scheme
+                                </label>
+                                <select
+                                    name="vatScheme"
+                                    value={formData.vatScheme}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                >
+                                    <option value="">Select scheme...</option>
+                                    <option value="Standard">Standard</option>
+                                    <option value="Flat Rate">Flat Rate</option>
+                                    <option value="Cash Accounting">Cash Accounting</option>
+                                    <option value="Annual Accounting">Annual Accounting</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    VAT Return Frequency
+                                </label>
+                                <select
+                                    name="vatReturnFrequency"
+                                    value={formData.vatReturnFrequency}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                >
+                                    <option value="">Select frequency...</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Annual">Annual</option>
+                                </select>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </section>
+
+            {/* HMRC Information */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">HMRC Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            UTR (Unique Taxpayer Reference)
+                        </label>
+                        <input
+                            type="text"
+                            name="utr"
+                            value={formData.utr}
+                            onChange={handleChange}
+                            placeholder="1234567890"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Corporation Tax Reference
+                        </label>
+                        <input
+                            type="text"
+                            name="corporationTaxReference"
+                            value={formData.corporationTaxReference}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            PAYE Reference (if employer)
+                        </label>
+                        <input
+                            type="text"
+                            name="payeReference"
+                            value={formData.payeReference}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Directors & Officers */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Directors & Officers</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Directors (JSON format or comma-separated names)
+                        </label>
+                        <textarea
+                            name="directors"
+                            value={formData.directors}
+                            onChange={handleChange}
+                            rows={3}
+                            placeholder='e.g., John Smith, Jane Doe'
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Company Secretary
+                        </label>
+                        <input
+                            type="text"
+                            name="companySecretary"
+                            value={formData.companySecretary}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Share Capital */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Share Capital</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Share Capital (£)
+                        </label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            name="shareCapital"
+                            value={formData.shareCapital}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Number of Shares
+                        </label>
+                        <input
+                            type="number"
+                            name="numberOfShares"
+                            value={formData.numberOfShares}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Accounting Software & Methods */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Accounting Software & Methods</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Accounting Software
+                        </label>
+                        <select
+                            name="accountingSoftware"
+                            value={formData.accountingSoftware}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        >
+                            <option value="">Select software...</option>
+                            <option value="Xero">Xero</option>
+                            <option value="QuickBooks">QuickBooks</option>
+                            <option value="Sage">Sage</option>
+                            <option value="FreeAgent">FreeAgent</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Accounting Method
+                        </label>
+                        <select
+                            name="accountingMethod"
+                            value={formData.accountingMethod}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        >
+                            <option value="">Select method...</option>
+                            <option value="Cash Basis">Cash Basis</option>
+                            <option value="Accrual Basis">Accrual Basis</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            {/* Contact Information */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Contact Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Contact Email
+                        </label>
+                        <input
+                            type="email"
+                            name="contactEmail"
+                            value={formData.contactEmail}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Contact Phone
+                        </label>
+                        <input
+                            type="tel"
+                            name="contactPhone"
+                            value={formData.contactPhone}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Website
+                        </label>
+                        <input
+                            type="url"
+                            name="website"
+                            value={formData.website}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Additional Notes */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Additional Notes</h2>
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Notes
+                    </label>
+                    <textarea
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        rows={4}
+                        className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                    />
+                </div>
+            </section>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors duration-200"
+                >
+                    {loading ? "Saving..." : "Save Company Settings"}
+                </button>
+            </div>
+        </form>
+    );
+}

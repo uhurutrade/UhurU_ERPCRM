@@ -23,6 +23,7 @@ export default async function DashboardLayout({
                     <a href="/dashboard/erp" className="block px-4 py-2 rounded hover:bg-slate-800">ERP</a>
                     <a href="/dashboard/banking" className="block px-4 py-2 rounded hover:bg-slate-800">Banca</a>
                     <a href="/dashboard/compliance" className="block px-4 py-2 rounded hover:bg-slate-800 text-slate-400">Cumplimiento (UK)</a>
+                    <a href="/dashboard/company-settings" className="block px-4 py-2 rounded hover:bg-slate-800 text-emerald-400">Company Settings</a>
                 </nav>
 
                 <div className="border-t border-slate-800 pt-4">

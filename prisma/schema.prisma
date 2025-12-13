@@ -283,3 +283,68 @@ model InvoiceItem {
   invoiceId   String
   invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
+
+// Company Settings - UK Legal Compliance
+model CompanySettings {
+  id                        String    @id @default(cuid())
+  
+  // Basic Company Information
+  companyName               String
+  companyNumber             String    @unique // Companies House registration number
+  incorporationDate         DateTime  // Date of incorporation
+  
+  // Registered Office Address
+  registeredAddress         String
+  registeredCity            String
+  registeredPostcode        String
+  registeredCountry         String    @default("United Kingdom")
+  
+  // Trading Address (if different)
+  tradingAddress            String?
+  tradingCity               String?
+  tradingPostcode           String?
+  
+  // Company Type & SIC Codes
+  companyType               String    // Ltd, PLC, LLP, etc.
+  sicCodes                  String?   // Standard Industrial Classification codes (comma separated)
+  
+  // Financial Year
+  financialYearEnd          String    // Format: "DD-MM" e.g., "31-03"
+  accountsNextDueDate       DateTime? // Next accounts filing deadline
+  confirmationNextDueDate   DateTime? // Next confirmation statement deadline
+  
+  // Tax Information
+  vatRegistered             Boolean   @default(false)
+  vatNumber                 String?
+  vatRegistrationDate       DateTime?
+  vatScheme                 String?   // Standard, Flat Rate, Cash Accounting, etc.
+  vatReturnFrequency        String?   // Quarterly, Monthly, Annual
+  
+  // HMRC Information
+  payeReference             String?   // If employer
+  corporationTaxReference   String?
+  utr                       String?   // Unique Taxpayer Reference
+  
+  // Directors & Officers
+  directors                 String?   @db.Text // JSON array of directors
+  companySecretary          String?
+  
+  // Share Capital
+  shareCapital              Decimal?  @db.Decimal(15, 2)
+  numberOfShares            Int?
+  
+  // Accounting Software & Methods
+  accountingSoftware        String?   // Xero, QuickBooks, etc.
+  accountingMethod          String?   // Cash basis, Accrual basis
+  
+  // Contact Information
+  contactEmail              String?
+  contactPhone              String?
+  website                   String?
+  
+  // Additional Notes
+  notes                     String?   @db.Text
+  
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+}
