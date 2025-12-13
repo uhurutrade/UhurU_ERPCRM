@@ -7,8 +7,11 @@ interface CompanySettingsFormProps {
     initialData: any;
 }
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 export default function CompanySettingsForm({ initialData }: CompanySettingsFormProps) {
     const router = useRouter();
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         // Basic Company Information
@@ -97,11 +100,19 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                 throw new Error("Failed to save company settings");
             }
 
+            // Artificial delay for better UX as requested
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             router.refresh();
-            alert("Company settings saved successfully!");
         } catch (error) {
             console.error("Error saving company settings:", error);
-            alert("Error saving company settings. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error saving company settings. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
         } finally {
             setLoading(false);
         }

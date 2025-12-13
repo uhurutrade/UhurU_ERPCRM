@@ -9,8 +9,11 @@ interface AddAccountFormProps {
     preselectedCurrency?: string;
 }
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 export default function AddAccountForm({ bankId, preselectedCurrency }: AddAccountFormProps) {
     const router = useRouter();
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         accountName: "",
@@ -43,11 +46,20 @@ export default function AddAccountForm({ bankId, preselectedCurrency }: AddAccou
                 throw new Error("Failed to create account");
             }
 
+            // Artificial delay for better UX
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             router.push(`/dashboard/bank-settings`);
             router.refresh();
         } catch (error) {
             console.error("Error creating account:", error);
-            alert("Error creating account. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error creating account. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
         } finally {
             setLoading(false);
         }

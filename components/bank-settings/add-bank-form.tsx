@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 export default function AddBankForm() {
     const router = useRouter();
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         bankName: "",
@@ -38,12 +41,21 @@ export default function AddBankForm() {
                 throw new Error("Failed to create bank");
             }
 
+            // Artificial delay for better UX
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             const bank = await response.json();
             router.push(`/dashboard/bank-settings`);
             router.refresh();
         } catch (error) {
             console.error("Error creating bank:", error);
-            alert("Error creating bank. Please try again.");
+            await confirm({
+                title: "Error",
+                message: "Error creating bank. Please try again.",
+                type: "danger",
+                confirmText: "Close",
+                cancelText: "",
+            });
         } finally {
             setLoading(false);
         }
