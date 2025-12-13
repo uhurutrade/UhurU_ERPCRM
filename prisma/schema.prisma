@@ -134,17 +134,193 @@ model Activity {
 }
 
 // ERP & Banking
-model BankAccount {
-  id              String            @id @default(cuid())
-  bankName        String            // Revolut, Wise, Worldfirst
-  accountName     String?
-  currency        String            // GBP, USD, EUR
-  accountNumber   String?
-  iban            String?
-  transactions    BankTransaction[]
+// Bank Settings - Traditional Banks
+model Bank {
+  id                  String         @id @default(cuid())
+  
+  // Basic Bank Information
+  bankName            String         // Revolut, Wise, Worldfirst, HSBC, etc.
+  bankType            String         // TRADITIONAL, NEOBANK, PAYMENT_PROVIDER
+  
+  // Bank Details
+  swiftBic            String?        // SWIFT/BIC code
+  bankCode            String?        // Bank code (varies by country)
+  
+  // Contact Information
+  website             String?
+  supportEmail        String?
+  supportPhone        String?
+  
+  // Address
+  bankAddress         String?
+  bankCity            String?
+  bankPostcode        String?
+  bankCountry         String?
+  
+  // Status
+  isActive            Boolean        @default(true)
+  
+  // Notes
+  notes               String?        @db.Text
+  
+  // Relations
+  accounts            BankAccount[]
+  
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Bank Accounts - Specific accounts per currency
+model BankAccount {
+  id                  String            @id @default(cuid())
+  
+  // Bank Reference
+  bankId              String
+  bank                Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  
+  // Account Information
+  accountName         String            // e.g., "Main EUR Account", "USD Business Account"
+  accountType         String            // CHECKING, SAVINGS, BUSINESS, MULTI_CURRENCY
+  currency            String            // EUR, USD, GBP, CHF
+  
+  // Account Numbers (varies by currency/country)
+  // EUR (SEPA)
+  iban                String?           // International Bank Account Number
+  
+  // USD (USA)
+  accountNumber       String?           // Account number
+  routingNumber       String?           // ABA routing number (USA)
+  
+  // GBP (UK)
+  sortCode            String?           // UK sort code (6 digits)
+  accountNumberUK     String?           // UK account number (8 digits)
+  
+  // CHF (Switzerland)
+  ibanCH              String?           // Swiss IBAN
+  bcNumber            String?           // BC number (Switzerland)
+  
+  // Additional identifiers
+  swiftBic            String?           // SWIFT/BIC for this specific account
+  
+  // Balance tracking (optional)
+  currentBalance      Decimal?          @db.Decimal(15, 2)
+  availableBalance    Decimal?          @db.Decimal(15, 2)
+  lastBalanceUpdate   DateTime?
+  
+  // Status
+  isActive            Boolean           @default(true)
+  isPrimary           Boolean           @default(false) // Primary account for this currency
+  
+  // Notes
+  notes               String?           @db.Text
+  
+  // Relations
+  transactions        BankTransaction[]
+  
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  @@index([bankId])
+  @@index([currency])
+}
+
+// Crypto Wallets - Corporate crypto wallets
+model CryptoWallet {
+  id                  String         @id @default(cuid())
+  
+  // Wallet Information
+  walletName          String         // e.g., "Corporate USDC Wallet", "BTC Treasury"
+  walletType          String         // HOT_WALLET, COLD_WALLET, HARDWARE, EXCHANGE
+  
+  // Blockchain & Network
+  blockchain          String         // BITCOIN, ETHEREUM, POLYGON, BINANCE_SMART_CHAIN, etc.
+  network             String         // MAINNET, TESTNET
+  
+  // Token/Asset
+  asset               String         // BTC, ETH, USDC, USDT, etc.
+  assetType           String         // NATIVE, ERC20, BEP20, etc.
+  contractAddress     String?        // For tokens (e.g., USDC contract address)
+  
+  // Wallet Address
+  walletAddress       String         @unique // Public address for receiving funds
+  
+  // Additional Information
+  provider            String?        // MetaMask, Ledger, Coinbase, Binance, etc.
+  
+  // Balance tracking (optional)
+  currentBalance      Decimal?       @db.Decimal(25, 8) // Higher precision for crypto
+  balanceUSD          Decimal?       @db.Decimal(15, 2) // USD equivalent
+  lastBalanceUpdate   DateTime?
+  
+  // Security
+  isMultiSig          Boolean        @default(false)
+  requiredSignatures  Int?           // For multi-sig wallets
+  
+  // Status
+  isActive            Boolean        @default(true)
+  
+  // Notes
+  notes               String?        @db.Text
+  
+  // Relations
+  transactions        CryptoTransaction[]
+  
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  
+  @@index([blockchain])
+  @@index([asset])
+}
+
+// Crypto Transactions
+model CryptoTransaction {
+  id                  String         @id @default(cuid())
+  
+  // Wallet Reference
+  walletId            String
+  wallet              CryptoWallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  // Transaction Details
+  txHash              String         @unique // Transaction hash on blockchain
+  type                String         // DEPOSIT, WITHDRAWAL, INTERNAL_TRANSFER
+  
+  // Amounts
+  amount              Decimal        @db.Decimal(25, 8)
+  asset               String         // BTC, ETH, USDC, etc.
+  
+  // USD Value (at time of transaction)
+  amountUSD           Decimal?       @db.Decimal(15, 2)
+  exchangeRate        Decimal?       @db.Decimal(15, 8)
+  
+  // Addresses
+  fromAddress         String?
+  toAddress           String?
+  
+  // Fees
+  networkFee          Decimal?       @db.Decimal(25, 8)
+  networkFeeUSD       Decimal?       @db.Decimal(15, 2)
+  
+  // Status
+  status              String         // PENDING, CONFIRMED, FAILED
+  confirmations       Int?
+  
+  // Blockchain info
+  blockNumber         String?
+  timestamp           DateTime
+  
+  // Categorization
+  category            String?        // PAYMENT, INVESTMENT, EXCHANGE, etc.
+  description         String?
+  reference           String?
+  
+  // Metadata
+  metadata            String?        @db.Text // JSON for additional data
+  
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  
+  @@index([walletId])
+  @@index([timestamp])
 }
 
 model BankTransaction {
