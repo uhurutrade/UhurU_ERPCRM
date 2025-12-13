@@ -8,21 +8,6 @@ export const authConfig = {
     })],
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
-            const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-            const isApiAuth = nextUrl.pathname.startsWith('/api/auth');
-
-            // Allow auth routes always
-            if (isApiAuth) return true;
-
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn) {
-                // If logged in and on home, redirect to dashboard
-                const isHome = nextUrl.pathname === '/';
-                if (isHome) return Response.redirect(new URL('/dashboard', nextUrl));
-            }
             return true;
         },
         async signIn({ user }) {
