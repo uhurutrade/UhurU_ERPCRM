@@ -1,10 +1,34 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { UploadDropzone } from '@/components/banking/upload-dropzone';
-import { prisma } from '@/lib/prisma';
+import { AddBankAccountModal } from '@/components/banking/add-bank-account-modal';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-export default async function BankingUploadPage() {
-    const account = await prisma.bankAccount.findFirst();
+export default function BankingUploadPage() {
+    const [account, setAccount] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        // Fetch bank account on client side
+        fetch('/api/banking/accounts')
+            .then(res => res.json())
+            .then(data => {
+                setAccount(data.account);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen p-8 flex items-center justify-center">
+                <div className="text-white">Loading...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen p-8">
@@ -53,13 +77,18 @@ export default async function BankingUploadPage() {
                             </div>
                             <h3 className="text-2xl font-semibold text-white mb-3">No Bank Accounts Found</h3>
                             <p className="text-slate-400 mb-6 max-w-md mx-auto">You need to add a bank account before you can upload statements.</p>
-                            <button className="px-6 py-3 bg-uhuru-blue hover:bg-uhuru-blue-light text-white rounded-xl font-semibold transition-all shadow-uhuru hover:shadow-uhuru-sm transform hover:scale-105">
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="px-6 py-3 bg-uhuru-blue hover:bg-uhuru-blue-light text-white rounded-xl font-semibold transition-all shadow-uhuru hover:shadow-uhuru-sm transform hover:scale-105"
+                            >
                                 Add Bank Account
                             </button>
                         </div>
                     )}
                 </div>
             </div>
+
+            <AddBankAccountModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
 }
