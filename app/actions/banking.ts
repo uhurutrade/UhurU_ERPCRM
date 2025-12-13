@@ -1,11 +1,8 @@
 'use server';
 
-import { prisma } from '@/lib/prisma'; // Assuming prisma client instance at @/lib/prisma, if not I might need to create it
+import { prisma } from '@/lib/prisma';
 import { parseCSVLines, generateTransactionHash } from '@/lib/banking/parsers';
 import { revalidatePath } from 'next/cache';
-
-// Need to ensure prisma client is instantiated somewhere. 
-// Usually in `lib/prisma.ts`. I will check if that exists later, or create it.
 
 export async function uploadBankStatement(formData: FormData, bankAccountId: string) {
     const file = formData.get('file') as File;
@@ -22,7 +19,6 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
             return { success: false, error: 'No valid transactions found in file' };
         }
 
-        // Create BankStatement Record
         const statement = await prisma.bankStatement.create({
             data: {
                 filename: file.name,
@@ -35,7 +31,6 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
         for (const row of rows) {
             const hash = generateTransactionHash(row);
 
-            // Check for duplicate
             const existing = await prisma.bankTransaction.findUnique({
                 where: { hash }
             });
@@ -69,5 +64,42 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
     } catch (error) {
         console.error('Upload error:', error);
         return { success: false, error: 'Failed to process file' };
+    }
+}
+
+export async function createBankAccount(formData: FormData) {
+    try {
+        const bankName = formData.get('bankName') as string;
+        const accountName = formData.get('accountName') as string;
+        const currency = formData.get('currency') as string;
+        const accountNumber = formData.get('accountNumber') as string;
+        const iban = formData.get('iban') as string;
+
+        if (!bankName || !currency) {
+            return { success: false, error: 'Bank name and currency are required' };
+        }
+
+        const account = await prisma.bankAccount.create({
+            data: {
+                bankName,
+                accountName: accountName || null,
+                currency,
+                accountNumber: accountNumber || null,
+                iban: iban || null,
+            }
+        });
+
+        revalidatePath('/dashboard/banking');
+        revalidatePath('/dashboard/banking/upload');
+
+        return {
+            success: true,
+            message: 'Bank account created successfully',
+            accountId: account.id
+        };
+
+    } catch (error) {
+        console.error('Create bank account error:', error);
+        return { success: false, error: 'Failed to create bank account' };
     }
 }

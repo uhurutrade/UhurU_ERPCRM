@@ -68,14 +68,16 @@ export function UploadDropzone({ bankAccountId }: { bankAccountId: string }) {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-2xl mx-auto">
             <div
                 className={`
-          relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300
+          relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300
+          backdrop-blur-sm
           ${isDragOver
-                        ? 'border-indigo-500 bg-indigo-50/10'
-                        : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600'}
-          ${file ? 'bg-indigo-50/5 dark:bg-indigo-900/10 border-indigo-200' : ''}
+                        ? 'border-uhuru-blue bg-uhuru-blue/10 shadow-uhuru'
+                        : 'border-slate-700/50 hover:border-uhuru-blue/50 bg-gradient-card'
+                    }
+          ${file ? 'bg-uhuru-blue/5 border-uhuru-blue/70 shadow-uhuru-sm' : ''}
         `}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -88,16 +90,19 @@ export function UploadDropzone({ bankAccountId }: { bankAccountId: string }) {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
 
-                <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className={`p-4 rounded-full ${file ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-                        {file ? <FileText size={32} /> : <Upload size={32} />}
+                <div className="flex flex-col items-center justify-center space-y-6">
+                    <div className={`p-6 rounded-2xl transition-all duration-300 ${file
+                            ? 'bg-uhuru-blue/20 text-uhuru-blue shadow-uhuru-sm'
+                            : 'bg-slate-800/50 text-slate-400'
+                        }`}>
+                        {file ? <FileText size={48} /> : <Upload size={48} />}
                     </div>
 
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-semibold text-white">
                             {file ? file.name : 'Drop your bank statement here'}
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-400">
                             {file ? `${(file.size / 1024).toFixed(1)} KB` : 'or click to browse (CSV files only)'}
                         </p>
                     </div>
@@ -105,12 +110,12 @@ export function UploadDropzone({ bankAccountId }: { bankAccountId: string }) {
             </div>
 
             {message && (
-                <div className={`mt-4 p-3 rounded-lg flex items-center gap-2 text-sm ${message.type === 'success'
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400'
-                        : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 text-sm backdrop-blur-sm border ${message.type === 'success'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                        : 'bg-red-500/10 text-red-400 border-red-500/30'
                     }`}>
-                    {message.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                    {message.text}
+                    {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                    <span className="font-medium">{message.text}</span>
                 </div>
             )}
 
@@ -118,11 +123,11 @@ export function UploadDropzone({ bankAccountId }: { bankAccountId: string }) {
                 <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    className="mt-4 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="mt-6 w-full py-4 px-6 bg-uhuru-blue hover:bg-uhuru-blue-light text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-uhuru hover:shadow-uhuru-sm transform hover:scale-[1.02]"
                 >
                     {uploading ? (
                         <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
