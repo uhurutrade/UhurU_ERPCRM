@@ -210,6 +210,7 @@ model BankAccount {
   // Status
   isActive            Boolean           @default(true)
   isPrimary           Boolean           @default(false) // Primary account for this currency
+  order               Int               @default(0)     // Order for display
   
   // Notes
   notes               String?           @db.Text

@@ -1,11 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { convertToGBP } from "@/lib/currency";
+import BankAccountsGrid from "@/components/bank-settings/bank-accounts-grid";
 
 export default async function BankSettingsPage() {
     // Fetch all banks with their accounts
     const banks = await prisma.bank.findMany({
         include: {
             accounts: {
+                // Note: Change this to { order: 'asc' } after restarting the server to pick up the new schema
                 orderBy: { currency: 'asc' }
             }
         },
@@ -52,74 +55,56 @@ export default async function BankSettingsPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4">
-                        {banks.map((bank) => (
-                            <div key={bank.id} className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-white mb-1">{bank.bankName}</h3>
-                                        <p className="text-sm text-slate-400">{bank.bankType}</p>
-                                        {bank.swiftBic && (
-                                            <p className="text-sm text-slate-500 mt-1">SWIFT/BIC: {bank.swiftBic}</p>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Link
-                                            href={`/dashboard/bank-settings/bank/${bank.id}`}
-                                            className="px-3 py-1 text-sm bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors"
-                                        >
-                                            Edit
-                                        </Link>
-                                        <Link
-                                            href={`/dashboard/bank-settings/bank/${bank.id}/add-account`}
-                                            className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                                        >
-                                            + Account
-                                        </Link>
-                                    </div>
-                                </div>
+                        {banks.map((bank) => {
+                            // Calculate total balance for this bank in GBP
+                            const totalBalanceGBP = bank.accounts.reduce((sum, account) => {
+                                return sum + convertToGBP(Number(account.currentBalance || 0), account.currency);
+                            }, 0);
 
-                                {/* Bank Accounts */}
-                                {bank.accounts.length > 0 ? (
-                                    <div className="space-y-2">
-                                        <p className="text-sm font-semibold text-slate-300 mb-2">Accounts:</p>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                            {bank.accounts.map((account) => (
-                                                <Link
-                                                    key={account.id}
-                                                    href={`/dashboard/bank-settings/account/${account.id}`}
-                                                    className="p-4 bg-slate-800 hover:bg-slate-750 rounded-lg border border-slate-700 transition-colors"
-                                                >
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <span className="font-mono text-lg font-bold text-emerald-400">
-                                                            {account.currency}
-                                                        </span>
-                                                        {account.isPrimary && (
-                                                            <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded">
-                                                                Primary
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-slate-300 mb-1">{account.accountName}</p>
-                                                    <p className="text-xs text-slate-500">{account.accountType}</p>
-                                                    {account.iban && (
-                                                        <p className="text-xs text-slate-600 mt-2 font-mono">
-                                                            {account.iban.substring(0, 20)}...
-                                                        </p>
-                                                    )}
-                                                    {account.currentBalance !== null && (
-                                                        <p className="text-sm font-semibold text-white mt-2">
-                                                            {Number(account.currentBalance).toLocaleString()} {account.currency}
-                                                        </p>
-                                                    )}
-                                                </Link>
-                                            ))}
+                            return (
+                                <div key={bank.id} className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <div className="flex items-center gap-3">
+                                                <h3 className="text-xl font-semibold text-white mb-1">{bank.bankName}</h3>
+                                                {/* Total Balance Badge */}
+                                                <div className="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1">
+                                                    <span className="text-xs text-slate-400 mr-1">Total:</span>
+                                                    <span className="text-sm font-bold text-emerald-400">
+                                                        £{totalBalanceGBP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-sm text-slate-400">{bank.bankType}</p>
+                                            {bank.swiftBic && (
+                                                <p className="text-sm text-slate-500 mt-1">SWIFT/BIC: {bank.swiftBic}</p>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Link
+                                                href={`/dashboard/bank-settings/bank/${bank.id}`}
+                                                className="px-3 py-1 text-sm bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <Link
+                                                href={`/dashboard/bank-settings/bank/${bank.id}/add-account`}
+                                                className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                                            >
+                                                + Account
+                                            </Link>
                                         </div>
                                     </div>
-                                ) : (
-                                    <p className="text-sm text-slate-500">No accounts added yet</p>
-                                )}
-                            </div>
-                        ))}
+
+                                    {/* Bank Accounts Grid Component */}
+                                    <BankAccountsGrid
+                                        initialAccounts={bank.accounts}
+                                        bankId={bank.id}
+                                    />
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </section>

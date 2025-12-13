@@ -1,0 +1,310 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { BankAccount } from "@prisma/client";
+
+interface EditAccountFormProps {
+    account: BankAccount;
+    bankName: string;
+}
+
+export default function EditAccountForm({ account, bankName }: EditAccountFormProps) {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        accountName: account.accountName,
+        accountType: account.accountType,
+        currency: account.currency,
+        iban: account.iban || "",
+        accountNumber: account.accountNumber || "",
+        routingNumber: account.routingNumber || "",
+        sortCode: account.sortCode || "",
+        accountNumberUK: account.accountNumberUK || "",
+        swiftBic: account.swiftBic || "",
+        currentBalance: account.currentBalance?.toString() || "",
+        isPrimary: account.isPrimary,
+        isActive: account.isActive,
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/banking/accounts/${account.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update account");
+            }
+
+            router.push(`/dashboard/bank-settings`);
+            router.refresh();
+        } catch (error) {
+            console.error("Error updating account:", error);
+            alert("Error updating account. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this account? This action cannot be undone.")) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch(`/api/banking/accounts/${account.id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete account");
+            }
+
+            router.push(`/dashboard/bank-settings`);
+            router.refresh();
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            alert("Error deleting account. Please try again.");
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+
+        if (type === "checkbox") {
+            const checked = (e.target as HTMLInputElement).checked;
+            setFormData(prev => ({
+                ...prev,
+                [name]: checked,
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex justify-between items-center bg-slate-800 p-4 rounded-lg mb-6">
+                <div>
+                    <p className="text-sm text-slate-400">Bank</p>
+                    <p className="font-semibold text-white">{bankName}</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm text-slate-400">Currency</p>
+                    <p className="font-mono font-bold text-emerald-400">{formData.currency}</p>
+                </div>
+            </div>
+
+            <div className="flex justify-end">
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="px-4 py-2 bg-red-600/20 text-red-500 hover:bg-red-600/30 hover:text-red-400 rounded-lg transition-colors text-sm font-semibold"
+                >
+                    Delete Account
+                </button>
+            </div>
+
+            <section>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Account Name <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="accountName"
+                            value={formData.accountName}
+                            onChange={handleChange}
+                            required
+                            placeholder="e.g., Main EUR Account"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Account Type <span className="text-rose-400">*</span>
+                        </label>
+                        <select
+                            name="accountType"
+                            value={formData.accountType}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        >
+                            <option value="BUSINESS">Business</option>
+                            <option value="SAVINGS">Savings</option>
+                            <option value="CHECKING">Checking</option>
+                            <option value="MULTI_CURRENCY">Multi-Currency</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Status
+                        </label>
+                        <select
+                            name="isActive"
+                            value={formData.isActive ? "true" : "false"}
+                            onChange={(e) => setFormData(p => ({ ...p, isActive: e.target.value === "true" }))}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        >
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+
+                    {/* Conditional fields based on currency */}
+                    {formData.currency === "EUR" && (
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                IBAN
+                            </label>
+                            <input
+                                type="text"
+                                name="iban"
+                                value={formData.iban}
+                                onChange={handleChange}
+                                placeholder="IE29..."
+                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                            />
+                        </div>
+                    )}
+
+                    {formData.currency === "GBP" && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Sort Code
+                                </label>
+                                <input
+                                    type="text"
+                                    name="sortCode"
+                                    value={formData.sortCode}
+                                    onChange={handleChange}
+                                    placeholder="00-00-00"
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Account Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="accountNumberUK"
+                                    value={formData.accountNumberUK}
+                                    onChange={handleChange}
+                                    placeholder="8 digits"
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    {formData.currency === "USD" && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Routing Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="routingNumber"
+                                    value={formData.routingNumber}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Account Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="accountNumber"
+                                    value={formData.accountNumber}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            SWIFT/BIC Code (Optional)
+                        </label>
+                        <input
+                            type="text"
+                            name="swiftBic"
+                            value={formData.swiftBic}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Current Balance
+                        </label>
+                        <input
+                            type="number"
+                            name="currentBalance"
+                            value={formData.currentBalance}
+                            onChange={handleChange}
+                            step="0.01"
+                            placeholder="0.00"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        />
+                    </div>
+
+                    <div className="flex items-center pt-8">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isPrimary"
+                                checked={formData.isPrimary}
+                                onChange={handleChange}
+                                className="w-5 h-5 rounded border-slate-700 bg-slate-800 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-slate-900"
+                            />
+                            <span className="text-sm text-slate-300">Set as Primary Account for this currency</span>
+                        </label>
+                    </div>
+
+                </div>
+            </section>
+
+            <div className="flex justify-end gap-3">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+                >
+                    {loading ? "Saving..." : "Save Changes"}
+                </button>
+            </div>
+        </form>
+    );
+}
