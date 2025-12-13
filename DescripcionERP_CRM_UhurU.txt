@@ -1,0 +1,38 @@
+Contexto:
+Tengo una empresa ltd registrada en UK como Uhuru Trade Ltd. Soy español residente fiscal español, y quiero una aplicacion para gestionar mi empresa.
+
+Objetivo crear una aplicación para instalar dockerizada en mi servidor vps de contabo, con recursos segun el plan mas barato de VPS.
+La aplicacion se va a alojar cuando este depurada en Antigravity en  outlook.uhurutrade.com en mi VPS , dockerizada.
+La aplicacion, tendra una landing page en Dark mode de acuerdo a mis colores y logo institucional de uhurutrade.com.
+Debera tener una landing page que diga, con mi logo Management Outlook ERP&CRM , y sera necesario logarte con gmail/google en las siguientes cuentas, las dos unicas autorizadas raul.irus@gmail.com y uhurutradeuk@gmail.com, con  el tipico boton de login with google, sino loga no pasa de ahi.
+La aplicación debe tener una bbdd asociada y q se guarde en el vps en un futuro, dockerizada y opensource tipo mysql, o supabase, alguna q pueda guardar documentos pdf imagenes y cargar archivos normales, para tener todo bajo mi control. Debera tener frontend y backend dockerizable.
+En una primera version debe ser la version V1 para ser ejecutada en la web, con tecnologia que deberas elegir tu para que sea compatible, una aplicacion Full-stack (frotend backend etc) desconozco si debe ser en nodejs ,react etc.etc, quiero que sea responsive y adaptada a los estandares actuales.
+En una segunda version V2, debera ser funcional para crear una apk para instalar en moviles android, y que ataque el backend de mi vps, y en la v3 sera igual pero para ios instalable en iphone. pero en principio la version para web, pero la tecnologia preparada para evolucionar.Asi mismo todo el codigo debe guardarse en github que me deberas pedir el login para guardar.
+El dominio bajo el que lo pondre outlook.uhurutrade.com ya lo tengo creado en mi vps, y no es necesario ningun ngix, dado que en mi vps ya lo tengo para otras aplicaciones
+
+Funcionalidad:
+La aplicacion tendra estas secciones claramente diferenciadas pero unidas y accesibles entre ellas, queriendo decir que si tengo un cliente en el modulo de clientes pero me ha facturado la aplicacion sepa saber q tenemos una factura de el e identificar al cliente.
+1.- CRM, necesito el tipico crm donde se registran los clientes contactos , notas, personas o emails que me han llegado por dicversos canales, incluso vervales, , capturo clientes de linkedin, de redes sociales como x, instagram etc, los tipicos leeds, etc, un crm robusto.
+
+2.- ERP, el objetivo es un pequeño erp para llevar la contabilidad basica, donde tenga una pantalla que me registre todas las  cuentas bancarias q estan a nombre de UhurU Trade Ltd. en las distintas monedas y bancos, suelo trabajar con varios bancos en UK con cuentas para pagos con IBAN, de USA, en Libras de UK etc., osea un mantenimiento de esa parte.Debe tener funcionalidad de erp, cuentas a pagar a cobrar activos fijos q pueda comprar como ordenadores, si hay q amortizar, reparto de dividendos, prestamos hacia el director, para saber plazo maximo de amortizacion, y los repagos q vaya haciendo desde mi cienta personal
+ 
+
+3.-Pantalla de carga de documentos. En esta seccion, debe  poder permitir cargar archivos csv de las distintas entidades bancarias, para que vaya llevando control de los ingresos y gastos, los formatos de las tres entidades que tengo (podre tener mas bancos en un futuro de ahi que en el punto 3 pueda incluir bancos nuevos y cuentas y divisas, direccion etc), son Revolut, Wise y Worldfirst. Los formatos de csv son estos a modo de ejemplo (te pongo la cabecera del csv):
+Revolut:
+Date started (UTC)	Date completed (UTC)	ID	Type	State	Description	Reference	Payer	Card number	Card label	Card state	Orig currency	Orig amount	Payment currency	Amount	Total amount	Exchange rate	Fee	Fee currency	Balance	Account	Beneficiary account number	Beneficiary sort code or routing number	Beneficiary IBAN	Beneficiary BIC	MCC	Related transaction id	Spend program		
+Wise:
+TransferWise ID	Date	Date Time	Amount	Currency	Description	Payment Reference	Running Balance	Exchange From	Exchange To	Exchange Rate	Payer Name	Payee Name	Payee Account Number	Merchant	Card Last Four Digits	Card Holder Full Name	Attachment	Note	Total fees	Exchange To Amount	Asset Base Currency Unit Price Amount-0	Asset Base Currency Unit Price Currency-0	Effective trade rate-0	Settlement Currency Unit Price Amount-0	Settlement Currency Unit Price Currency-0	Trade Side-0	Traded Asset Id Type-0	Traded Asset Id Value-0	Traded Units-0		
+Worldfirst
+Transaction type	Description	Currency	Amount entered	Out	Balance	Transaction ID	Transaction Creation Date	Transaction time	Transaction amount	Transaction currency	Payment  fee	Payment fee currency	Rate	Currency quote pair	Net amount currency	Net amount	Status	Remarks	Actual receiving currency	Actual receiving amount	Payee account type	Payee name	Bank location	Bank name	Payee account number	Payer type	Payer name	Payer account number	Collection account number	Marketplace/payment gateway name	Storefront name	Merchant transaction No	Refund time	Refund currency	Refund amount	Refunded payment fee	Refund currency quote pair	Original refund currency	Original refund amount	Paying entity	Payment reference number	Additional remarks	Operator	Operator email	Balance Account Type	Main Account Login ID	Friendly name (original payee remark)	Acquiring transaction number	Transaction Source	Payer's Transaction No
+
+Como puedes ver cada banco tiene un formato , pero debes poder cargarlos en una tabla de la bbdd de movimientos metiendo los campos, y homogenizandolos.
+Los extractos podran ser de todas las monedas juntas, o por separado y deberas distinguirlos, y contabilizar correctamente el dinero para q no se repita.
+Ademas voy a subir extractos por periodos, y si por ejemplo vuelvo a subir un extracto con movimientos repetidos, debes o bien descartarlos o bien updatearlos, de tal forma q lleve una coherencia de movimientos contable. Asi mismo y es una parte importante el campo descripcion, y el debe haber. 
+
+4.- pantalla de movimientos por banco con flitros por cuentas bancos, moneda etc. con totales visibles de saldo actual acumulado de ingresos y gastos, y con columna de categorizacion. Asi mismo la fila debe tener un campo para poder cargar justificante con un click en pdf, jpg texto, o la evidencia financiera de ese movimiento. Debe ser como un libro contable de situacion bancaria.
+5.-Situacion patrimonial. En esta opcion/ apartado necesito un cuadro de mandos, por ejercicio fiscal, que definre los calendarios y fechas de presentacion de cuentas ante la companies house y ante la HMRC. Gastos ingresos, por tipologia, con graficos actualizables tipo tarta barras etc, es uin poco intepretar lo que esta ocurriendo en el punto 2 que es el erp. Ademas tendra en cuenta los plazos de cierre fiscal y los documentos que debere poder cargar para que interpretes lo presentado a las autoridades fiscales.
+
+
+5.-Plazos de presentacion en companies house y HMRC, registrare y cargare cuando se han presentado cuentas. Debera estar preparada para consultar la legistacion britanica para tener en cuenta las obligaciones fiscales.
+
+ 

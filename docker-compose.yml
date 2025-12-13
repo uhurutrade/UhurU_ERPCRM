@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: uhuru-erp-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://uhuru_user:uhuru_password@db:5432/uhuru_db?schema=public
+      # 🚨 CORRECCIÓN CLAVE: Usamos la URL pública (HTTPS) para NextAuth 🚨
+      - NEXTAUTH_URL=https://outlook.uhurutrade.com 
+      - NEXTAUTH_SECRET=changeme_in_production_secret_key
+      # Google Auth
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: uhuru-erp-db
+    restart: always
+    environment:
+      POSTGRES_USER: uhuru_user
+      POSTGRES_PASSWORD: uhuru_password
+      POSTGRES_DB: uhuru_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
