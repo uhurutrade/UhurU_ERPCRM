@@ -82,10 +82,10 @@ export async function createBankAccount(formData: FormData) {
         const account = await prisma.bankAccount.create({
             data: {
                 bankName,
-                accountName: accountName || null,
                 currency,
-                accountNumber: accountNumber || null,
-                iban: iban || null,
+                ...(accountName && { accountName }),
+                ...(accountNumber && { accountNumber }),
+                ...(iban && { iban }),
             }
         });
 
