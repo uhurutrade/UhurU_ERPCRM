@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 // Tipo BankProvider temporal para que el código compile
-type BankProvider = string; 
+type BankProvider = string;
 
 export async function uploadBankStatement(formData: FormData) {
     const file = formData.get('file') as File;
@@ -18,19 +18,19 @@ export async function uploadBankStatement(formData: FormData) {
     }
 
     const text = await file.text();
-    const transactions = parseCSVLines(text); 
+    const transactions = parseCSVLines(text);
 
     let addedCount = 0;
 
     for (const tx of transactions) {
         // CORRECCIÓN: Calcular el hash aquí, ya que tx (BankStatementRow) no lo tiene
-        const transactionHash = generateTransactionHash(tx); 
+        const transactionHash = generateTransactionHash(tx);
 
         try {
             // Upsert based on hash to deduplicate
             await prisma.bankTransaction.upsert({
                 // Usa la variable local 'transactionHash'
-                where: { hash: transactionHash }, 
+                where: { hash: transactionHash },
                 update: {},
                 create: {
                     // NOTA: Es posible que otros campos (externalId, fee, status, reference) 
@@ -43,7 +43,7 @@ export async function uploadBankStatement(formData: FormData) {
                     currency: tx.currency,
                     fee: 0, // <- Placeholder, ya que tx no tiene fee
                     status: 'PENDING', // <- Placeholder, ya que tx no tiene status
-                    reference: tx.reference || '', 
+                    reference: tx.reference || '',
                     hash: transactionHash, // Usa el hash calculado
                     bankAccountId: accountId
                 }
@@ -66,9 +66,15 @@ export async function createBankAccount(data: { name: string, currency: string, 
     await prisma.bankAccount.create({
         data: {
             accountName: data.name,
+            accountType: "CHECKING",
             currency: data.currency,
             iban: data.iban,
-            bankName: data.bankName
+            bank: {
+                create: {
+                    bankName: data.bankName,
+                    bankType: "TRADITIONAL"
+                }
+            }
         }
     });
     revalidatePath('/dashboard/banking');
