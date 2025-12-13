@@ -1,6 +1,8 @@
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { TransactionTable } from '@/components/banking/transaction-table';
+import { Upload } from 'lucide-react';
 import { ExchangeRatesWidget } from '@/components/banking/exchange-rates-widget';
-
-// ... (existing imports)
 
 export default async function BankingPage() {
     const transactions = await prisma.bankTransaction.findMany({
