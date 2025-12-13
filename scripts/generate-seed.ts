@@ -1,0 +1,180 @@
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+
+const prisma = new PrismaClient();
+
+async function main() {
+    console.log('🔄 Extrayendo datos de la base de datos local...');
+
+    // 1. Users
+    const users = await prisma.user.findMany();
+
+    // 2. Company Settings
+    const companySettings = await prisma.companySettings.findMany();
+
+    // 3. Banks & Accounts
+    const banks = await prisma.bank.findMany({ include: { accounts: true } });
+
+    // 4. Crypto Wallets
+    const cryptoWallets = await prisma.cryptoWallet.findMany();
+
+    // 5. CRM
+    const organizations = await prisma.organization.findMany();
+    const contacts = await prisma.contact.findMany();
+    const deals = await prisma.deal.findMany();
+
+    // 6. Invoices
+    const invoices = await prisma.invoice.findMany({ include: { items: true } });
+
+    const seedContent = `
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('🌱 Start seeding...');
+
+  // --- Users ---
+  for (const user of ${JSON.stringify(users, null, 2)}) {
+    await prisma.user.upsert({
+      where: { email: user.email || '' },
+      update: {},
+      create: {
+        ...user,
+        emailVerified: user.emailVerified ? new Date(user.emailVerified) : null,
+        createdAt: new Date(user.createdAt),
+        updatedAt: new Date(user.updatedAt),
+      } as any // Bypass strict typing for simplicity in seed
+    });
+  }
+
+  // --- Company Settings ---
+  for (const setting of ${JSON.stringify(companySettings, null, 2)}) {
+    await prisma.companySettings.create({
+        data: {
+            ...setting,
+            id: undefined, // Let new DB generate ID or keep? better keep if references exist.
+            incorporationDate: new Date(setting.incorporationDate),
+            accountsNextDueDate: setting.accountsNextDueDate ? new Date(setting.accountsNextDueDate) : null,
+            confirmationNextDueDate: setting.confirmationNextDueDate ? new Date(setting.confirmationNextDueDate) : null,
+            vatRegistrationDate: setting.vatRegistrationDate ? new Date(setting.vatRegistrationDate) : null,
+            createdAt: new Date(setting.createdAt),
+            updatedAt: new Date(setting.updatedAt),
+        } as any
+    }).catch(e => console.log('Company settings might already exist'));
+  }
+
+  // --- Banks & Accounts ---
+  for (const bank of ${JSON.stringify(banks, null, 2)}) {
+    await prisma.bank.create({
+      data: {
+        ...bank,
+        accounts: {
+            create: bank.accounts.map(acc => ({
+                ...acc,
+                bankId: undefined, // remove parent ref
+                lastBalanceUpdate: acc.lastBalanceUpdate ? new Date(acc.lastBalanceUpdate) : null,
+                createdAt: new Date(acc.createdAt),
+                updatedAt: new Date(acc.updatedAt),
+            }))
+        },
+        createdAt: new Date(bank.createdAt),
+        updatedAt: new Date(bank.updatedAt),
+      } as any
+    }).catch(e => console.log('Bank ' + bank.bankName + ' error or exists'));
+  }
+
+  // --- Crypto Wallets ---
+  for (const wallet of ${JSON.stringify(cryptoWallets, null, 2)}) {
+    await prisma.cryptoWallet.create({
+      data: {
+        ...wallet,
+        lastBalanceUpdate: wallet.lastBalanceUpdate ? new Date(wallet.lastBalanceUpdate) : null,
+        createdAt: new Date(wallet.createdAt),
+        updatedAt: new Date(wallet.updatedAt),
+      } as any
+    }).catch(e => console.log('Wallet ' + wallet.walletName + ' error'));
+  }
+
+  // --- CRM: Organizations ---
+  for (const org of ${JSON.stringify(organizations, null, 2)}) {
+    await prisma.organization.upsert({
+        where: { id: org.id },
+        update: {},
+        create: {
+            ...org,
+            createdAt: new Date(org.createdAt),
+            updatedAt: new Date(org.updatedAt),
+        }
+    });
+  }
+
+  // --- CRM: Contacts ---
+  for (const contact of ${JSON.stringify(contacts, null, 2)}) {
+    await prisma.contact.create({
+        data: {
+            ...contact,
+            createdAt: new Date(contact.createdAt),
+            updatedAt: new Date(contact.updatedAt),
+        } as any
+    }).catch(e => console.log('Contact error'));
+  }
+  
+ // --- CRM: Deals ---
+  for (const deal of ${JSON.stringify(deals, null, 2)}) {
+    await prisma.deal.create({
+        data: {
+            ...deal,
+            amount: deal.amount ? Number(deal.amount) : null,
+            closeDate: deal.closeDate ? new Date(deal.closeDate) : null,
+            createdAt: new Date(deal.createdAt),
+            updatedAt: new Date(deal.updatedAt),
+        } as any
+    }).catch(e => console.log('Deal error'));
+  }
+
+  // --- Invoices ---
+  for (const inv of ${JSON.stringify(invoices, null, 2)}) {
+    await prisma.invoice.create({
+        data: {
+            ...inv,
+            date: new Date(inv.date),
+            dueDate: new Date(inv.dueDate),
+            createdAt: new Date(inv.createdAt),
+            updatedAt: new Date(inv.updatedAt),
+            items: {
+                create: inv.items.map(item => ({
+                    ...item,
+                    invoiceId: undefined,
+                    createdAt: undefined, // InvoiceItem usually doesn't have timestamps but let's check schema
+                }))
+            }
+        } as any
+    }).catch(e => console.log('Invoice error'));
+  }
+
+  console.log('✅ Seeding finished.');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+`;
+
+    fs.writeFileSync('prisma/seed.ts', seedContent);
+    console.log('✅ prisma/seed.ts generado con los datos actuales.');
+}
+
+main()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
