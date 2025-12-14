@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import CompanySettingsForm from "@/components/company-settings/company-settings-form";
 import ComplianceOverview from "@/components/company-settings/compliance-overview";
+import { serializeData } from "@/lib/serialization";
 
 export default async function CompanySettingsPage() {
     // Fetch existing company settings (there should only be one record)
@@ -19,7 +20,7 @@ export default async function CompanySettingsPage() {
             <ComplianceOverview />
 
             <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
-                <CompanySettingsForm initialData={companySettings} />
+                <CompanySettingsForm initialData={serializeData(companySettings)} />
             </div>
         </div>
     );

@@ -10,7 +10,8 @@ import {
     ShieldCheck,
     Building2,
     Settings,
-    LogOut
+    LogOut,
+    FileText
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -19,6 +20,7 @@ const navItems = [
     { href: "/dashboard/crm", label: "CRM", icon: Users, color: "text-purple-400" },
     { href: "/dashboard/erp", label: "ERP", icon: Briefcase, color: "text-emerald-400" },
     { href: "/dashboard/banking", label: "Banca", icon: Landmark, color: "text-amber-400" },
+    { href: "/dashboard/statements", label: "Statements", icon: FileText, color: "text-pink-400" },
     { href: "/dashboard/compliance", label: "Compliance (UK)", icon: ShieldCheck, color: "text-rose-400" },
     { href: "/dashboard/company-settings", label: "Company Settings", icon: Building2, color: "text-cyan-400" },
     { href: "/dashboard/bank-settings", label: "Bank Settings", icon: Settings, color: "text-indigo-400" },

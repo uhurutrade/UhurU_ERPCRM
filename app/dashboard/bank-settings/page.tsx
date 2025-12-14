@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { convertToGBP } from "@/lib/currency";
 import BankAccountsGrid from "@/components/bank-settings/bank-accounts-grid";
+import { serializeData } from "@/lib/serialization";
 
 export default async function BankSettingsPage() {
     // Fetch all banks with their accounts
@@ -99,7 +100,7 @@ export default async function BankSettingsPage() {
 
                                     {/* Bank Accounts Grid Component */}
                                     <BankAccountsGrid
-                                        initialAccounts={bank.accounts}
+                                        initialAccounts={serializeData(bank.accounts)}
                                         bankId={bank.id}
                                     />
                                 </div>

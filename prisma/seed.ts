@@ -6,456 +6,262 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Start seeding...');
 
-  // --- Users ---
-  for (const user of [] as any[]) {
-    await prisma.user.upsert({
-      where: { email: user.email || '' },
+  try {
+    // --- 1. Clean up existing data (optional but good for dev) ---
+    // In production be careful, but for dev:
+    // await prisma.bankTransaction.deleteMany();
+    // await prisma.bankAccount.deleteMany();
+    // await prisma.bank.deleteMany();
+    // await prisma.companySettings.deleteMany();
+    // await prisma.taxObligation.deleteMany();
+
+    // --- 2. Company Settings ---
+    const company = await prisma.companySettings.upsert({
+      where: { id: "cmj4nsgar0000124l7l4uqtjj" },
       update: {},
       create: {
-        ...user,
-        emailVerified: user.emailVerified ? new Date(user.emailVerified) : null,
-        createdAt: new Date(user.createdAt),
-        updatedAt: new Date(user.updatedAt),
-      } as any // Bypass strict typing for simplicity in seed
-    });
-  }
-
-  // --- Company Settings ---
-  for (const setting of [
-    {
-      "id": "cmj4nsgar0000124l7l4uqtjj",
-      "companyName": "UHURU TRADE LTD",
-      "companyNumber": "15883242",
-      "incorporationDate": "2024-08-07T00:00:00.000Z",
-      "registeredAddress": "Unit 13 Freeland Park Wareham Road",
-      "registeredCity": "Lytchett Matravers, Poole",
-      "registeredPostcode": "BH16 6FA",
-      "registeredCountry": "United Kingdom",
-      "tradingAddress": "Unit 13 Freeland Park Wareham Road",
-      "tradingCity": "Lytchett Matravers, Poole",
-      "tradingPostcode": "BH16 6FA",
-      "companyType": "Ltd",
-      "sicCodes": "47910, 62012, 62020, 70229",
-      "financialYearEnd": "31-08",
-      "accountsNextDueDate": "2027-05-31T00:00:00.000Z",
-      "confirmationNextDueDate": "2026-08-09T00:00:00.000Z",
-      "vatRegistered": false,
-      "vatNumber": null,
-      "vatRegistrationDate": null,
-      "vatScheme": null,
-      "vatReturnFrequency": null,
-      "payeReference": null,
-      "corporationTaxReference": "f",
-      "utr": null,
-      "directors": "Raul Ortega Irus",
-      "companySecretary": ".",
-      "shareCapital": "1",
-      "numberOfShares": 1,
-      "accountingSoftware": null,
-      "accountingMethod": null,
-      "contactEmail": null,
-      "contactPhone": null,
-      "website": "https://uhurutrade.com",
-      "notes": "Datos importados de Companies House el 12/12/2025",
-      "createdAt": "2025-12-13T18:58:17.860Z",
-      "updatedAt": "2025-12-13T20:38:14.461Z"
-    }
-  ]) {
-    await prisma.companySettings.create({
-      data: {
-        ...setting,
-        id: undefined, // Let new DB generate ID or keep? better keep if references exist.
-        incorporationDate: new Date(setting.incorporationDate),
-        accountsNextDueDate: setting.accountsNextDueDate ? new Date(setting.accountsNextDueDate) : null,
-        confirmationNextDueDate: setting.confirmationNextDueDate ? new Date(setting.confirmationNextDueDate) : null,
-        vatRegistrationDate: setting.vatRegistrationDate ? new Date(setting.vatRegistrationDate) : null,
-        createdAt: new Date(setting.createdAt),
-        updatedAt: new Date(setting.updatedAt),
-      } as any
-    }).catch(e => console.log('Company settings might already exist'));
-  }
-
-  // --- Banks & Accounts ---
-  for (const bank of [
-    {
-      "id": "cmj4oiydp0000a47op1qeul17",
-      "bankName": "Revolut",
-      "bankType": "NEOBANK",
-      "swiftBic": "REVOGB21",
-      "bankCode": null,
-      "website": "https://www.revolut.com",
-      "supportEmail": "support@revolut.com",
-      "supportPhone": "+44 20 3322 8352",
-      "bankAddress": "7 Westferry Circus",
-      "bankCity": "London",
-      "bankPostcode": "E14 4HD",
-      "bankCountry": "United Kingdom",
-      "isActive": true,
-      "notes": "Multi-currency neobank with instant transfers and crypto support",
-      "createdAt": "2025-12-13T19:18:54.349Z",
-      "updatedAt": "2025-12-13T19:18:54.349Z",
-      "accounts": [
-        {
-          "id": "cmj4oiydv0002a47o3h33cgnc",
-          "bankId": "cmj4oiydp0000a47op1qeul17",
-          "accountName": "Revolut EUR Business",
-          "accountType": "BUSINESS",
-          "currency": "EUR",
-          "iban": "GB33REVO00996912345678",
-          "accountNumber": null,
-          "routingNumber": null,
-          "sortCode": null,
-          "accountNumberUK": null,
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "REVOGB21",
-          "currentBalance": "25000",
-          "availableBalance": "25000",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": true,
-          "order": 1,
-          "notes": "Main EUR account for SEPA transfers",
-          "createdAt": "2025-12-13T19:18:54.355Z",
-          "updatedAt": "2025-12-13T20:33:18.110Z"
-        },
-        {
-          "id": "cmj4oiye20004a47open4oqfq",
-          "bankId": "cmj4oiydp0000a47op1qeul17",
-          "accountName": "Revolut GBP Business",
-          "accountType": "BUSINESS",
-          "currency": "GBP",
-          "iban": "GB29REVO00996987654321",
-          "accountNumber": null,
-          "routingNumber": null,
-          "sortCode": "040004",
-          "accountNumberUK": "12345678",
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "REVOGB21",
-          "currentBalance": "15000",
-          "availableBalance": "15000",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": false,
-          "order": 0,
-          "notes": "Main GBP account for UK payments",
-          "createdAt": "2025-12-13T19:18:54.362Z",
-          "updatedAt": "2025-12-13T20:33:27.020Z"
-        },
-        {
-          "id": "cmj4oiyea0006a47oohpl0vhd",
-          "bankId": "cmj4oiydp0000a47op1qeul17",
-          "accountName": "Revolut USD Business",
-          "accountType": "BUSINESS",
-          "currency": "USD",
-          "iban": null,
-          "accountNumber": "123456789012",
-          "routingNumber": "026073150",
-          "sortCode": null,
-          "accountNumberUK": null,
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "REVOGB21",
-          "currentBalance": "50000",
-          "availableBalance": "50000",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": false,
-          "order": 2,
-          "notes": "USD account for US payments and international transfers",
-          "createdAt": "2025-12-13T19:18:54.370Z",
-          "updatedAt": "2025-12-13T20:34:57.459Z"
-        }
-      ]
-    },
-    {
-      "id": "cmj4oiyen0009a47otrw1dys4",
-      "bankName": "Wise",
-      "bankType": "PAYMENT_PROVIDER",
-      "swiftBic": "TRWIGB22",
-      "bankCode": null,
-      "website": "https://wise.com",
-      "supportEmail": "support@wise.com",
-      "supportPhone": "+44 20 3695 8888",
-      "bankAddress": "56 Shoreditch High Street",
-      "bankCity": "London",
-      "bankPostcode": "E1 6JJ",
-      "bankCountry": "United Kingdom",
-      "isActive": true,
-      "notes": "International money transfer service with multi-currency accounts",
-      "createdAt": "2025-12-13T19:18:54.383Z",
-      "updatedAt": "2025-12-13T19:18:54.383Z",
-      "accounts": [
-        {
-          "id": "cmj4oiyeq000ba47ouvhdn9cd",
-          "bankId": "cmj4oiyen0009a47otrw1dys4",
-          "accountName": "Wise EUR Business",
-          "accountType": "MULTI_CURRENCY",
-          "currency": "EUR",
-          "iban": "BE68539007547034",
-          "accountNumber": null,
-          "routingNumber": null,
-          "sortCode": null,
-          "accountNumberUK": null,
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "TRWIBEB1XXX",
-          "currentBalance": "18500",
-          "availableBalance": "18500",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": true,
-          "order": 0,
-          "notes": "EUR account for European SEPA transfers",
-          "createdAt": "2025-12-13T19:18:54.386Z",
-          "updatedAt": "2025-12-13T19:18:54.386Z"
-        },
-        {
-          "id": "cmj4oiyeu000da47o4fd88rbb",
-          "bankId": "cmj4oiyen0009a47otrw1dys4",
-          "accountName": "Wise GBP Business",
-          "accountType": "MULTI_CURRENCY",
-          "currency": "GBP",
-          "iban": "GB33BUKB20201555555555",
-          "accountNumber": null,
-          "routingNumber": null,
-          "sortCode": "231470",
-          "accountNumberUK": "87654321",
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "TRWIGB22",
-          "currentBalance": "22000",
-          "availableBalance": "22000",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": false,
-          "order": 0,
-          "notes": "GBP account for UK domestic transfers",
-          "createdAt": "2025-12-13T19:18:54.390Z",
-          "updatedAt": "2025-12-13T20:33:22.979Z"
-        },
-        {
-          "id": "cmj4oiyey000fa47o5rppwica",
-          "bankId": "cmj4oiyen0009a47otrw1dys4",
-          "accountName": "Wise USD Business",
-          "accountType": "MULTI_CURRENCY",
-          "currency": "USD",
-          "iban": null,
-          "accountNumber": "987654321098",
-          "routingNumber": "026073008",
-          "sortCode": null,
-          "accountNumberUK": null,
-          "ibanCH": null,
-          "bcNumber": null,
-          "swiftBic": "CMFGUS33",
-          "currentBalance": "35000",
-          "availableBalance": "35000",
-          "lastBalanceUpdate": null,
-          "isActive": true,
-          "isPrimary": false,
-          "order": 0,
-          "notes": "USD account for US ACH and wire transfers",
-          "createdAt": "2025-12-13T19:18:54.394Z",
-          "updatedAt": "2025-12-13T20:33:44.947Z"
-        }
-      ]
-    }
-  ]) {
-    await prisma.bank.create({
-      data: {
-        ...bank,
-        accounts: {
-          create: bank.accounts.map(acc => ({
-            ...acc,
-            bankId: undefined, // remove parent ref
-            lastBalanceUpdate: acc.lastBalanceUpdate ? new Date(acc.lastBalanceUpdate) : null,
-            createdAt: new Date(acc.createdAt),
-            updatedAt: new Date(acc.updatedAt),
-          }))
-        },
-        createdAt: new Date(bank.createdAt),
-        updatedAt: new Date(bank.updatedAt),
-      } as any
-    }).catch(e => console.log('Bank ' + bank.bankName + ' error or exists'));
-  }
-
-  // --- Crypto Wallets ---
-  for (const wallet of [
-    {
-      "id": "cmj4oiyf7000ia47oqj0ofpgp",
-      "walletName": "Corporate USDC - Polygon",
-      "walletType": "HOT_WALLET",
-      "blockchain": "POLYGON",
-      "network": "MAINNET",
-      "asset": "USDC",
-      "assetType": "ERC20",
-      "contractAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
-      "provider": "MetaMask",
-      "currentBalance": "50000",
-      "balanceUSD": "50000",
-      "lastBalanceUpdate": null,
-      "isMultiSig": false,
-      "requiredSignatures": null,
-      "isActive": true,
-      "notes": "Main USDC wallet on Polygon for low-fee stablecoin transactions",
-      "createdAt": "2025-12-13T19:18:54.403Z",
-      "updatedAt": "2025-12-13T19:18:54.403Z"
-    },
-    {
-      "id": "cmj4oiyfb000ja47o5epodl72",
-      "walletName": "Corporate USDC - Ethereum",
-      "walletType": "HOT_WALLET",
-      "blockchain": "ETHEREUM",
-      "network": "MAINNET",
-      "asset": "USDC",
-      "assetType": "ERC20",
-      "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "walletAddress": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-      "provider": "MetaMask",
-      "currentBalance": "25000",
-      "balanceUSD": "25000",
-      "lastBalanceUpdate": null,
-      "isMultiSig": false,
-      "requiredSignatures": null,
-      "isActive": true,
-      "notes": "USDC on Ethereum mainnet for DeFi and large transactions",
-      "createdAt": "2025-12-13T19:18:54.407Z",
-      "updatedAt": "2025-12-13T19:18:54.407Z"
-    },
-    {
-      "id": "cmj4oiyfe000ka47oytj1h0pt",
-      "walletName": "Corporate BTC Treasury",
-      "walletType": "COLD_WALLET",
-      "blockchain": "BITCOIN",
-      "network": "MAINNET",
-      "asset": "BTC",
-      "assetType": "NATIVE",
-      "contractAddress": null,
-      "walletAddress": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-      "provider": "Ledger",
-      "currentBalance": "0.5",
-      "balanceUSD": "21500",
-      "lastBalanceUpdate": null,
-      "isMultiSig": true,
-      "requiredSignatures": 2,
-      "isActive": true,
-      "notes": "Cold storage for BTC treasury - requires 2 of 3 signatures",
-      "createdAt": "2025-12-13T19:18:54.410Z",
-      "updatedAt": "2025-12-13T19:18:54.410Z"
-    },
-    {
-      "id": "cmj4oiyfi000la47om1bm9y7k",
-      "walletName": "Corporate ETH Wallet",
-      "walletType": "HOT_WALLET",
-      "blockchain": "ETHEREUM",
-      "network": "MAINNET",
-      "asset": "ETH",
-      "assetType": "NATIVE",
-      "contractAddress": null,
-      "walletAddress": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-      "provider": "MetaMask",
-      "currentBalance": "5.25",
-      "balanceUSD": "11812.5",
-      "lastBalanceUpdate": null,
-      "isMultiSig": false,
-      "requiredSignatures": null,
-      "isActive": true,
-      "notes": "Main ETH wallet for gas fees and ETH holdings",
-      "createdAt": "2025-12-13T19:18:54.415Z",
-      "updatedAt": "2025-12-13T19:18:54.415Z"
-    },
-    {
-      "id": "cmj4oiyfm000ma47oi5coquht",
-      "walletName": "Corporate USDT - Polygon",
-      "walletType": "HOT_WALLET",
-      "blockchain": "POLYGON",
-      "network": "MAINNET",
-      "asset": "USDT",
-      "assetType": "ERC20",
-      "contractAddress": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-      "walletAddress": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
-      "provider": "MetaMask",
-      "currentBalance": "15000",
-      "balanceUSD": "15000",
-      "lastBalanceUpdate": null,
-      "isMultiSig": false,
-      "requiredSignatures": null,
-      "isActive": true,
-      "notes": "USDT on Polygon for alternative stablecoin option",
-      "createdAt": "2025-12-13T19:18:54.418Z",
-      "updatedAt": "2025-12-13T19:18:54.418Z"
-    }
-  ]) {
-    await prisma.cryptoWallet.create({
-      data: {
-        ...wallet,
-        lastBalanceUpdate: wallet.lastBalanceUpdate ? new Date(wallet.lastBalanceUpdate) : null,
-        createdAt: new Date(wallet.createdAt),
-        updatedAt: new Date(wallet.updatedAt),
-      } as any
-    }).catch(e => console.log('Wallet ' + wallet.walletName + ' error'));
-  }
-
-  // --- CRM: Organizations ---
-  for (const org of [] as any[]) {
-    await prisma.organization.upsert({
-      where: { id: org.id },
-      update: {},
-      create: {
-        ...org,
-        createdAt: new Date(org.createdAt),
-        updatedAt: new Date(org.updatedAt),
+        id: "cmj4nsgar0000124l7l4uqtjj",
+        companyName: "UHURU TRADE LTD",
+        companyNumber: "15883242",
+        incorporationDate: new Date("2024-08-07T00:00:00.000Z"),
+        registeredAddress: "Unit 13 Freeland Park Wareham Road",
+        registeredCity: "Lytchett Matravers, Poole",
+        registeredPostcode: "BH16 6FA",
+        registeredCountry: "United Kingdom",
+        tradingAddress: "Unit 13 Freeland Park Wareham Road",
+        tradingCity: "Lytchett Matravers, Poole",
+        tradingPostcode: "BH16 6FA",
+        companyType: "Ltd",
+        sicCodes: "47910, 62012, 62020, 70229",
+        financialYearEnd: "31-08",
+        accountsNextDueDate: new Date("2027-05-31T00:00:00.000Z"),
+        confirmationNextDueDate: new Date("2026-08-09T00:00:00.000Z"),
+        vatRegistered: false,
+        corporationTaxReference: "1234567890",
+        directors: "Raul Ortega Irus",
+        companySecretary: ".",
+        shareCapital: "1",
+        numberOfShares: 1,
+        website: "https://uhurutrade.com",
+        notes: "Datos importados de Companies House el 12/12/2025",
       }
     });
-  }
 
-  // --- CRM: Contacts ---
-  for (const contact of [] as any[]) {
-    await prisma.contact.create({
-      data: {
-        ...contact,
-        createdAt: new Date(contact.createdAt),
-        updatedAt: new Date(contact.updatedAt),
-      } as any
-    }).catch(e => console.log('Contact error'));
-  }
+    // --- 3. Banks & Accounts ---
+    // Revolut
+    const revolut = await prisma.bank.upsert({
+      where: { id: "cmj4oiydp0000a47op1qeul17" },
+      update: {},
+      create: {
+        id: "cmj4oiydp0000a47op1qeul17",
+        bankName: "Revolut",
+        bankType: "NEOBANK",
+        swiftBic: "REVOGB21",
+        website: "https://www.revolut.com",
+        bankCountry: "United Kingdom",
+        isActive: true,
+      }
+    });
 
-  // --- CRM: Deals ---
-  for (const deal of [] as any[]) {
-    await prisma.deal.create({
-      data: {
-        ...deal,
-        amount: deal.amount ? Number(deal.amount) : null,
-        closeDate: deal.closeDate ? new Date(deal.closeDate) : null,
-        createdAt: new Date(deal.createdAt),
-        updatedAt: new Date(deal.updatedAt),
-      } as any
-    }).catch(e => console.log('Deal error'));
-  }
+    // Revolut Accounts
+    const revEur = await prisma.bankAccount.upsert({
+      where: { id: "cmj4oiydv0002a47o3h33cgnc" },
+      update: {},
+      create: {
+        id: "cmj4oiydv0002a47o3h33cgnc",
+        bankId: revolut.id,
+        accountName: "Revolut EUR Business",
+        accountType: "BUSINESS",
+        currency: "EUR",
+        iban: "GB33REVO00996912345678",
+        swiftBic: "REVOGB21",
+        currentBalance: 25000,
+        isActive: true,
+        isPrimary: true,
+      }
+    });
 
-  // --- Invoices ---
-  for (const inv of [] as any[]) {
-    await prisma.invoice.create({
-      data: {
-        ...inv,
-        date: new Date(inv.date),
-        dueDate: new Date(inv.dueDate),
-        createdAt: new Date(inv.createdAt),
-        updatedAt: new Date(inv.updatedAt),
-        items: {
-          create: inv.items.map((item: any) => ({
-            ...item,
-            invoiceId: undefined,
-            createdAt: undefined, // InvoiceItem usually doesn't have timestamps but let's check schema
-          }))
+    const revGbp = await prisma.bankAccount.upsert({
+      where: { id: "cmj4oiye20004a47open4oqfq" },
+      update: {},
+      create: {
+        id: "cmj4oiye20004a47open4oqfq",
+        bankId: revolut.id,
+        accountName: "Revolut GBP Business",
+        accountType: "BUSINESS",
+        currency: "GBP",
+        iban: "GB29REVO00996987654321",
+        sortCode: "040004",
+        accountNumberUK: "12345678",
+        swiftBic: "REVOGB21",
+        currentBalance: 15000,
+        isActive: true,
+        isPrimary: true,
+      }
+    });
+
+    // Wise
+    const wise = await prisma.bank.upsert({
+      where: { id: "cmj4oiyen0009a47otrw1dys4" },
+      update: {},
+      create: {
+        id: "cmj4oiyen0009a47otrw1dys4",
+        bankName: "Wise",
+        bankType: "PAYMENT_PROVIDER",
+        swiftBic: "TRWIGB22",
+        website: "https://wise.com",
+        bankCountry: "United Kingdom",
+        isActive: true,
+      }
+    });
+
+    // Wise Accounts
+    const wiseUsd = await prisma.bankAccount.upsert({
+      where: { id: "cmj4oiyey000fa47o5rppwica" },
+      update: {},
+      create: {
+        id: "cmj4oiyey000fa47o5rppwica",
+        bankId: wise.id,
+        accountName: "Wise USD Business",
+        accountType: "MULTI_CURRENCY",
+        currency: "USD",
+        accountNumber: "987654321098",
+        routingNumber: "026073008",
+        wireRoutingNumber: "026073009", // Wired routing number
+        swiftBic: "CMFGUS33",
+        currentBalance: 35000,
+        isActive: true,
+        isPrimary: true,
+      }
+    });
+
+    // --- 4. Transactions (Simulating History) ---
+    console.log('Adding transactions...');
+
+    const transactions = [
+      // FY 2024 (Closed): Aug 2024 - Aug 2025
+      // Income
+      { desc: "Consulting Fee - Client A", amount: 5000, date: "2024-09-15" },
+      { desc: "Software Dev Project - Milestone 1", amount: 12000, date: "2024-10-20" },
+      { desc: "Maintenance Retainer", amount: 2000, date: "2024-11-01" },
+      { desc: "Consulting Fee - Client B", amount: 7500, date: "2024-12-10" },
+      { desc: "Software Dev Project - Milestone 2", amount: 12000, date: "2025-01-20" },
+      { desc: "Q1 Bonus Payment", amount: 3000, date: "2025-03-15" },
+      { desc: "Consulting Fee - Client A", amount: 5500, date: "2025-05-20" },
+      { desc: "New Project Deposit", amount: 8000, date: "2025-07-05" },
+
+      // Expenses
+      { desc: "Server Hosting (AWS)", amount: -150, date: "2024-09-01" },
+      { desc: "Software Licenses", amount: -450, date: "2024-09-05" },
+      { desc: "Legal Fees", amount: -1200, date: "2024-10-15" },
+      { desc: "Server Hosting (AWS)", amount: -150, date: "2024-10-01" },
+      { desc: "Contractor Payout", amount: -3500, date: "2024-11-25" },
+      { desc: "Office Supplies", amount: -300, date: "2024-12-05" },
+      { desc: "Annual Co. House Fee", amount: -13, date: "2025-01-05" },
+      { desc: "Server Hosting (AWS)", amount: -160, date: "2025-02-01" },
+      { desc: "Marketing Campaign", amount: -2500, date: "2025-04-10" },
+      { desc: "Travel Expenses", amount: -850, date: "2025-06-20" },
+
+      // FY 2025 (Current): Aug 2025 - Present (Dec 2025)
+      // Income
+      { desc: "Retainer - Client C", amount: 4000, date: "2025-09-01" },
+      { desc: "Web App Launch Payment", amount: 15000, date: "2025-09-25" },
+      { desc: "Consulting Fee - Client A", amount: 6000, date: "2025-10-15" },
+      { desc: "Emergency Support", amount: 1500, date: "2025-11-05" },
+      { desc: "Holiday Promo Sales", amount: 4500, date: "2025-12-10" },
+
+      // Expenses
+      { desc: "Server Hosting (AWS)", amount: -180, date: "2025-09-01" },
+      { desc: "Accounting Service", amount: -500, date: "2025-09-10" },
+      { desc: "New Laptop Eqpt", amount: -2200, date: "2025-10-05" },
+      { desc: "SaaS Subscriptions", amount: -250, date: "2025-11-01" },
+      { desc: "Christmas Party", amount: -800, date: "2025-12-12" },
+    ];
+
+    for (const t of transactions) {
+      // Distribute randomly across accounts primarily GBP and EUR for realism
+      const accountId = Math.random() > 0.5 ? revGbp.id : revEur.id;
+
+      // Basic hash generation: date_amount_desc
+      const simpleHash = `${t.date}_${t.amount}_${t.desc.replace(/\s+/g, '')}_${Math.random().toString(36).substring(7)}`;
+
+      await prisma.bankTransaction.create({
+        data: {
+          bankAccountId: accountId,
+          amount: t.amount,
+          currency: accountId === revGbp.id ? 'GBP' : 'EUR', // Simplified currency match
+          date: new Date(t.date),
+          description: t.desc,
+          status: "COMPLETED",
+          reference: `REF-${Math.floor(Math.random() * 10000)}`,
+          category: t.amount > 0 ? "Income" : "Expense",
+          hash: simpleHash, // Unique hash
         }
-      } as any
-    }).catch(e => console.log('Invoice error'));
-  }
+      });
+    }
 
-  console.log('✅ Seeding finished.');
+    // --- 5. Crypto Wallets ---
+    await prisma.cryptoWallet.upsert({
+      where: { id: "cmj4oiyf7000ia47oqj0ofpgp" },
+      update: {},
+      create: {
+        id: "cmj4oiyf7000ia47oqj0ofpgp",
+        walletName: "Corporate USDC - Polygon",
+        walletType: "HOT_WALLET",
+        blockchain: "POLYGON",
+        network: "MAINNET",
+        asset: "USDC",
+        assetType: "ERC20",
+        walletAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
+        provider: "MetaMask",
+        currentBalance: 50000,
+        balanceUSD: 50000,
+        isActive: true,
+      }
+    });
+
+    // --- 6. Compliance (Tax Obligations) ---
+    // Seed mocked obligations matching user screenshot requirement
+    console.log('Adding tax obligations...');
+    await prisma.taxObligation.deleteMany(); // Clear simulation data first
+
+    await prisma.taxObligation.createMany({
+      data: [
+        {
+          type: "CORPORATION_TAX",
+          status: "PENDING",
+          dueDate: new Date("2026-06-01"), // 01/06/2026
+          periodStart: new Date("2024-09-01"),
+          periodEnd: new Date("2025-08-31"),
+          amountEstimated: 0,
+          amountActual: null,
+        },
+        {
+          type: "CONFIRMATION_STATEMENT",
+          status: "PENDING",
+          dueDate: new Date("2026-08-09"), // 09/08/2026
+          periodStart: new Date("2025-08-08"),
+          periodEnd: new Date("2026-08-07"),
+          amountEstimated: 13, // Standard Companies House fee
+          amountActual: null,
+        },
+        {
+          type: "ACCOUNTS",
+          status: "PENDING",
+          dueDate: new Date("2027-05-31"), // 31/05/2027
+          periodStart: new Date("2025-09-01"),
+          periodEnd: new Date("2026-08-31"),
+          amountEstimated: 0,
+          amountActual: null,
+        }
+      ]
+    });
+
+    console.log('✅ Seeding finished.');
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 main()
