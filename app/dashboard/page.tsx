@@ -175,22 +175,24 @@ export default async function DashboardPage() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {accounts.map((acc: any) => (
-                                <div key={acc.id} className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-slate-600 transition-colors group">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="p-2 bg-slate-800 rounded-lg text-slate-400 group-hover:text-white transition-colors">
-                                            <Building2 size={16} />
+                                <Link href={`/dashboard/banking?accountId=${acc.id}`} key={acc.id} className="block group">
+                                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 group-hover:border-emerald-500/50 transition-colors">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="p-2 bg-slate-800 rounded-lg text-slate-400 group-hover:text-white transition-colors">
+                                                <Building2 size={16} />
+                                            </div>
+                                            <span className="text-xs font-mono text-slate-500 bg-slate-900 px-2 py-0.5 rounded">
+                                                {acc.currency}
+                                            </span>
                                         </div>
-                                        <span className="text-xs font-mono text-slate-500 bg-slate-900 px-2 py-0.5 rounded">
-                                            {acc.currency}
-                                        </span>
+                                        <p className="text-sm text-slate-400 truncate mb-1">{acc.bank.bankName}</p>
+                                        <p className={`font-bold truncate text-lg ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
+                                            {acc.currency === 'GBP' ? '£' : acc.currency === 'EUR' ? '€' : acc.currency === 'USD' ? '$' : ''}
+                                            {Number(acc.currentBalance).toLocaleString()}
+                                        </p>
+                                        <p className="text-xs text-slate-500 truncate mt-1">{acc.accountName}</p>
                                     </div>
-                                    <p className="text-sm text-slate-400 truncate mb-1">{acc.bank.bankName}</p>
-                                    <p className={`font-bold truncate text-lg ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
-                                        {acc.currency === 'GBP' ? '£' : acc.currency === 'EUR' ? '€' : acc.currency === 'USD' ? '$' : ''}
-                                        {Number(acc.currentBalance).toLocaleString()}
-                                    </p>
-                                    <p className="text-xs text-slate-500 truncate mt-1">{acc.accountName}</p>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
