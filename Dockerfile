@@ -28,9 +28,8 @@ WORKDIR /app
 # Copiamos TODO el código fuente
 COPY . .
 
-# Copiamos dependencias y Prisma desde la etapa deps
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/prisma ./prisma
+# Instalar TODAS las dependencias (incluyendo dev) para tener Prisma CLI
+RUN npm ci --legacy-peer-deps
 
 # Generar el cliente Prisma
 RUN ./node_modules/.bin/prisma generate
