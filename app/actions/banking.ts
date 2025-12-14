@@ -196,8 +196,24 @@ export async function uploadTransactionAttachment(formData: FormData, transactio
 
         revalidatePath('/dashboard/banking');
         return { success: true, attachment };
+
     } catch (error: any) {
         console.error('Attachment upload error:', error);
         return { success: false, error: 'Failed to upload attachment' };
+    }
+}
+
+export async function updateTransactionCategory(transactionId: string, category: string) {
+    try {
+        await prisma.bankTransaction.update({
+            where: { id: transactionId },
+            data: { category }
+        });
+
+        revalidatePath('/dashboard/banking');
+        return { success: true };
+    } catch (error) {
+        console.error('Update category error:', error);
+        return { success: false, error: 'Failed to update category' };
     }
 }

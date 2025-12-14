@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip, Search } from 'lucide-react';
 import { useConfirm } from '@/components/providers/modal-provider';
 import { TransactionDetailsModal } from './transaction-details-modal';
+import { CategoryBadge } from './category-badge';
 
 type Transaction = {
     id: string;
@@ -285,7 +286,7 @@ export function TransactionTable({
                                             {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                         </td>
                                         <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
-                                            {tx.category || '-'}
+                                            <CategoryBadge transactionId={tx.id} initialCategory={tx.category} />
                                         </td>
                                         {/* Attachments Cell */}
                                         <td className="py-3 px-4 text-center hidden md:table-cell" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>
