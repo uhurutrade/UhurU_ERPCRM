@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BankAccount } from "@prisma/client";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Ban } from "lucide-react";
+import { ArrowLeft, ArrowRight, Ban, Settings } from "lucide-react";
 
 interface BankAccountsGridProps {
     initialAccounts: BankAccount[];
@@ -61,8 +61,8 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                 {accounts.map((account, index) => (
                     <div key={account.id} className="relative group">
                         <Link
-                            href={`/dashboard/bank-settings/account/${account.id}`}
-                            className="block p-4 bg-gradient-card backdrop-blur-xl rounded-lg border border-slate-700 transition-colors h-full"
+                            href={`/dashboard/banking?accountId=${account.id}`}
+                            className="block p-4 bg-gradient-card backdrop-blur-xl rounded-lg border border-slate-700 transition-colors h-full hover:border-emerald-500/50"
                         >
                             <div className="flex justify-between items-start mb-2">
                                 <div className="flex items-center gap-2">
@@ -114,8 +114,16 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                             )}
                         </Link>
 
-                        {/* Reordering Controls (Visible on hover) */}
+                        {/* Controls (Visible on hover) */}
                         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Link
+                                href={`/dashboard/bank-settings/account/${account.id}`}
+                                className="p-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 hover:text-white"
+                                title="Edit Settings"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Settings size={14} />
+                            </Link>
                             {index > 0 && (
                                 <button
                                     onClick={(e) => {

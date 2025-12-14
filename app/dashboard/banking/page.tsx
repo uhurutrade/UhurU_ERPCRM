@@ -8,23 +8,29 @@ import { serializeData } from '@/lib/serialization';
 export default async function BankingPage({
     searchParams
 }: {
-    searchParams: { page?: string, query?: string }
+    searchParams: { page?: string, query?: string, accountId?: string }
 }) {
     const currentPage = Number(searchParams.page) || 1;
     const query = searchParams.query || "";
+    const accountId = searchParams.accountId;
     const itemsPerPage = 25;
 
     // --- Build Where Clause ---
-    const whereClause: any = query ? {
-        OR: [
-            { description: { contains: query, mode: 'insensitive' } },
-            { category: { contains: query, mode: 'insensitive' } },
-            { reference: { contains: query, mode: 'insensitive' } },
-            { counterparty: { contains: query, mode: 'insensitive' } },
-            { merchant: { contains: query, mode: 'insensitive' } },
-            { bankAccount: { bank: { bankName: { contains: query, mode: 'insensitive' } } } }
+    const whereClause: any = {
+        AND: [
+            accountId ? { bankAccountId: accountId } : {},
+            query ? {
+                OR: [
+                    { description: { contains: query, mode: 'insensitive' } },
+                    { category: { contains: query, mode: 'insensitive' } },
+                    { reference: { contains: query, mode: 'insensitive' } },
+                    { counterparty: { contains: query, mode: 'insensitive' } },
+                    { merchant: { contains: query, mode: 'insensitive' } },
+                    { bankAccount: { bank: { bankName: { contains: query, mode: 'insensitive' } } } }
+                ]
+            } : {}
         ]
-    } : {};
+    };
 
     // --- Execute Query ---
     const [totalItems, transactions] = await Promise.all([
