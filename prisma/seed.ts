@@ -234,7 +234,7 @@ async function main() {
       {
         "id": "cmj5ix1a300023sv8se06ra7b",
         "bankId": "cmj5iwrjg00003sv8ooc8cebo",
-        "accountName": "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
+        "accountName": "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
         "accountType": "BUSINESS",
         "currency": "EUR",
         "iban": null,
@@ -254,7 +254,7 @@ async function main() {
         "order": 0,
         "notes": null,
         "createdAt": "2025-12-14T09:29:39.772Z",
-        "updatedAt": "2025-12-14T09:29:39.772Z"
+        "updatedAt": "2025-12-14T09:41:13.328Z"
       }
     ]
   },
@@ -275,6 +275,25 @@ async function main() {
     "notes": null,
     "createdAt": "2025-12-14T09:35:05.630Z",
     "updatedAt": "2025-12-14T09:35:05.630Z",
+    "accounts": []
+  },
+  {
+    "id": "cmj5jb4a30000ua0cj6v8z6aq",
+    "bankName": "MANOLOS BANK",
+    "bankType": "NEOBANK",
+    "swiftBic": null,
+    "bankCode": null,
+    "website": null,
+    "supportEmail": null,
+    "supportPhone": null,
+    "bankAddress": null,
+    "bankCity": null,
+    "bankPostcode": null,
+    "bankCountry": null,
+    "isActive": true,
+    "notes": null,
+    "createdAt": "2025-12-14T09:40:36.843Z",
+    "updatedAt": "2025-12-14T09:40:36.843Z",
     "accounts": []
   }
 ] as any[]) {
@@ -339,6 +358,27 @@ async function main() {
     "notes": null,
     "createdAt": "2025-12-14T09:29:56.527Z",
     "updatedAt": "2025-12-14T09:29:56.527Z"
+  },
+  {
+    "id": "cmj5jc9cw0001ua0cyhdqrd3i",
+    "walletName": "yyyyyyyyyyyyyyyyyyyyyyyyy",
+    "walletType": "HOT_WALLET",
+    "blockchain": "ETHEREUM",
+    "network": "MAINNET",
+    "asset": "USDC",
+    "assetType": "ERC20",
+    "contractAddress": null,
+    "walletAddress": "ll",
+    "provider": null,
+    "currentBalance": null,
+    "balanceUSD": null,
+    "lastBalanceUpdate": null,
+    "isMultiSig": false,
+    "requiredSignatures": 1,
+    "isActive": true,
+    "notes": null,
+    "createdAt": "2025-12-14T09:41:30.081Z",
+    "updatedAt": "2025-12-14T09:41:30.081Z"
   }
 ] as any[]) {
     await prisma.cryptoWallet.create({
