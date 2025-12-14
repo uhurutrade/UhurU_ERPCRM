@@ -53,7 +53,7 @@ export function parseBankStatement(fileContent: string): NormalizedTransaction[]
         skip_empty_lines: true,
         trim: true,
         relax_column_count: true
-    });
+    }) as Record<string, string>[];
 
     if (records.length === 0) return [];
 
