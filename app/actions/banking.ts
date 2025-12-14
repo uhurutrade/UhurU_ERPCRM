@@ -14,10 +14,16 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
     }
 
     try {
-        // 1. Fetch Target Account Currency to enforce integrity
+        // 1. Fetch Target Account Currency AND Bank Name to enforce integrity
         const targetAccount = await prisma.bankAccount.findUnique({
             where: { id: bankAccountId },
-            select: { currency: true, accountName: true }
+            select: {
+                currency: true,
+                accountName: true,
+                bank: {
+                    select: { bankName: true }
+                }
+            }
         });
 
         if (!targetAccount) {
@@ -25,10 +31,26 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
         }
 
         const text = await file.text();
-        const rows = parseBankStatement(text);
+        const { transactions: rows, detectedBank } = parseBankStatement(text);
 
         if (rows.length === 0) {
             return { success: false, error: 'No valid transactions found in file' };
+        }
+
+        // --- BANK MISMATCH PROTECTION ---
+        // If the CSV is clearly from Bank A (e.g. Revolut), but the user selected Bank B (e.g. Wise),
+        // block the upload to prevent messing up the ledger.
+        const targetBankName = targetAccount.bank.bankName.toLowerCase();
+        const detected = detectedBank.toLowerCase();
+
+        if (detected !== 'unknown') {
+            if (detected === 'revolut' && !targetBankName.includes('revolut')) {
+                return { success: false, error: `Detected a Revolut CSV, but you selected a "${targetAccount.bank.bankName}" account. Please select the correct account.` };
+            }
+            if (detected === 'wise' && !targetBankName.includes('wise') && !targetBankName.includes('transferwise')) {
+                return { success: false, error: `Detected a Wise CSV, but you selected a "${targetAccount.bank.bankName}" account. Please select the correct account.` };
+            }
+            // Add WorldFirst check if needed
         }
 
         const statement = await prisma.bankStatement.create({

@@ -63,7 +63,12 @@ function createTransactionHash(tx: Partial<NormalizedTransaction>): string {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-export function parseBankStatement(fileContent: string): NormalizedTransaction[] {
+export type ParseResult = {
+    transactions: NormalizedTransaction[];
+    detectedBank: 'Wise' | 'Revolut' | 'WorldFirst' | 'Unknown';
+};
+
+export function parseBankStatement(fileContent: string): ParseResult {
     const records = parse(fileContent, {
         columns: true,
         skip_empty_lines: true,
@@ -71,7 +76,7 @@ export function parseBankStatement(fileContent: string): NormalizedTransaction[]
         relax_column_count: true
     }) as Record<string, string>[];
 
-    if (records.length === 0) return [];
+    if (records.length === 0) return { transactions: [], detectedBank: 'Unknown' };
 
     const headers = Object.keys(records[0]);
 
@@ -85,20 +90,20 @@ export function parseBankStatement(fileContent: string): NormalizedTransaction[]
 
     // Detect Bank Type
     if (headers.includes('TransferWise ID')) {
-        return parseWise(records);
+        return { transactions: parseWise(records), detectedBank: 'Wise' };
     } else if (headers.includes('Card number') && headers.includes('Sort code') === false) {
         // Heuristic for Revolut (usually has 'Card number', 'Balance', 'Fee')
         // User provided: "Date started (UTC)", "Card number", "Card label"
         if (headers.includes('Date started (UTC)')) {
-            return parseRevolut(records);
+            return { transactions: parseRevolut(records), detectedBank: 'Revolut' };
         }
         // Fallback check
         if (headers.includes('Product') && headers.includes('Completed Date')) {
-            return parseRevolut(records); // Some revolut formats
+            return { transactions: parseRevolut(records), detectedBank: 'Revolut' };
         }
-        return parseRevolut(records); // Defaulting based on user input order guess
+        return { transactions: parseRevolut(records), detectedBank: 'Revolut' }; // Defaulting based on user input order guess
     } else if (headers.includes('Transaction type') && headers.includes('Payee account number')) {
-        return parseWorldFirst(records);
+        return { transactions: parseWorldFirst(records), detectedBank: 'WorldFirst' };
     }
 
     throw new Error('Unsupported bank statement format. Allowed: Wise, Revolut, WorldFirst.');
