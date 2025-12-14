@@ -64,9 +64,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copiar Prisma al contenedor de producción
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Copiar .env si aplica
-COPY --from=builder --chown=nextjs:nodejs /app/.env ./
-
 # Crear carpeta de uploads
 RUN mkdir -p /app/uploads && chown nextjs:nodejs /app/uploads
 
