@@ -117,31 +117,6 @@ async function main() {
     "updatedAt": "2025-12-14T08:39:19.496Z",
     "accounts": [
       {
-        "id": "cmj4oiydv0002a47o3h33cgnc",
-        "bankId": "cmj4oiydp0000a47op1qeul17",
-        "accountName": "Revolut EUR Business",
-        "accountType": "BUSINESS",
-        "currency": "EUR",
-        "iban": "GB33REVO00996912345678",
-        "accountNumber": null,
-        "routingNumber": null,
-        "wireRoutingNumber": null,
-        "sortCode": null,
-        "accountNumberUK": null,
-        "ibanCH": null,
-        "bcNumber": null,
-        "swiftBic": "REVOGB21",
-        "currentBalance": "25000",
-        "availableBalance": null,
-        "lastBalanceUpdate": null,
-        "isActive": true,
-        "isPrimary": true,
-        "order": 0,
-        "notes": null,
-        "createdAt": "2025-12-14T08:39:19.504Z",
-        "updatedAt": "2025-12-14T08:39:19.504Z"
-      },
-      {
         "id": "cmj4oiye20004a47open4oqfq",
         "bankId": "cmj4oiydp0000a47op1qeul17",
         "accountName": "Revolut GBP Business",
@@ -165,6 +140,31 @@ async function main() {
         "notes": null,
         "createdAt": "2025-12-14T08:39:19.513Z",
         "updatedAt": "2025-12-14T08:39:19.513Z"
+      },
+      {
+        "id": "cmj4oiydv0002a47o3h33cgnc",
+        "bankId": "cmj4oiydp0000a47op1qeul17",
+        "accountName": "KAKA Revolut EUR Business",
+        "accountType": "BUSINESS",
+        "currency": "EUR",
+        "iban": "GB33REVO00996912345678",
+        "accountNumber": null,
+        "routingNumber": null,
+        "wireRoutingNumber": null,
+        "sortCode": null,
+        "accountNumberUK": null,
+        "ibanCH": null,
+        "bcNumber": null,
+        "swiftBic": "REVOGB21",
+        "currentBalance": "25000",
+        "availableBalance": null,
+        "lastBalanceUpdate": null,
+        "isActive": true,
+        "isPrimary": true,
+        "order": 0,
+        "notes": null,
+        "createdAt": "2025-12-14T08:39:19.504Z",
+        "updatedAt": "2025-12-14T09:29:13.671Z"
       }
     ]
   },
@@ -212,6 +212,51 @@ async function main() {
         "updatedAt": "2025-12-14T08:39:19.525Z"
       }
     ]
+  },
+  {
+    "id": "cmj5iwrjg00003sv8ooc8cebo",
+    "bankName": "PEDRO",
+    "bankType": "NEOBANK",
+    "swiftBic": null,
+    "bankCode": null,
+    "website": null,
+    "supportEmail": null,
+    "supportPhone": null,
+    "bankAddress": null,
+    "bankCity": null,
+    "bankPostcode": null,
+    "bankCountry": null,
+    "isActive": true,
+    "notes": null,
+    "createdAt": "2025-12-14T09:29:27.148Z",
+    "updatedAt": "2025-12-14T09:29:27.148Z",
+    "accounts": [
+      {
+        "id": "cmj5ix1a300023sv8se06ra7b",
+        "bankId": "cmj5iwrjg00003sv8ooc8cebo",
+        "accountName": "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
+        "accountType": "BUSINESS",
+        "currency": "EUR",
+        "iban": null,
+        "accountNumber": null,
+        "routingNumber": null,
+        "wireRoutingNumber": null,
+        "sortCode": null,
+        "accountNumberUK": null,
+        "ibanCH": null,
+        "bcNumber": null,
+        "swiftBic": null,
+        "currentBalance": "0",
+        "availableBalance": null,
+        "lastBalanceUpdate": null,
+        "isActive": true,
+        "isPrimary": false,
+        "order": 0,
+        "notes": null,
+        "createdAt": "2025-12-14T09:29:39.772Z",
+        "updatedAt": "2025-12-14T09:29:39.772Z"
+      }
+    ]
   }
 ] as any[]) {
     await prisma.bank.create({
@@ -254,6 +299,27 @@ async function main() {
     "notes": null,
     "createdAt": "2025-12-14T08:39:19.622Z",
     "updatedAt": "2025-12-14T08:39:19.622Z"
+  },
+  {
+    "id": "cmj5ixe7j00033sv84eiyfwao",
+    "walletName": "hhhhhhhhhhhhhhhhhhhh",
+    "walletType": "HOT_WALLET",
+    "blockchain": "ETHEREUM",
+    "network": "MAINNET",
+    "asset": "USDC",
+    "assetType": "ERC20",
+    "contractAddress": null,
+    "walletAddress": "das",
+    "provider": null,
+    "currentBalance": null,
+    "balanceUSD": null,
+    "lastBalanceUpdate": null,
+    "isMultiSig": false,
+    "requiredSignatures": 1,
+    "isActive": true,
+    "notes": null,
+    "createdAt": "2025-12-14T09:29:56.527Z",
+    "updatedAt": "2025-12-14T09:29:56.527Z"
   }
 ] as any[]) {
     await prisma.cryptoWallet.create({
