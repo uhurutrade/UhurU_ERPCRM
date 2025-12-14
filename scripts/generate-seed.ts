@@ -39,7 +39,7 @@ async function main() {
   console.log('🌱 Start seeding...');
 
   // --- Users ---
-  for (const user of ${JSON.stringify(users, null, 2)}) {
+  for (const user of ${JSON.stringify(users, null, 2)} as any[]) {
     await prisma.user.upsert({
       where: { email: user.email || '' },
       update: {},
@@ -53,7 +53,7 @@ async function main() {
   }
 
   // --- Company Settings ---
-  for (const setting of ${JSON.stringify(companySettings, null, 2)}) {
+  for (const setting of ${JSON.stringify(companySettings, null, 2)} as any[]) {
     await prisma.companySettings.create({
         data: {
             ...setting,
@@ -69,7 +69,7 @@ async function main() {
   }
 
   // --- Banks & Accounts ---
-  for (const bank of ${JSON.stringify(banks, null, 2)}) {
+  for (const bank of ${JSON.stringify(banks, null, 2)} as any[]) {
     await prisma.bank.create({
       data: {
         ...bank,
@@ -89,7 +89,7 @@ async function main() {
   }
 
   // --- Crypto Wallets ---
-  for (const wallet of ${JSON.stringify(cryptoWallets, null, 2)}) {
+  for (const wallet of ${JSON.stringify(cryptoWallets, null, 2)} as any[]) {
     await prisma.cryptoWallet.create({
       data: {
         ...wallet,
@@ -101,7 +101,7 @@ async function main() {
   }
 
   // --- CRM: Organizations ---
-  for (const org of ${JSON.stringify(organizations, null, 2)}) {
+  for (const org of ${JSON.stringify(organizations, null, 2)} as any[]) {
     await prisma.organization.upsert({
         where: { id: org.id },
         update: {},
@@ -114,7 +114,7 @@ async function main() {
   }
 
   // --- CRM: Contacts ---
-  for (const contact of ${JSON.stringify(contacts, null, 2)}) {
+  for (const contact of ${JSON.stringify(contacts, null, 2)} as any[]) {
     await prisma.contact.create({
         data: {
             ...contact,
@@ -125,7 +125,7 @@ async function main() {
   }
   
  // --- CRM: Deals ---
-  for (const deal of ${JSON.stringify(deals, null, 2)}) {
+  for (const deal of ${JSON.stringify(deals, null, 2)} as any[]) {
     await prisma.deal.create({
         data: {
             ...deal,
@@ -138,7 +138,7 @@ async function main() {
   }
 
   // --- Invoices ---
-  for (const inv of ${JSON.stringify(invoices, null, 2)}) {
+  for (const inv of ${JSON.stringify(invoices, null, 2)} as any[]) {
     await prisma.invoice.create({
         data: {
             ...inv,
@@ -159,7 +159,7 @@ async function main() {
 
   // --- Transactions ---
   // Using simple create because IDs might conflict if we are not careful, but usually strict copy is fine
-  for (const t of ${JSON.stringify(transactions, null, 2)}) {
+  for (const t of ${JSON.stringify(transactions, null, 2)} as any[]) {
     await prisma.bankTransaction.create({
         data: {
             ...t,
@@ -174,7 +174,7 @@ async function main() {
   }
 
   // --- Tax Obligations ---
-  for (const tax of ${JSON.stringify(taxObligations, null, 2)}) {
+  for (const tax of ${JSON.stringify(taxObligations, null, 2)} as any[]) {
     await prisma.taxObligation.create({
         data: {
             ...tax,

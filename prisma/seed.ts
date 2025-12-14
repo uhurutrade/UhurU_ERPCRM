@@ -7,7 +7,7 @@ async function main() {
   console.log('🌱 Start seeding...');
 
   // --- Users ---
-  for (const user of []) {
+  for (const user of [] as any[]) {
     await prisma.user.upsert({
       where: { email: user.email || '' },
       update: {},
@@ -60,7 +60,7 @@ async function main() {
     "createdAt": "2025-12-14T08:39:19.479Z",
     "updatedAt": "2025-12-14T08:39:19.479Z"
   }
-]) {
+] as any[]) {
     await prisma.companySettings.create({
         data: {
             ...setting,
@@ -192,7 +192,7 @@ async function main() {
       }
     ]
   }
-]) {
+] as any[]) {
     await prisma.bank.create({
       data: {
         ...bank,
@@ -234,7 +234,7 @@ async function main() {
     "createdAt": "2025-12-14T08:39:19.622Z",
     "updatedAt": "2025-12-14T08:39:19.622Z"
   }
-]) {
+] as any[]) {
     await prisma.cryptoWallet.create({
       data: {
         ...wallet,
@@ -246,7 +246,7 @@ async function main() {
   }
 
   // --- CRM: Organizations ---
-  for (const org of []) {
+  for (const org of [] as any[]) {
     await prisma.organization.upsert({
         where: { id: org.id },
         update: {},
@@ -259,7 +259,7 @@ async function main() {
   }
 
   // --- CRM: Contacts ---
-  for (const contact of []) {
+  for (const contact of [] as any[]) {
     await prisma.contact.create({
         data: {
             ...contact,
@@ -270,7 +270,7 @@ async function main() {
   }
   
  // --- CRM: Deals ---
-  for (const deal of []) {
+  for (const deal of [] as any[]) {
     await prisma.deal.create({
         data: {
             ...deal,
@@ -283,7 +283,7 @@ async function main() {
   }
 
   // --- Invoices ---
-  for (const inv of []) {
+  for (const inv of [] as any[]) {
     await prisma.invoice.create({
         data: {
             ...inv,
@@ -781,7 +781,7 @@ async function main() {
     "createdAt": "2025-12-14T08:39:19.619Z",
     "updatedAt": "2025-12-14T08:39:19.619Z"
   }
-]) {
+] as any[]) {
     await prisma.bankTransaction.create({
         data: {
             ...t,
@@ -836,7 +836,7 @@ async function main() {
     "createdAt": "2025-12-14T08:39:19.630Z",
     "updatedAt": "2025-12-14T08:39:19.630Z"
   }
-]) {
+] as any[]) {
     await prisma.taxObligation.create({
         data: {
             ...tax,
