@@ -59,6 +59,14 @@ export function parseBankStatement(fileContent: string): NormalizedTransaction[]
 
     const headers = Object.keys(records[0]);
 
+    // ------------------------------------------------------------------------
+    // FUTURE BANKS EXTENSION POINT:
+    // To add a new bank:
+    // 1. Identify a unique column name in the CSV header (e.g. "Crypto Address", "Santander Ref").
+    // 2. Add an 'else if' block here checking for that header.
+    // 3. Create a new parseFunction below (like parseWise) mapping columns to NormalizedTransaction.
+    // ------------------------------------------------------------------------
+
     // Detect Bank Type
     if (headers.includes('TransferWise ID')) {
         return parseWise(records);
