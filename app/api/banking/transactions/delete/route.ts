@@ -8,32 +8,57 @@ export async function POST(req: Request) {
         // No active session check, auth bypassed as per instruction.
 
         const body = await req.json();
-        const { transactionIds, reason } = body;
+        const { transactionIds, reason, deleteAllMatching, query } = body;
 
-        if (!transactionIds || !Array.isArray(transactionIds) || transactionIds.length === 0) {
-            return new NextResponse("Invalid transaction IDs", { status: 400 });
+        let transactionsToDelete: any[] = [];
+
+        if (deleteAllMatching) {
+            // --- GLOBAL DELETION LOGIC ---
+            // 1. Find all eligible transactions based on search query
+            const whereClause: Prisma.BankTransactionWhereInput = {};
+            if (query) {
+                whereClause.OR = [
+                    { description: { contains: query, mode: 'insensitive' } },
+                    { category: { contains: query, mode: 'insensitive' } },
+                    { reference: { contains: query, mode: 'insensitive' } },
+                    { counterparty: { contains: query, mode: 'insensitive' } },
+                    { merchant: { contains: query, mode: 'insensitive' } },
+                    { bankAccount: { bank: { bankName: { contains: query, mode: 'insensitive' } } } },
+                ];
+            }
+
+            // We must fetch them all to create the audit log snapshots
+            transactionsToDelete = await prisma.bankTransaction.findMany({
+                where: whereClause,
+                include: {
+                    bankAccount: { include: { bank: true } },
+                    attachments: true,
+                },
+            });
+
+        } else {
+            // --- ID-BASED DELETION LOGIC (Standard) ---
+            if (!transactionIds || !Array.isArray(transactionIds) || transactionIds.length === 0) {
+                return new NextResponse("Invalid transaction IDs", { status: 400 });
+            }
+
+            transactionsToDelete = await prisma.bankTransaction.findMany({
+                where: {
+                    id: { in: transactionIds },
+                },
+                include: {
+                    bankAccount: { include: { bank: true } },
+                    attachments: true,
+                },
+            });
         }
-
-        // 1. Fetch original transactions to be deleted (including attachments for audit)
-        const transactionsToDelete = await prisma.bankTransaction.findMany({
-            where: {
-                id: {
-                    in: transactionIds,
-                },
-            },
-            include: {
-                bankAccount: {
-                    include: {
-                        bank: true,
-                    },
-                },
-                attachments: true, // Include attachments for audit log
-            },
-        });
 
         if (transactionsToDelete.length === 0) {
-            return new NextResponse("No transactions found", { status: 404 });
+            return new NextResponse("No transactions found to delete", { status: 404 });
         }
+
+        // Extract IDs for final deletion step
+        const finalIds = transactionsToDelete.map(t => t.id);
 
         // 2. Archive transactions to DeletedTransaction (Audit Log)
         // We do this in a transaction to ensure atomicity
@@ -61,7 +86,7 @@ export async function POST(req: Request) {
             await tx.attachment.updateMany({
                 where: {
                     transactionId: {
-                        in: transactionIds
+                        in: finalIds
                     }
                 },
                 data: {
@@ -73,7 +98,7 @@ export async function POST(req: Request) {
             await tx.bankTransaction.deleteMany({
                 where: {
                     id: {
-                        in: transactionIds,
+                        in: finalIds,
                     },
                 },
             });

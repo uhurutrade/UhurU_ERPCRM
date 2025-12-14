@@ -24,6 +24,20 @@ export default async function EditAccountPage({ params }: EditAccountPageProps) 
         notFound();
     }
 
+    // Calculate balance from active transactions (Live Ledger)
+    const balanceResult = await prisma.bankTransaction.aggregate({
+        where: { bankAccountId: params.id },
+        _sum: { amount: true }
+    });
+
+    // Override the stored balance with the calculated one to ensure it matches the "sum and subtraction of movements"
+    // We treat the stored currentBalance as the calculated one for display
+    account.currentBalance = balanceResult._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+
+    if (!account) {
+        notFound();
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">

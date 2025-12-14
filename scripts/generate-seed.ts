@@ -26,8 +26,10 @@ async function main() {
   // 6. Invoices
   const invoices = await prisma.invoice.findMany({ include: { items: true } });
 
-  // 7. Transactions & Compliance
+  // 7. Transactions & Compliance & Logs
+  const bankStatements = await prisma.bankStatement.findMany(); // New
   const transactions = await prisma.bankTransaction.findMany();
+  const deletedTransactions = await prisma.deletedTransaction.findMany(); // New
   const taxObligations = await prisma.taxObligation.findMany();
 
   const seedContent = `
@@ -43,7 +45,9 @@ async function main() {
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
   await prisma.invoiceItem.deleteMany().catch(() => {});
+  await prisma.deletedTransaction.deleteMany().catch(() => {}); // New
   await prisma.bankTransaction.deleteMany().catch(() => {});
+  await prisma.bankStatement.deleteMany().catch(() => {}); // New
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
   await prisma.taxObligation.deleteMany().catch(() => {});
   await prisma.invoice.deleteMany().catch(() => {});
@@ -51,7 +55,6 @@ async function main() {
   await prisma.activity.deleteMany().catch(() => {});
   await prisma.contact.deleteMany().catch(() => {});
   await prisma.bankAccount.deleteMany().catch(() => {});
-  await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.bank.deleteMany().catch(() => {});
   await prisma.cryptoWallet.deleteMany().catch(() => {});
   await prisma.organization.deleteMany().catch(() => {});
@@ -178,6 +181,16 @@ async function main() {
     }).catch(e => console.log('Invoice error'));
   }
 
+  // --- Bank Statements ---
+  for (const st of ${JSON.stringify(bankStatements, null, 2)} as any[]) {
+    await prisma.bankStatement.create({
+        data: {
+            ...st,
+            uploadedAt: new Date(st.uploadedAt),
+        } as any
+    }).catch(e => console.log('Bank Statement error'));
+  }
+
   // --- Transactions ---
   // Using simple create because IDs might conflict if we are not careful, but usually strict copy is fine
   for (const t of ${JSON.stringify(transactions, null, 2)} as any[]) {
@@ -186,12 +199,27 @@ async function main() {
             ...t,
             amount: t.amount ? Number(t.amount) : 0,
             fee: t.fee ? Number(t.fee) : null,
+            balanceAfter: t.balanceAfter ? Number(t.balanceAfter) : null,
+            exchangeRate: t.exchangeRate ? Number(t.exchangeRate) : null,
             date: new Date(t.date),
             createdAt: new Date(t.createdAt),
             updatedAt: new Date(t.updatedAt),
-            bankStatementId: undefined, // skip complex relations for now or keep if needed
+            // Link to statement if it exists (using original ID)
+            bankStatementId: t.bankStatementId || undefined, 
         } as any
     }).catch(e => console.log('Transaction error (possibly duplicate hash)'));
+  }
+
+  // --- Deleted Transactions (Audit Log) ---
+  for (const dt of ${JSON.stringify(deletedTransactions, null, 2)} as any[]) {
+    await prisma.deletedTransaction.create({
+        data: {
+            ...dt,
+            amount: dt.amount ? Number(dt.amount) : 0,
+            date: new Date(dt.date),
+            deletedAt: new Date(dt.deletedAt),
+        } as any
+    }).catch(e => console.log('Deleted Transaction error'));
   }
 
   // --- Tax Obligations ---

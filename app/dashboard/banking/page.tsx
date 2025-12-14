@@ -5,23 +5,51 @@ import { Upload, History } from 'lucide-react';
 import { ExchangeRatesWidget } from '@/components/banking/exchange-rates-widget';
 import { serializeData } from '@/lib/serialization';
 
-export default async function BankingPage() {
-    const transactions = await prisma.bankTransaction.findMany({
-        orderBy: { date: 'desc' },
-        take: 50,
-        include: {
-            attachments: true,
-            bankAccount: {
-                include: {
-                    bank: {
-                        select: {
-                            bankName: true
+export default async function BankingPage({
+    searchParams
+}: {
+    searchParams: { page?: string, query?: string }
+}) {
+    const currentPage = Number(searchParams.page) || 1;
+    const query = searchParams.query || "";
+    const itemsPerPage = 25;
+
+    // --- Build Where Clause ---
+    const whereClause: any = query ? {
+        OR: [
+            { description: { contains: query, mode: 'insensitive' } },
+            { category: { contains: query, mode: 'insensitive' } },
+            { reference: { contains: query, mode: 'insensitive' } },
+            { counterparty: { contains: query, mode: 'insensitive' } },
+            { merchant: { contains: query, mode: 'insensitive' } },
+            { bankAccount: { bank: { bankName: { contains: query, mode: 'insensitive' } } } }
+        ]
+    } : {};
+
+    // --- Execute Query ---
+    const [totalItems, transactions] = await Promise.all([
+        prisma.bankTransaction.count({ where: whereClause }),
+        prisma.bankTransaction.findMany({
+            where: whereClause,
+            orderBy: { date: 'desc' },
+            take: itemsPerPage,
+            skip: (currentPage - 1) * itemsPerPage,
+            include: {
+                attachments: true,
+                bankAccount: {
+                    include: {
+                        bank: {
+                            select: {
+                                bankName: true
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        })
+    ]);
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
         <div className="min-h-screen p-8">
@@ -60,7 +88,12 @@ export default async function BankingPage() {
                     <div className="p-6 border-b border-slate-700/50">
                         <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
                     </div>
-                    <TransactionTable transactions={serializeData(transactions)} />
+                    <TransactionTable
+                        transactions={serializeData(transactions)}
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                    />
                 </div>
             </div>
         </div>

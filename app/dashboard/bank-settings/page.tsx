@@ -21,6 +21,19 @@ export default async function BankSettingsPage() {
         orderBy: { walletName: 'asc' }
     });
 
+    // Recalculate balances for all accounts to ensure consistency with Live Ledger (excluding Audit Log)
+    // This ensures the "image" (card) shows the computed sum of movements
+    for (const bank of banks) {
+        for (const account of bank.accounts) {
+            const balanceCtx = await prisma.bankTransaction.aggregate({
+                where: { bankAccountId: account.id },
+                _sum: { amount: true }
+            });
+            // Override the stored balance
+            account.currentBalance = balanceCtx._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">

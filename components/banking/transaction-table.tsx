@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { format } from 'date-fns';
-import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip } from 'lucide-react';
+import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip, Search } from 'lucide-react';
 import { useConfirm } from '@/components/providers/modal-provider';
 import { TransactionDetailsModal } from './transaction-details-modal';
 
@@ -28,29 +28,80 @@ type Transaction = {
     attachments: any[]; // Extended via include
 };
 
-export function TransactionTable({ transactions }: { transactions: any[] }) {
+export function TransactionTable({
+    transactions,
+    totalPages = 1,
+    currentPage = 1,
+    totalItems = 0
+}: {
+    transactions: any[],
+    totalPages?: number,
+    currentPage?: number,
+    totalItems?: number
+}) {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isSelectAllMatching, setIsSelectAllMatching] = useState(false); // Global selection state
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteReason, setDeleteReason] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('query')?.toString() || "");
+
+    // Sync search with URL (Debounced)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(searchParams);
+            if (searchTerm) {
+                params.set('query', searchTerm);
+            } else {
+                params.delete('query');
+            }
+            params.set('page', '1'); // Reset to page 1 on search
+            router.replace(`${pathname}?${params.toString()}`);
+            setIsSelectAllMatching(false); // Reset global selection on search change
+            setSelectedIds(new Set());
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm, pathname, router]); // Intentionally omitting searchParams to avoid loop if possible, but strict deps needed. 
+    // Actually, searchParams changes on push, so this might loop if not careful.
+    // Better strategy: Only push if value is different from current param.
 
     // Viewing State
     const [viewTransaction, setViewTransaction] = useState<Transaction | null>(null);
 
     // --- Selection Logic ---
     const handleSelectAll = () => {
-        if (selectedIds.size === transactions.length) {
+        if (isSelectAllMatching || (selectedIds.size === transactions.length && transactions.length > 0)) {
             setSelectedIds(new Set());
+            setIsSelectAllMatching(false);
         } else {
             setSelectedIds(new Set(transactions.map(t => t.id)));
+            // Global selection prompt logic handled in UI render
         }
+    };
+
+    const handleSelectAllMatching = () => {
+        setIsSelectAllMatching(true);
+    };
+
+    const handlePageChange = (newPage: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', newPage.toString());
+        router.push(`${pathname}?${params.toString()}`);
+        setSelectedIds(new Set()); // Reset local selection on page change
+        setIsSelectAllMatching(false);
     };
 
     const handleSelectOne = (id: string) => {
         const newSelected = new Set(selectedIds);
         if (newSelected.has(id)) {
             newSelected.delete(id);
+            setIsSelectAllMatching(false); // If unselecting one, global selection is broken
         } else {
             newSelected.add(id);
         }
@@ -68,6 +119,8 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     transactionIds: Array.from(selectedIds),
+                    deleteAllMatching: isSelectAllMatching,
+                    query: searchTerm, // Send query for global deletion
                     reason: deleteReason
                 })
             });
@@ -79,6 +132,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
 
             // Success
             setSelectedIds(new Set());
+            setIsSelectAllMatching(false);
             setIsDeleteModalOpen(false);
             setDeleteReason("");
             router.refresh();
@@ -117,7 +171,50 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                 </div>
             )}
 
+            {/* --- Search Bar --- */}
+            <div className="mb-6 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                <input
+                    type="text"
+                    placeholder="Search recent transactions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-uhuru-blue text-white placeholder-slate-500 transition-all focus:bg-slate-900"
+                />
+            </div>
+
             {/* --- Table --- */}
+            {/* Active Filters / Bulk Actions Warning */}
+            {selectedIds.size > 0 && transactions.length > 0 && (
+                <div className="bg-uhuru-blue/10 border-b border-uhuru-blue/20 p-2 text-center text-sm text-uhuru-blue">
+                    {!isSelectAllMatching ? (
+                        <span>
+                            All <strong>{selectedIds.size}</strong> items on this page are selected.
+                            {' '}
+                            {totalItems > transactions.length && (
+                                <button
+                                    onClick={handleSelectAllMatching}
+                                    className="underline font-bold hover:text-white"
+                                >
+                                    Select all {totalItems} items matching this search
+                                </button>
+                            )}
+                        </span>
+                    ) : (
+                        <span>
+                            All <strong>{totalItems}</strong> items matching this search are selected.
+                            {' '}
+                            <button
+                                onClick={() => { setIsSelectAllMatching(false); setSelectedIds(new Set()); }}
+                                className="underline font-bold hover:text-white"
+                            >
+                                Clear selection
+                            </button>
+                        </span>
+                    )}
+                </div>
+            )}
+
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
@@ -148,7 +245,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                         {transactions.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="py-8 text-center text-slate-500">
-                                    No transactions found.
+                                    {searchTerm ? "No matching transactions found." : "No transactions found."}
                                 </td>
                             </tr>
                         ) : (
@@ -184,7 +281,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                                 {tx.bankAccount.bank.bankName}
                                             </span>
                                         </td>
-                                        <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                        <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
                                             {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                         </td>
                                         <td className="py-3 px-4 text-slate-500">
@@ -204,6 +301,29 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* --- Pagination --- */}
+            <div className="flex items-center justify-between mt-4">
+                <div className="text-sm text-slate-400">
+                    Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage <= 1}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* --- Transaction Details Modal (with Attachments) --- */}

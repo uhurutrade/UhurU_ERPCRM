@@ -64,7 +64,7 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
                 data: {
                     date: row.date,
                     amount: row.amount,
-                    description: row.description,
+                    description: row.isDateInferred ? `(*) ${row.description}` : row.description,
                     currency: targetAccount.currency, // Enforce target currency consistency
 
                     // Extended Fields

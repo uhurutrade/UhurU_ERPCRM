@@ -314,15 +314,17 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
                             Current Balance
+                            <span className="ml-2 text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">
+                                Calculated from Transactions
+                            </span>
                         </label>
                         <input
                             type="number"
                             name="currentBalance"
                             value={formData.currentBalance}
-                            onChange={handleChange}
-                            step="0.01"
-                            placeholder="0.00"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            readOnly
+                            disabled
+                            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-500 cursor-not-allowed font-mono font-bold"
                         />
                     </div>
 

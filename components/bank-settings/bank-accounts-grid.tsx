@@ -108,7 +108,7 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                                 </div>
                             )}
                             {account.currentBalance !== null && (
-                                <p className="text-sm font-semibold text-white mt-2">
+                                <p className={`text-sm font-semibold mt-2 ${Number(account.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
                                     {Number(account.currentBalance).toLocaleString()} {account.currency}
                                 </p>
                             )}

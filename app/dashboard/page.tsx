@@ -19,23 +19,34 @@ export default async function DashboardPage() {
         take: 5
     });
 
-    const totalBalance = transactions.reduce((sum: number, tx: any) => {
-        return sum + Number(tx.amount);
-    }, 0);
-
+    // 2. Fetch Active Accounts & Recalculate Balances from Live Ledger
     const leads = await prisma.lead.count({ where: { status: 'NEW' } });
     const tasks = await prisma.task.count({ where: { completed: false } });
 
-    // 2. Fetch Active Accounts for the Overview Cards (Max 12)
-    const accounts = await prisma.bankAccount.findMany({
-        take: 12,
+    const allAccounts = await prisma.bankAccount.findMany({
         include: {
             bank: true
-        },
-        orderBy: {
-            currentBalance: 'desc'
         }
     });
+
+    // Recalculate balances
+    for (const account of allAccounts) {
+        const balanceCtx = await prisma.bankTransaction.aggregate({
+            where: { bankAccountId: account.id },
+            _sum: { amount: true }
+        });
+        account.currentBalance = balanceCtx._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+    }
+
+    // Sort by balance desc and take top 12 for display
+    const accounts = allAccounts
+        .sort((a, b) => Number(b.currentBalance) - Number(a.currentBalance))
+        .slice(0, 12);
+
+    // Calculate Global Balance (Sum of all active account balances)
+    // Note: This sums mixed currencies simply as a number, effectively assuming 1:1 for a rough overview 
+    // or relying on the user to interpret the mixed value. Ideally this should be currency normalized.
+    const totalBalance = allAccounts.reduce((sum, acc) => sum + Number(acc.currentBalance), 0);
 
     return (
         <div className="space-y-8">
@@ -174,7 +185,7 @@ export default async function DashboardPage() {
                                         </span>
                                     </div>
                                     <p className="text-sm text-slate-400 truncate mb-1">{acc.bank.bankName}</p>
-                                    <p className="font-bold text-white truncate text-lg">
+                                    <p className={`font-bold truncate text-lg ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
                                         {acc.currency === 'GBP' ? '£' : acc.currency === 'EUR' ? '€' : acc.currency === 'USD' ? '$' : ''}
                                         {Number(acc.currentBalance).toLocaleString()}
                                     </p>

@@ -18,27 +18,43 @@ export type NormalizedTransaction = {
     balanceAfter: number | null;
     exchangeRate: number | null;
     hash: string;
+    isDateInferred?: boolean;
 };
 
 // Helper: Normalize Date
-// Handles multiple formats: YYYY-MM-DD, DD/MM/YYYY, etc.
-function normalizeDate(dateStr: string): Date {
-    if (!dateStr) return new Date();
-    try {
-        // Try standard ISO first
-        const date = new Date(dateStr);
-        if (!isNaN(date.getTime())) return date;
+// Returns { date, inferred } tuple to track fallbacks
+function normalizeDate(dateStr: string): { date: Date, inferred: boolean } {
+    if (!dateStr) return { date: new Date(), inferred: true };
 
-        // Try DD/MM/YYYY
-        const parts = dateStr.split('/');
-        if (parts.length === 3) {
-            // assumed dd/mm/yyyy
-            return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    try {
+        const cleanStr = dateStr.trim();
+
+        // 1. DD-MM-YYYY (e.g. 14-12-2025)
+        if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(cleanStr)) {
+            const [day, month, year] = cleanStr.split('-').map(Number);
+            return { date: new Date(year, month - 1, day), inferred: false };
         }
-    } catch (e) {
-        console.error("Date parsing error", dateStr);
+
+        // 2. DD/MM/YYYY (e.g. 14/12/2025)
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(cleanStr)) {
+            const [day, month, year] = cleanStr.split('/').map(Number);
+            return { date: new Date(year, month - 1, day), inferred: false };
+        }
+
+        // 3. DD.MM.YYYY (e.g. 14.12.2025)
+        if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(cleanStr)) {
+            const [day, month, year] = cleanStr.split('.').map(Number);
+            return { date: new Date(year, month - 1, day), inferred: false };
+        }
+
+        // 4. Dec 14, 2025 (Textual) or ISO
+        const date = new Date(cleanStr);
+        if (!isNaN(date.getTime())) return { date, inferred: false };
+
+    } catch {
+        // fallback
     }
-    return new Date();
+    return { date: new Date(), inferred: true };
 }
 
 // Helper: Create Hash
@@ -96,10 +112,11 @@ function parseWise(records: any[]): NormalizedTransaction[] {
         // User said: Amount, Credit, Debit? No, header says "Amount".
         const amount = parseFloat(row['Amount']);
         const fee = parseFloat(row['Total fees'] || '0');
-        const date = normalizeDate(row['Date']);
+        const { date, inferred } = normalizeDate(row['Date']);
 
         const tx: NormalizedTransaction = {
             date: date,
+            isDateInferred: inferred,
             description: row['Description'] || row['Merchant'] || 'Wise Transaction',
             amount: amount,
             currency: row['Currency'],
@@ -124,7 +141,7 @@ function parseRevolut(records: any[]): NormalizedTransaction[] {
     return records.map(row => {
         // Revolut often uses 'Date started (UTC)' or 'Completed Date'
         const dateStr = row['Date started (UTC)'] || row['Date completed (UTC)'] || row['Date'];
-        const date = normalizeDate(dateStr);
+        const { date, inferred } = normalizeDate(dateStr);
 
         // Amount field
         let amount = parseFloat(row['Amount']);
@@ -132,6 +149,7 @@ function parseRevolut(records: any[]): NormalizedTransaction[] {
 
         const tx: NormalizedTransaction = {
             date: date,
+            isDateInferred: inferred,
             description: row['Description'],
             amount: amount, // Revolut usually has negative for spend
             currency: row['Currency'] || row['Payment currency'], // careful with multi-currency
@@ -170,10 +188,11 @@ function parseWorldFirst(records: any[]): NormalizedTransaction[] {
             amount = -parseFloat(row['Out']);
         }
 
-        const date = normalizeDate(row['Transaction Creation Date'] || row['Date']);
+        const { date, inferred } = normalizeDate(row['Transaction Creation Date'] || row['Date']);
 
         const tx: NormalizedTransaction = {
             date: date,
+            isDateInferred: inferred,
             description: row['Description'],
             amount: amount,
             currency: row['Transaction currency'] || row['Currency'],

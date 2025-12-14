@@ -8,14 +8,37 @@ export const metadata = {
     title: "Deleted Transactions Audit | Uhuru ERP",
 };
 
-export default async function AuditLogPage() {
-    // 1. Fetch deleted transactions (newest deleted first)
-    const logs = await prisma.deletedTransaction.findMany({
-        orderBy: {
-            deletedAt: 'desc'
-        },
-        take: 100 // Limit to last 100 for performance, maybe paginate later
-    });
+export default async function AuditLogPage({
+    searchParams
+}: {
+    searchParams: { page?: string, query?: string }
+}) {
+    const currentPage = Number(searchParams.page) || 1;
+    const query = searchParams.query || "";
+    const itemsPerPage = 25;
+
+    // --- Build Where Clause ---
+    const whereClause: any = query ? {
+        OR: [
+            { description: { contains: query, mode: 'insensitive' } },
+            { deletedBy: { contains: query, mode: 'insensitive' } },
+            { bankName: { contains: query, mode: 'insensitive' } },
+            { reason: { contains: query, mode: 'insensitive' } }
+        ]
+    } : {};
+
+    // --- Execute Query ---
+    const [totalItems, logs] = await Promise.all([
+        prisma.deletedTransaction.count({ where: whereClause }),
+        prisma.deletedTransaction.findMany({
+            where: whereClause,
+            orderBy: { deletedAt: 'desc' },
+            take: itemsPerPage,
+            skip: (currentPage - 1) * itemsPerPage
+        })
+    ]);
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
         <div className="min-h-screen p-8">
@@ -37,7 +60,11 @@ export default async function AuditLogPage() {
 
                 {/* Audit Table */}
                 <div className="bg-slate-900/50 backdrop-blur-xl rounded-3xl border border-slate-800 p-6 shadow-2xl">
-                    <AuditLogTable logs={logs} />
+                    <AuditLogTable
+                        logs={logs}
+                        totalPages={totalPages}
+                        currentPage={currentPage}
+                    />
                 </div>
             </div>
         </div>

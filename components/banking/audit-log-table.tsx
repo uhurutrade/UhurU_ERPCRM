@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { format } from "date-fns";
 import { Search, Eye, AlertCircle, Paperclip } from "lucide-react";
 import { DeletedTransaction } from "@prisma/client";
@@ -9,15 +10,43 @@ interface AuditLogTableProps {
     logs: DeletedTransaction[];
 }
 
-export function AuditLogTable({ logs }: AuditLogTableProps) {
-    const [searchTerm, setSearchTerm] = useState("");
+export function AuditLogTable({
+    logs,
+    totalPages = 1,
+    currentPage = 1
+}: {
+    logs: DeletedTransaction[],
+    totalPages?: number,
+    currentPage?: number
+}) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('query')?.toString() || "");
     const [selectedLog, setSelectedLog] = useState<DeletedTransaction | null>(null);
 
-    const filteredLogs = logs.filter(log =>
-        log.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.amount.toString().includes(searchTerm) ||
-        log.deletedBy?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Sync search with URL (Debounced)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(searchParams);
+            if (searchTerm) {
+                params.set('query', searchTerm);
+            } else {
+                params.delete('query');
+            }
+            params.set('page', '1'); // Reset to page 1 on search
+            router.replace(`${pathname}?${params.toString()}`);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm, pathname, router]);
+
+    const handlePageChange = (newPage: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', newPage.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     return (
         <div className="space-y-4">
@@ -49,14 +78,14 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-700 bg-slate-900">
-                        {filteredLogs.length === 0 ? (
+                        {logs.length === 0 ? (
                             <tr>
                                 <td colSpan={8} className="px-6 py-8 text-center text-slate-500">
                                     No deleted transactions found.
                                 </td>
                             </tr>
                         ) : (
-                            filteredLogs.map((log) => (
+                            logs.map((log) => (
                                 <tr key={log.id} className="hover:bg-slate-800 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-rose-400 font-mono">
                                         {format(new Date(log.deletedAt), "dd/MM/yyyy HH:mm")}
@@ -111,6 +140,29 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* --- Pagination --- */}
+            <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-400">
+                    Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage <= 1}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* Detail Modal */}
