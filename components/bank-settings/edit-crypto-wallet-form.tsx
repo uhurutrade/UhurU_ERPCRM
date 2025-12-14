@@ -68,10 +68,10 @@ export default function EditCryptoWalletForm({ wallet }: EditCryptoWalletFormPro
 
     const handleDelete = async () => {
         const confirmed = await confirm({
-            title: "Delete Wallet",
-            message: "Are you sure you want to delete this wallet? This action cannot be undone.",
+            title: "CRITICAL ACTION: Delete Wallet",
+            message: "WARNING: Deleting this wallet will PERMANENTLY ERASE ALL associated transaction history from the database. \n\nWe will lose all trace of movements. This action is irreversible.\n\nAre you absolutely sure?",
             type: "danger",
-            confirmText: "Delete",
+            confirmText: "YES, DESTROY EVERYTHING",
             cancelText: "Cancel",
         });
 
@@ -85,26 +85,16 @@ export default function EditCryptoWalletForm({ wallet }: EditCryptoWalletFormPro
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error("Failed to delete crypto wallet");
-                }
-
-                if (data.action === "archived") {
-                    await confirm({
-                        title: "Wallet Deactivated",
-                        message: data.message || "This wallet has transactions and cannot be fully deleted. It has been marked as Inactive.",
-                        type: "info",
-                        confirmText: "Understood",
-                        cancelText: "",
-                    });
+                    throw new Error(data.error || "Failed to delete crypto wallet");
                 }
 
                 router.push(`/dashboard/bank-settings`);
                 router.refresh();
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error deleting crypto wallet:", error);
                 await confirm({
                     title: "Error",
-                    message: "Error deleting crypto wallet. Please try again.",
+                    message: error.message || "Error deleting crypto wallet. Please try again.",
                     type: "danger",
                     confirmText: "Close",
                     cancelText: "",
