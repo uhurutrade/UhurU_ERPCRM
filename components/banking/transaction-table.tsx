@@ -232,11 +232,11 @@ export function TransactionTable({
                             </th>
                             <th className="py-3 px-4 font-medium">Date</th>
                             <th className="py-3 px-4 font-medium">Description</th>
-                            <th className="py-3 px-4 font-medium">Account</th>
+                            <th className="py-3 px-4 font-medium hidden md:table-cell">Account</th>
                             <th className="py-3 px-4 font-medium text-right">Amount</th>
-                            <th className="py-3 px-4 font-medium">Category</th>
+                            <th className="py-3 px-4 font-medium hidden md:table-cell">Category</th>
                             {/* Attachments Column */}
-                            <th className="py-3 px-4 w-12 text-center text-slate-400">
+                            <th className="py-3 px-4 w-12 text-center text-slate-400 hidden md:table-cell">
                                 <Paperclip size={16} />
                             </th>
                         </tr>
@@ -276,7 +276,7 @@ export function TransactionTable({
                                             {tx.description}
                                             {tx.reference && <span className="block text-xs text-slate-500 mt-0.5">{tx.reference}</span>}
                                         </td>
-                                        <td className="py-3 px-4 text-slate-500">
+                                        <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
                                             <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
                                                 {tx.bankAccount.bank.bankName}
                                             </span>
@@ -284,11 +284,11 @@ export function TransactionTable({
                                         <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
                                             {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                         </td>
-                                        <td className="py-3 px-4 text-slate-500">
+                                        <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
                                             {tx.category || '-'}
                                         </td>
                                         {/* Attachments Cell */}
-                                        <td className="py-3 px-4 text-center" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>
+                                        <td className="py-3 px-4 text-center hidden md:table-cell" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>
                                             <div className="flex justify-center">
                                                 <button className={`p-1.5 rounded-lg transition-colors ${hasAttachments ? 'text-uhuru-blue bg-uhuru-blue/10' : 'text-slate-600 hover:text-slate-400'}`}>
                                                     <Paperclip size={16} />

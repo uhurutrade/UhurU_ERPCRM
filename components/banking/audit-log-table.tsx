@@ -68,12 +68,12 @@ export function AuditLogTable({
                     <thead className="bg-slate-800 text-slate-200 uppercase font-semibold">
                         <tr>
                             <th className="px-6 py-4">Deleted At</th>
-                            <th className="px-6 py-4">Original Date</th>
+                            <th className="px-6 py-4 hidden md:table-cell">Original Date</th>
                             <th className="px-6 py-4">Description</th>
                             <th className="px-6 py-4">Amount</th>
-                            <th className="px-6 py-4">Deleted By</th>
-                            <th className="px-6 py-4">Values</th>
-                            <th className="px-6 py-4 text-center">📎</th>
+                            <th className="px-6 py-4 hidden md:table-cell">Deleted By</th>
+                            <th className="px-6 py-4 hidden md:table-cell">Values</th>
+                            <th className="px-6 py-4 text-center hidden md:table-cell">📎</th>
                             <th className="px-6 py-4 text-right">Details</th>
                         </tr>
                     </thead>
@@ -90,7 +90,7 @@ export function AuditLogTable({
                                     <td className="px-6 py-4 whitespace-nowrap text-rose-400 font-mono">
                                         {format(new Date(log.deletedAt), "dd/MM/yyyy HH:mm")}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-slate-300">
+                                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 hidden md:table-cell">
                                         {format(new Date(log.date), "dd/MM/yyyy")}
                                     </td>
                                     <td className="px-6 py-4 font-medium text-white max-w-xs truncate">
@@ -99,16 +99,16 @@ export function AuditLogTable({
                                     <td className="px-6 py-4 whitespace-nowrap font-mono font-bold text-white">
                                         {Number(log.amount).toLocaleString()} {log.currency}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                         {log.deletedBy}
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4 hidden md:table-cell">
                                         <div className="flex flex-col text-xs">
                                             <span className="text-emerald-400">{log.bankName}</span>
                                             <span className="text-slate-500">{log.bankAccountName}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-center">
+                                    <td className="px-6 py-4 text-center hidden md:table-cell">
                                         {(() => {
                                             try {
                                                 const snapshot = JSON.parse(log.fullSnapshot || "{}");
