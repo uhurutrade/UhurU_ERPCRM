@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BankAccount } from "@prisma/client";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Ban } from "lucide-react";
 
 interface BankAccountsGridProps {
     initialAccounts: BankAccount[];
@@ -65,14 +65,26 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                             className="block p-4 bg-gradient-card backdrop-blur-xl rounded-lg border border-slate-700 transition-colors h-full"
                         >
                             <div className="flex justify-between items-start mb-2">
-                                <span className="font-mono text-lg font-bold text-emerald-400">
-                                    {account.currency}
-                                </span>
-                                {account.isPrimary && (
-                                    <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded">
-                                        Primary
+                                <div className="flex items-center gap-2">
+                                    <span className="font-mono text-lg font-bold text-emerald-400">
+                                        {account.currency}
                                     </span>
-                                )}
+                                    {!account.isActive && (
+                                        <Ban className="w-4 h-4 text-rose-500" />
+                                    )}
+                                </div>
+                                <div className="flex gap-1">
+                                    {!account.isActive && (
+                                        <span className="px-2 py-0.5 text-xs bg-rose-500/20 text-rose-500 rounded border border-rose-500/30">
+                                            Inactive
+                                        </span>
+                                    )}
+                                    {account.isPrimary && (
+                                        <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded">
+                                            Primary
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             <p className="text-sm text-slate-300 mb-1">{account.accountName}</p>
                             <p className="text-xs text-slate-500">{account.accountType}</p>
