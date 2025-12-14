@@ -257,6 +257,25 @@ async function main() {
         "updatedAt": "2025-12-14T09:29:39.772Z"
       }
     ]
+  },
+  {
+    "id": "cmj5j40pq0000it1qy6e2jpqk",
+    "bankName": "manolo bank",
+    "bankType": "NEOBANK",
+    "swiftBic": null,
+    "bankCode": null,
+    "website": null,
+    "supportEmail": null,
+    "supportPhone": null,
+    "bankAddress": null,
+    "bankCity": null,
+    "bankPostcode": null,
+    "bankCountry": null,
+    "isActive": true,
+    "notes": null,
+    "createdAt": "2025-12-14T09:35:05.630Z",
+    "updatedAt": "2025-12-14T09:35:05.630Z",
+    "accounts": []
   }
 ] as any[]) {
     await prisma.bank.create({
