@@ -59,8 +59,8 @@ export default async function ERPPage() {
                     <thead className="bg-slate-50 dark:bg-slate-900/50">
                         <tr className="text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                             <th className="px-6 py-4">Number</th>
-                            <th className="px-6 py-4">Client</th>
-                            <th className="px-6 py-4">Date</th>
+                            <th className="px-6 py-4 hidden md:table-cell">Client</th>
+                            <th className="px-6 py-4 hidden md:table-cell">Date</th>
                             <th className="px-6 py-4">Amount</th>
                             <th className="px-6 py-4">Status</th>
                         </tr>
@@ -72,8 +72,8 @@ export default async function ERPPage() {
                             invoices.map((inv) => (
                                 <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">{inv.number}</td>
-                                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{inv.organization.name}</td>
-                                    <td className="px-6 py-4 text-slate-500 text-sm">{inv.date.toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 hidden md:table-cell">{inv.organization.name}</td>
+                                    <td className="px-6 py-4 text-slate-500 text-sm hidden md:table-cell">{inv.date.toLocaleDateString()}</td>
                                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">£{Number(inv.total).toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${inv.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' :

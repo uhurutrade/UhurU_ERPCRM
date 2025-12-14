@@ -9,9 +9,9 @@ export function ContactList({ contacts }: { contacts: any[] }) {
                 <thead className="bg-slate-50 dark:bg-slate-900/50">
                     <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                         <th className="py-4 px-6">Name</th>
-                        <th className="py-4 px-6">Organization</th>
+                        <th className="py-4 px-6 hidden md:table-cell">Organization</th>
                         <th className="py-4 px-6">Contact Info</th>
-                        <th className="py-4 px-6">Role</th>
+                        <th className="py-4 px-6 hidden md:table-cell">Role</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -25,7 +25,7 @@ export function ContactList({ contacts }: { contacts: any[] }) {
                                     <div className="font-medium text-slate-900 dark:text-white">{contact.name}</div>
                                 </div>
                             </td>
-                            <td className="py-4 px-6">
+                            <td className="py-4 px-6 hidden md:table-cell">
                                 {contact.organization ? (
                                     <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                                         <Building2 size={14} />
@@ -49,7 +49,7 @@ export function ContactList({ contacts }: { contacts: any[] }) {
                                     )}
                                 </div>
                             </td>
-                            <td className="py-4 px-6 text-sm text-slate-500">
+                            <td className="py-4 px-6 text-sm text-slate-500 hidden md:table-cell">
                                 {contact.role || '-'}
                             </td>
                         </tr>
