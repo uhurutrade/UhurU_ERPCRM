@@ -43,6 +43,7 @@ interface TransactionDetailsModalProps {
 export function TransactionDetailsModal({ isOpen, onClose, transaction }: TransactionDetailsModalProps) {
     const [uploading, setUploading] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
 
     if (!isOpen || !transaction) return null;
 
@@ -70,14 +71,12 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
         }
     };
 
-    const handleDeleteAttachment = async (attachmentId: string, fileName: string) => {
-        const confirmed = window.confirm(`¿Eliminar "${fileName}"?\n\nEsta acción no se puede deshacer.`);
+    const handleDeleteAttachment = async () => {
+        if (!confirmDelete) return;
 
-        if (!confirmed) return;
-
-        setDeletingId(attachmentId);
+        setDeletingId(confirmDelete.id);
         try {
-            const response = await fetch(`/api/banking/attachments/${attachmentId}`, {
+            const response = await fetch(`/api/banking/attachments/${confirmDelete.id}`, {
                 method: 'DELETE'
             });
 
@@ -91,11 +90,12 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
             alert('Error al eliminar el archivo');
         } finally {
             setDeletingId(null);
+            setConfirmDelete(null);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
             <div
                 className="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-xl w-full flex flex-col shadow-2xl overflow-hidden max-h-[85vh]"
                 onClick={(e) => e.stopPropagation()}
@@ -213,7 +213,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
                                         <button
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                handleDeleteAttachment(file.id, file.originalName || 'Document');
+                                                setConfirmDelete({ id: file.id, name: file.originalName || 'Document' });
                                             }}
                                             disabled={deletingId === file.id}
                                             className="absolute top-2 right-2 p-1 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
@@ -253,6 +253,42 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
 
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {confirmDelete && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-red-900/50 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+                        <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <X className="text-red-500" size={24} />
+                            Eliminar Archivo
+                        </h3>
+
+                        <p className="text-slate-300 mb-2">
+                            ¿Eliminar <strong className="text-white">"{confirmDelete.name}"</strong>?
+                        </p>
+
+                        <p className="text-sm text-slate-400 mb-6">
+                            Esta acción no se puede deshacer.
+                        </p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleDeleteAttachment}
+                                disabled={deletingId !== null}
+                                className="flex-1 py-3 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl font-bold shadow-lg shadow-red-900/30 transition-all disabled:shadow-none"
+                            >
+                                {deletingId ? 'Eliminando...' : 'Eliminar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
