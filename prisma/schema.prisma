@@ -189,7 +189,8 @@ model BankAccount {
   
   // USD (USA)
   accountNumber       String?           // Account number
-  routingNumber       String?           // ABA routing number (USA)
+  routingNumber       String?           // ABA routing number (USA) - mostly for ACH
+  wireRoutingNumber   String?           // Wire transfer routing number (if different)
   
   // GBP (UK)
   sortCode            String?           // UK sort code (6 digits)

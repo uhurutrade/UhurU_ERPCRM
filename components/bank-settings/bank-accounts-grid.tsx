@@ -81,6 +81,20 @@ export default function BankAccountsGrid({ initialAccounts, bankId }: BankAccoun
                                     {account.iban.substring(0, 20)}...
                                 </p>
                             )}
+                            {account.currency === "USD" && (
+                                <div className="mt-2 space-y-1">
+                                    {account.routingNumber && (
+                                        <p className="text-xs text-slate-600 font-mono">
+                                            ACH: {account.routingNumber}
+                                        </p>
+                                    )}
+                                    {account.wireRoutingNumber && (
+                                        <p className="text-xs text-slate-600 font-mono">
+                                            Wire: {account.wireRoutingNumber}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                             {account.currentBalance !== null && (
                                 <p className="text-sm font-semibold text-white mt-2">
                                     {Number(account.currentBalance).toLocaleString()} {account.currency}

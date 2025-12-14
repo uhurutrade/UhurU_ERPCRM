@@ -25,6 +25,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 iban: data.iban || null,
                 accountNumber: data.accountNumber || null,
                 routingNumber: data.routingNumber || null,
+                wireRoutingNumber: data.wireRoutingNumber || null,
                 sortCode: data.sortCode || null,
                 accountNumberUK: data.accountNumberUK || null,
                 swiftBic: data.swiftBic || null,

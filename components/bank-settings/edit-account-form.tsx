@@ -22,6 +22,7 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
         iban: account.iban || "",
         accountNumber: account.accountNumber || "",
         routingNumber: account.routingNumber || "",
+        wireRoutingNumber: account.wireRoutingNumber || "",
         sortCode: account.sortCode || "",
         accountNumberUK: account.accountNumberUK || "",
         swiftBic: account.swiftBic || "",
@@ -244,13 +245,27 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
                         <>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                                    Routing Number
+                                    ACH Routing Number
                                 </label>
                                 <input
                                     type="text"
                                     name="routingNumber"
                                     value={formData.routingNumber}
                                     onChange={handleChange}
+                                    placeholder="9 Digits"
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Wire Routing Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="wireRoutingNumber"
+                                    value={formData.wireRoutingNumber}
+                                    onChange={handleChange}
+                                    placeholder="9 Digits (if different)"
                                     className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
                                 />
                             </div>

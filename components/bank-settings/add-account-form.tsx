@@ -22,6 +22,7 @@ export default function AddAccountForm({ bankId, preselectedCurrency }: AddAccou
         iban: "",
         accountNumber: "",
         routingNumber: "",
+        wireRoutingNumber: "",
         sortCode: "",
         accountNumberUK: "",
         swiftBic: "",
@@ -187,15 +188,30 @@ export default function AddAccountForm({ bankId, preselectedCurrency }: AddAccou
 
                     {formData.currency === "USD" && (
                         <>
+
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                                    Routing Number
+                                    ACH Routing Number
                                 </label>
                                 <input
                                     type="text"
                                     name="routingNumber"
                                     value={formData.routingNumber}
                                     onChange={handleChange}
+                                    placeholder="9 Digits"
+                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    Wire Routing Number
+                                </label>
+                                <input
+                                    type="text"
+                                    name="wireRoutingNumber"
+                                    value={formData.wireRoutingNumber}
+                                    onChange={handleChange}
+                                    placeholder="9 Digits (if different)"
                                     className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
                                 />
                             </div>
@@ -274,6 +290,6 @@ export default function AddAccountForm({ bankId, preselectedCurrency }: AddAccou
                     {loading ? "Creating..." : "Create Account"}
                 </button>
             </div>
-        </form>
+        </form >
     );
 }
