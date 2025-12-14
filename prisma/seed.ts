@@ -164,7 +164,7 @@ async function main() {
         "order": 0,
         "notes": null,
         "createdAt": "2025-12-14T08:39:19.504Z",
-        "updatedAt": "2025-12-14T10:00:18.835Z"
+        "updatedAt": "2025-12-14T10:48:13.848Z"
       }
     ]
   },
@@ -230,33 +230,7 @@ async function main() {
     "notes": null,
     "createdAt": "2025-12-14T09:29:27.148Z",
     "updatedAt": "2025-12-14T09:29:27.148Z",
-    "accounts": [
-      {
-        "id": "cmj5ix1a300023sv8se06ra7b",
-        "bankId": "cmj5iwrjg00003sv8ooc8cebo",
-        "accountName": "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
-        "accountType": "BUSINESS",
-        "currency": "EUR",
-        "iban": null,
-        "accountNumber": null,
-        "routingNumber": null,
-        "wireRoutingNumber": null,
-        "sortCode": null,
-        "accountNumberUK": null,
-        "ibanCH": null,
-        "bcNumber": null,
-        "swiftBic": null,
-        "currentBalance": "0",
-        "availableBalance": null,
-        "lastBalanceUpdate": null,
-        "isActive": true,
-        "isPrimary": false,
-        "order": 0,
-        "notes": null,
-        "createdAt": "2025-12-14T09:29:39.772Z",
-        "updatedAt": "2025-12-14T09:41:13.328Z"
-      }
-    ]
+    "accounts": []
   },
   {
     "id": "cmj5j40pq0000it1qy6e2jpqk",
@@ -552,23 +526,6 @@ async function main() {
     "bankStatementId": null,
     "createdAt": "2025-12-14T08:39:19.553Z",
     "updatedAt": "2025-12-14T08:39:19.553Z"
-  },
-  {
-    "id": "cmj5h4av8000dqxyj45pisvek",
-    "externalId": null,
-    "date": "2025-05-20T00:00:00.000Z",
-    "description": "Consulting Fee - Client A",
-    "amount": "5500",
-    "currency": "GBP",
-    "fee": null,
-    "status": "COMPLETED",
-    "category": "Income",
-    "reference": "REF-3451",
-    "hash": "2025-05-20_5500_ConsultingFee-ClientA_bghlz3",
-    "bankAccountId": "cmj4oiye20004a47open4oqfq",
-    "bankStatementId": null,
-    "createdAt": "2025-12-14T08:39:19.557Z",
-    "updatedAt": "2025-12-14T08:39:19.557Z"
   },
   {
     "id": "cmj5h4avb000fqxyjjgty3lux",
@@ -877,23 +834,6 @@ async function main() {
     "updatedAt": "2025-12-14T08:39:19.610Z"
   },
   {
-    "id": "cmj5h4awt001fqxyjxke3uiu8",
-    "externalId": null,
-    "date": "2025-10-05T00:00:00.000Z",
-    "description": "New Laptop Eqpt",
-    "amount": "-2200",
-    "currency": "EUR",
-    "fee": null,
-    "status": "COMPLETED",
-    "category": "Expense",
-    "reference": "REF-9731",
-    "hash": "2025-10-05_-2200_NewLaptopEqpt_l0qwo",
-    "bankAccountId": "cmj4oiydv0002a47o3h33cgnc",
-    "bankStatementId": null,
-    "createdAt": "2025-12-14T08:39:19.613Z",
-    "updatedAt": "2025-12-14T08:39:19.613Z"
-  },
-  {
     "id": "cmj5h4aww001hqxyjtcpxdlz7",
     "externalId": null,
     "date": "2025-11-01T00:00:00.000Z",
@@ -909,23 +849,6 @@ async function main() {
     "bankStatementId": null,
     "createdAt": "2025-12-14T08:39:19.616Z",
     "updatedAt": "2025-12-14T08:39:19.616Z"
-  },
-  {
-    "id": "cmj5h4awz001jqxyjpa28s9yx",
-    "externalId": null,
-    "date": "2025-12-12T00:00:00.000Z",
-    "description": "Christmas Party",
-    "amount": "-800",
-    "currency": "EUR",
-    "fee": null,
-    "status": "COMPLETED",
-    "category": "Expense",
-    "reference": "REF-1880",
-    "hash": "2025-12-12_-800_ChristmasParty_n42kh",
-    "bankAccountId": "cmj4oiydv0002a47o3h33cgnc",
-    "bankStatementId": null,
-    "createdAt": "2025-12-14T08:39:19.619Z",
-    "updatedAt": "2025-12-14T08:39:19.619Z"
   }
 ] as any[]) {
     await prisma.bankTransaction.create({

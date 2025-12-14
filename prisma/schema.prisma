@@ -397,6 +397,7 @@ model FiscalYear {
   obligations TaxObligation[]
 }
 
+
 model TaxObligation {
   id              String    @id @default(cuid())
   type            String    // VAT, CORPORATION_TAX, CONFIRMATION_STATEMENT, ACCOUNTS
@@ -443,7 +444,7 @@ model Invoice {
   currency       String        @default("GBP")
 
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id]) // Este es el campo que requiere la inversa
+  organization   Organization @relation(fields: [organizationId], references: [id]) 
 
   items          InvoiceItem[]
 
@@ -525,4 +526,29 @@ model CompanySettings {
   
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @updatedAt
+}
+
+
+// Audit Log for Deleted Transactions
+model DeletedTransaction {
+  id              String   @id @default(cuid())
+  
+  // Original Data Snapshot
+  originalId      String?  // The ID it had in BankTransaction
+  amount          Decimal  @db.Decimal(15, 2)
+  currency        String
+  description     String
+  date            DateTime
+  
+  // Context
+  bankAccountName String?
+  bankName        String?
+  
+  // Audit Info
+  deletedAt       DateTime @default(now())
+  deletedBy       String?  // User ID or Email
+  reason          String?
+  
+  // Raw Data (Backup)
+  fullSnapshot    String?  @db.Text // JSON string of the complete original object
 }

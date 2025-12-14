@@ -82,8 +82,20 @@ export default function EditCryptoWalletForm({ wallet }: EditCryptoWalletFormPro
                     method: "DELETE",
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
                     throw new Error("Failed to delete crypto wallet");
+                }
+
+                if (data.action === "archived") {
+                    await confirm({
+                        title: "Wallet Deactivated",
+                        message: data.message || "This wallet has transactions and cannot be fully deleted. It has been marked as Inactive.",
+                        type: "info",
+                        confirmText: "Understood",
+                        cancelText: "",
+                    });
                 }
 
                 router.push(`/dashboard/bank-settings`);

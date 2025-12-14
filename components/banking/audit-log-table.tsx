@@ -1,0 +1,147 @@
+"use client";
+
+import { useState } from "react";
+import { format } from "date-fns";
+import { Search, Eye, AlertCircle } from "lucide-react";
+import { DeletedTransaction } from "@prisma/client";
+
+interface AuditLogTableProps {
+    logs: DeletedTransaction[];
+}
+
+export function AuditLogTable({ logs }: AuditLogTableProps) {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedLog, setSelectedLog] = useState<DeletedTransaction | null>(null);
+
+    const filteredLogs = logs.filter(log =>
+        log.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        log.amount.toString().includes(searchTerm) ||
+        log.deletedBy?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                <input
+                    type="text"
+                    placeholder="Search audit log..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-slate-500"
+                />
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto rounded-lg border border-slate-700">
+                <table className="w-full text-left text-sm text-slate-400">
+                    <thead className="bg-slate-800 text-slate-200 uppercase font-semibold">
+                        <tr>
+                            <th className="px-6 py-4">Deleted At</th>
+                            <th className="px-6 py-4">Original Date</th>
+                            <th className="px-6 py-4">Description</th>
+                            <th className="px-6 py-4">Amount</th>
+                            <th className="px-6 py-4">Deleted By</th>
+                            <th className="px-6 py-4">Values</th>
+                            <th className="px-6 py-4 text-right">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700 bg-slate-900">
+                        {filteredLogs.length === 0 ? (
+                            <tr>
+                                <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
+                                    No deleted transactions found.
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredLogs.map((log) => (
+                                <tr key={log.id} className="hover:bg-slate-800 transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-rose-400 font-mono">
+                                        {format(new Date(log.deletedAt), "dd/MM/yyyy HH:mm")}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-slate-300">
+                                        {format(new Date(log.date), "dd/MM/yyyy")}
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-white max-w-xs truncate">
+                                        {log.description}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap font-mono font-bold text-white">
+                                        {Number(log.amount).toLocaleString()} {log.currency}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {log.deletedBy}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-col text-xs">
+                                            <span className="text-emerald-400">{log.bankName}</span>
+                                            <span className="text-slate-500">{log.bankAccountName}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button
+                                            onClick={() => setSelectedLog(log)}
+                                            className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors"
+                                            title="View Snapshot"
+                                        >
+                                            <Eye size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Detail Modal */}
+            {selectedLog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                <AlertCircle className="text-rose-500" />
+                                Deleted Transaction Details
+                            </h3>
+                            <button
+                                onClick={() => setSelectedLog(null)}
+                                className="text-slate-400 hover:text-white"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 bg-slate-800 rounded-lg">
+                                    <p className="text-xs text-slate-400 uppercase mb-1">Deleted By</p>
+                                    <p className="font-semibold text-white">{selectedLog.deletedBy}</p>
+                                </div>
+                                <div className="p-4 bg-slate-800 rounded-lg">
+                                    <p className="text-xs text-slate-400 uppercase mb-1">Delete Reason</p>
+                                    <p className="font-semibold text-white">{selectedLog.reason || "N/A"}</p>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 overflow-auto max-h-60">
+                                <p className="text-xs text-slate-500 mb-2 font-mono">FULL JSON SNAPSHOT</p>
+                                <pre className="text-xs text-emerald-400 font-mono whitespace-pre-wrap">
+                                    {JSON.stringify(JSON.parse(selectedLog.fullSnapshot || "{}"), null, 2)}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                onClick={() => setSelectedLog(null)}
+                                className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

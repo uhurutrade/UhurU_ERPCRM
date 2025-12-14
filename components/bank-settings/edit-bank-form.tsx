@@ -83,16 +83,17 @@ export default function EditBankForm({ bank }: EditBankFormProps) {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete bank");
+                const data = await response.json();
+                throw new Error(data.message || "Failed to delete bank");
             }
 
             router.push(`/dashboard/bank-settings`);
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting bank:", error);
             await confirm({
-                title: "Error",
-                message: "Error deleting bank. Please try again.",
+                title: "Cannot Delete Bank",
+                message: error.message || "Error deleting bank. Please try again.",
                 type: "danger",
                 confirmText: "Close",
                 cancelText: "",

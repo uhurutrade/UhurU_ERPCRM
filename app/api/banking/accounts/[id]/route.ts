@@ -106,10 +106,16 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
             message: "Account deleted successfully."
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error deleting account:", error);
+
+        let errorMessage = "We could not delete the account due to a technical issue.";
+        if (error.code === 'P2003') {
+            errorMessage = "This account cannot be deleted because it is still linked to other records (e.g. Transactions or Compliance data).";
+        }
+
         return NextResponse.json(
-            { error: "Failed to delete account" },
+            { error: errorMessage },
             { status: 500 }
         );
     }

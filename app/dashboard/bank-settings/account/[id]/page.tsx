@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import EditAccountForm from "@/components/bank-settings/edit-account-form";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
+import { serializeData } from "@/lib/serialization";
 
 interface EditAccountPageProps {
     params: {
@@ -43,7 +43,7 @@ export default async function EditAccountPage({ params }: EditAccountPageProps) 
             </div>
 
             <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-                <EditAccountForm account={account} bankName={account.bank.bankName} />
+                <EditAccountForm account={serializeData(account)} bankName={account.bank.bankName} />
             </div>
         </div>
     );
