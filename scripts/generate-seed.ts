@@ -4,29 +4,33 @@ const fs = require('fs');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🔄 Extrayendo datos de la base de datos local...');
+  console.log('🔄 Extrayendo datos de la base de datos local...');
 
-    // 1. Users
-    const users = await prisma.user.findMany();
+  // 1. Users
+  const users = await prisma.user.findMany();
 
-    // 2. Company Settings
-    const companySettings = await prisma.companySettings.findMany();
+  // 2. Company Settings
+  const companySettings = await prisma.companySettings.findMany();
 
-    // 3. Banks & Accounts
-    const banks = await prisma.bank.findMany({ include: { accounts: true } });
+  // 3. Banks & Accounts
+  const banks = await prisma.bank.findMany({ include: { accounts: true } });
 
-    // 4. Crypto Wallets
-    const cryptoWallets = await prisma.cryptoWallet.findMany();
+  // 4. Crypto Wallets
+  const cryptoWallets = await prisma.cryptoWallet.findMany();
 
-    // 5. CRM
-    const organizations = await prisma.organization.findMany();
-    const contacts = await prisma.contact.findMany();
-    const deals = await prisma.deal.findMany();
+  // 5. CRM
+  const organizations = await prisma.organization.findMany();
+  const contacts = await prisma.contact.findMany();
+  const deals = await prisma.deal.findMany();
 
-    // 6. Invoices
-    const invoices = await prisma.invoice.findMany({ include: { items: true } });
+  // 6. Invoices
+  const invoices = await prisma.invoice.findMany({ include: { items: true } });
 
-    const seedContent = `
+  // 7. Transactions & Compliance
+  const transactions = await prisma.bankTransaction.findMany();
+  const taxObligations = await prisma.taxObligation.findMany();
+
+  const seedContent = `
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -153,6 +157,38 @@ async function main() {
     }).catch(e => console.log('Invoice error'));
   }
 
+  // --- Transactions ---
+  // Using simple create because IDs might conflict if we are not careful, but usually strict copy is fine
+  for (const t of ${JSON.stringify(transactions, null, 2)}) {
+    await prisma.bankTransaction.create({
+        data: {
+            ...t,
+            amount: t.amount ? Number(t.amount) : 0,
+            fee: t.fee ? Number(t.fee) : null,
+            date: new Date(t.date),
+            createdAt: new Date(t.createdAt),
+            updatedAt: new Date(t.updatedAt),
+            bankStatementId: undefined, // skip complex relations for now or keep if needed
+        } as any
+    }).catch(e => console.log('Transaction error (possibly duplicate hash)'));
+  }
+
+  // --- Tax Obligations ---
+  for (const tax of ${JSON.stringify(taxObligations, null, 2)}) {
+    await prisma.taxObligation.create({
+        data: {
+            ...tax,
+            periodStart: tax.periodStart ? new Date(tax.periodStart) : null,
+            periodEnd: tax.periodEnd ? new Date(tax.periodEnd) : null,
+            dueDate: new Date(tax.dueDate),
+            amountEstimated: tax.amountEstimated ? Number(tax.amountEstimated) : null,
+            amountActual: tax.amountActual ? Number(tax.amountActual) : null,
+            createdAt: new Date(tax.createdAt),
+            updatedAt: new Date(tax.updatedAt),
+        } as any
+    }).catch(e => console.log('Tax Obligation error'));
+  }
+
   console.log('✅ Seeding finished.');
 }
 
@@ -166,15 +202,15 @@ main()
   });
 `;
 
-    fs.writeFileSync('prisma/seed.ts', seedContent);
-    console.log('✅ prisma/seed.ts generado con los datos actuales.');
+  fs.writeFileSync('prisma/seed.ts', seedContent);
+  console.log('✅ prisma/seed.ts generado con los datos actuales.');
 }
 
 main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
