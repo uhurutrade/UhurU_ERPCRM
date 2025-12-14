@@ -6,16 +6,16 @@ import { getTransactionCategories, createTransactionCategory } from '@/app/actio
 import { Check, Plus, Tag, Palette } from 'lucide-react';
 
 const PRESET_COLORS = [
-    { name: 'Emerald', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' },
-    { name: 'Pink', class: 'bg-pink-500/10 text-pink-400 border-pink-500/20 hover:bg-pink-500/20' },
-    { name: 'Purple', class: 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20' },
-    { name: 'Blue', class: 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' },
-    { name: 'Orange', class: 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20' },
-    { name: 'Slate', class: 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20' },
-    { name: 'Indigo', class: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20' },
-    { name: 'Red', class: 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' },
-    { name: 'Yellow', class: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20' },
-    { name: 'Teal', class: 'bg-teal-500/10 text-teal-400 border-teal-500/20 hover:bg-teal-500/20' },
+    { name: 'White', solid: 'bg-slate-100', class: 'bg-slate-100/10 text-slate-200 border-slate-100/20 hover:bg-slate-100/20' },
+    { name: 'Yellow', solid: 'bg-yellow-400', class: 'bg-yellow-400/10 text-yellow-300 border-yellow-400/20 hover:bg-yellow-400/20' },
+    { name: 'Blue', solid: 'bg-blue-400', class: 'bg-blue-400/10 text-blue-300 border-blue-400/20 hover:bg-blue-400/20' },
+    { name: 'Red', solid: 'bg-rose-400', class: 'bg-rose-400/10 text-rose-300 border-rose-400/20 hover:bg-rose-400/20' },
+    { name: 'Green', solid: 'bg-emerald-400', class: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/20 hover:bg-emerald-400/20' },
+    { name: 'Purple', solid: 'bg-purple-400', class: 'bg-purple-400/10 text-purple-300 border-purple-400/20 hover:bg-purple-400/20' },
+    { name: 'Pink', solid: 'bg-pink-400', class: 'bg-pink-400/10 text-pink-300 border-pink-400/20 hover:bg-pink-400/20' },
+    { name: 'Cyan', solid: 'bg-cyan-400', class: 'bg-cyan-400/10 text-cyan-300 border-cyan-400/20 hover:bg-cyan-400/20' },
+    { name: 'Orange', solid: 'bg-orange-400', class: 'bg-orange-400/10 text-orange-300 border-orange-400/20 hover:bg-orange-400/20' },
+    { name: 'Lime', solid: 'bg-lime-400', class: 'bg-lime-400/10 text-lime-300 border-lime-400/20 hover:bg-lime-400/20' },
 ];
 
 const DEFAULT_CATEGORIES = [
@@ -174,7 +174,7 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
                                             onClick={() => setCustomColor(color.class)}
                                             className={`
                                                 w-6 h-6 rounded-full flex items-center justify-center transition-all
-                                                ${color.class.split(' ')[0].replace('/10', '')}
+                                                ${color.solid}
                                                 ${customColor === color.class ? 'ring-2 ring-white scale-110' : 'opacity-70 hover:opacity-100'}
                                             `}
                                             title={color.name}

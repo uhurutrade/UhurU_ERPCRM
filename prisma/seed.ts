@@ -30,7 +30,22 @@ async function main() {
   // ... (Users loop same as before)
 
   // --- Transaction Categories ---
-  for (const cat of [] as any[]) {
+  for (const cat of [
+  {
+    "id": "cmj62n8yg0000sft23sncqxfz",
+    "name": "hola",
+    "color": "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20",
+    "createdAt": "2025-12-14T18:41:55.480Z",
+    "updatedAt": "2025-12-14T18:41:55.480Z"
+  },
+  {
+    "id": "cmj62oz0e0001sft22b5ep8rc",
+    "name": "adios",
+    "color": "bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20",
+    "createdAt": "2025-12-14T18:43:15.902Z",
+    "updatedAt": "2025-12-14T18:43:15.902Z"
+  }
+] as any[]) {
     await prisma.transactionCategory.create({
         data: {
             ...cat,
@@ -1225,50 +1240,6 @@ async function main() {
     "updatedAt": "2025-12-14T18:29:17.015Z"
   },
   {
-    "id": "cmj627z970025rjaq7dmbb1n0",
-    "externalId": "69369b18-429e-a3ea-ae96-ac5d533889c9",
-    "date": "2025-12-08T00:00:00.000Z",
-    "description": "A Uhuru Trade Ltd",
-    "amount": "-0.2",
-    "currency": "GBP",
-    "fee": "0",
-    "status": null,
-    "category": null,
-    "reference": "Revolut pounds",
-    "counterparty": "Raul Ortega Irus",
-    "merchant": null,
-    "balanceAfter": "19.67",
-    "exchangeRate": null,
-    "type": "TRANSFER",
-    "hash": "13e41f137e7081698f2d92cf456df0aed0df47044e4a578c0cc6660350d2a6eb",
-    "bankAccountId": "cmj4oiye20004a47open4oqfq",
-    "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
-    "createdAt": "2025-12-14T18:30:03.068Z",
-    "updatedAt": "2025-12-14T18:30:03.068Z"
-  },
-  {
-    "id": "cmj627z9f0027rjaq46d4fe3d",
-    "externalId": "69369a1e-c204-a732-8c0c-581dcdd2662d",
-    "date": "2025-12-08T00:00:00.000Z",
-    "description": "A Uhuru Trade Ltd.",
-    "amount": "-0.44",
-    "currency": "GBP",
-    "fee": "0",
-    "status": null,
-    "category": null,
-    "reference": "Revolut",
-    "counterparty": "Raul Ortega Irus",
-    "merchant": null,
-    "balanceAfter": "19.87",
-    "exchangeRate": "1.14288",
-    "type": "TRANSFER",
-    "hash": "51766bdf15071a786087730928e71ea141d026da218ee3e3cda9bdf7fa36ebbc",
-    "bankAccountId": "cmj4oiye20004a47open4oqfq",
-    "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
-    "createdAt": "2025-12-14T18:30:03.075Z",
-    "updatedAt": "2025-12-14T18:30:03.075Z"
-  },
-  {
     "id": "cmj627z9k0029rjaqpvg796d3",
     "externalId": "69340698-aca8-ae9c-b661-d4acb8129a02",
     "date": "2025-12-06T00:00:00.000Z",
@@ -1643,6 +1614,50 @@ async function main() {
     "updatedAt": "2025-12-14T18:39:19.781Z"
   },
   {
+    "id": "cmj627z9f0027rjaq46d4fe3d",
+    "externalId": "69369a1e-c204-a732-8c0c-581dcdd2662d",
+    "date": "2025-12-08T00:00:00.000Z",
+    "description": "A Uhuru Trade Ltd.",
+    "amount": "-0.44",
+    "currency": "GBP",
+    "fee": "0",
+    "status": null,
+    "category": "hola",
+    "reference": "Revolut",
+    "counterparty": "Raul Ortega Irus",
+    "merchant": null,
+    "balanceAfter": "19.87",
+    "exchangeRate": "1.14288",
+    "type": "TRANSFER",
+    "hash": "51766bdf15071a786087730928e71ea141d026da218ee3e3cda9bdf7fa36ebbc",
+    "bankAccountId": "cmj4oiye20004a47open4oqfq",
+    "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
+    "createdAt": "2025-12-14T18:30:03.075Z",
+    "updatedAt": "2025-12-14T18:41:59.980Z"
+  },
+  {
+    "id": "cmj627z970025rjaq7dmbb1n0",
+    "externalId": "69369b18-429e-a3ea-ae96-ac5d533889c9",
+    "date": "2025-12-08T00:00:00.000Z",
+    "description": "A Uhuru Trade Ltd",
+    "amount": "-0.2",
+    "currency": "GBP",
+    "fee": "0",
+    "status": null,
+    "category": "hola",
+    "reference": "Revolut pounds",
+    "counterparty": "Raul Ortega Irus",
+    "merchant": null,
+    "balanceAfter": "19.67",
+    "exchangeRate": null,
+    "type": "TRANSFER",
+    "hash": "13e41f137e7081698f2d92cf456df0aed0df47044e4a578c0cc6660350d2a6eb",
+    "bankAccountId": "cmj4oiye20004a47open4oqfq",
+    "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
+    "createdAt": "2025-12-14T18:30:03.068Z",
+    "updatedAt": "2025-12-14T18:42:03.097Z"
+  },
+  {
     "id": "cmj627zc70035rjaqe6vpjhew",
     "externalId": "67d6d9d2-f646-aea3-afd0-01b420d9bc40",
     "date": "2025-03-16T00:00:00.000Z",
@@ -1717,7 +1732,7 @@ async function main() {
     "currency": "USD",
     "fee": "0",
     "status": null,
-    "category": "Loan Repay",
+    "category": "adios",
     "reference": "Dir Loan Repay",
     "counterparty": "Raul Ortega Irus",
     "merchant": null,
@@ -1728,7 +1743,7 @@ async function main() {
     "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
     "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
     "createdAt": "2025-12-14T18:29:30.452Z",
-    "updatedAt": "2025-12-14T18:38:00.841Z"
+    "updatedAt": "2025-12-14T18:43:15.993Z"
   }
 ] as any[]) {
     await prisma.bankTransaction.create({
