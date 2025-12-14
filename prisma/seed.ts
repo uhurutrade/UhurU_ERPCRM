@@ -749,23 +749,6 @@ async function main() {
     "updatedAt": "2025-12-14T08:39:19.597Z"
   },
   {
-    "id": "cmj5h4awg0015qxyje3i28yau",
-    "externalId": null,
-    "date": "2025-10-15T00:00:00.000Z",
-    "description": "Consulting Fee - Client A",
-    "amount": "6000",
-    "currency": "GBP",
-    "fee": null,
-    "status": "COMPLETED",
-    "category": "Income",
-    "reference": "REF-681",
-    "hash": "2025-10-15_6000_ConsultingFee-ClientA_lby7fi",
-    "bankAccountId": "cmj4oiye20004a47open4oqfq",
-    "bankStatementId": null,
-    "createdAt": "2025-12-14T08:39:19.600Z",
-    "updatedAt": "2025-12-14T08:39:19.600Z"
-  },
-  {
     "id": "cmj5h4awj0017qxyjmtbohnrf",
     "externalId": null,
     "date": "2025-11-05T00:00:00.000Z",

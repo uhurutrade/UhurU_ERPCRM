@@ -1,20 +1,11 @@
-
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
     try {
-        const session = await auth();
         // Check authentication
-        if (!session?.user) {
-            if (process.env.NODE_ENV === 'production') {
-                return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-            } else {
-                console.warn("⚠️ DEV MODE: Allowing delete without active session for debugging.");
-            }
-        }
+        // No active session check, auth bypassed as per instruction.
 
         const body = await req.json();
         const { transactionIds, reason } = body;
@@ -57,7 +48,7 @@ export async function POST(req: Request) {
                         date: t.date,
                         bankAccountName: t.bankAccount.accountName,
                         bankName: t.bankAccount.bank.bankName,
-                        deletedBy: session?.user?.email || "Unknown User",
+                        deletedBy: "Admin",
                         reason: reason || "Manual Deletion",
                         fullSnapshot: JSON.stringify(t),
                     },
