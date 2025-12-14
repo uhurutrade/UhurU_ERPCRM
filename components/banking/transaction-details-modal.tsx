@@ -42,6 +42,7 @@ interface TransactionDetailsModalProps {
 
 export function TransactionDetailsModal({ isOpen, onClose, transaction }: TransactionDetailsModalProps) {
     const [uploading, setUploading] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     if (!isOpen || !transaction) return null;
 
@@ -56,12 +57,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
             try {
                 const res = await uploadTransactionAttachment(formData, transaction.id);
                 if (res.success) {
-                    // Refresh triggered by server action, but we might want to update local state or just wait for re-render
-                    // Ideally we should have a way to refresh the view or router.refresh() 
-                    // But since the parent component provided 'transaction', the parent needs to refresh.
-                    // The server action 'revalidatePath' handles the data refresh on Next.js server components,
-                    // but the client 'transaction' prop won't update instantly unless we trigger a router refresh.
-                    window.location.reload(); // Quickest way to refetch for now, or use router.refresh()
+                    window.location.reload();
                 } else {
                     alert('Upload failed: ' + res.error);
                 }
@@ -74,32 +70,56 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
         }
     };
 
+    const handleDeleteAttachment = async (attachmentId: string, fileName: string) => {
+        const confirmed = window.confirm(`¿Eliminar "${fileName}"?\n\nEsta acción no se puede deshacer.`);
+
+        if (!confirmed) return;
+
+        setDeletingId(attachmentId);
+        try {
+            const response = await fetch(`/api/banking/attachments/${attachmentId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error al eliminar el archivo');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error al eliminar el archivo');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
             <div
-                className="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden max-h-[90vh]"
+                className="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-xl w-full flex flex-col shadow-2xl overflow-hidden max-h-[85vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-700 flex justify-between items-start bg-slate-900/50">
+                <div className="p-5 border-b border-slate-700 flex justify-between items-start bg-slate-900/50">
                     <div>
-                        <h2 className="text-2xl font-bold text-white mb-1">Transaction Details</h2>
-                        <p className="text-slate-400 text-sm font-mono">{transaction.id}</p>
+                        <h2 className="text-xl font-bold text-white mb-1">Transaction Details</h2>
+                        <p className="text-slate-400 text-xs font-mono">{transaction.id}</p>
                     </div>
                     <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-800 rounded-lg">
-                        <X size={24} />
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="flex-1 overflow-y-auto p-5 space-y-6">
 
                     {/* Main Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
                             <div>
                                 <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Amount</label>
-                                <div className={`text-3xl font-bold ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                <div className={`text-2xl font-bold ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
                                     {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
                                 </div>
                             </div>
@@ -185,25 +205,43 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
                         {transaction.attachments && transaction.attachments.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {transaction.attachments.map((file) => (
-                                    <a
+                                    <div
                                         key={file.id}
-                                        href={file.path}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group flex items-center p-3 bg-slate-900 border border-slate-700 rounded-xl hover:border-uhuru-blue/50 transition-colors"
+                                        className="group relative flex items-center p-3 bg-slate-900 border border-slate-700 rounded-xl hover:border-uhuru-blue/50 transition-colors"
                                     >
-                                        <div className="flex-shrink-0 w-12 h-12 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-uhuru-blue border border-slate-700">
-                                            {file.fileType?.includes('image') ? (
-                                                <img src={file.path} alt="Preview" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <FileText size={24} />
-                                            )}
-                                        </div>
-                                        <div className="ml-3 overflow-hidden">
-                                            <p className="text-sm font-medium text-slate-200 truncate">{file.originalName || 'Document'}</p>
-                                            <p className="text-xs text-slate-500">{format(new Date(file.uploadedAt), 'MMM d, HH:mm')}</p>
-                                        </div>
-                                    </a>
+                                        {/* Delete Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleDeleteAttachment(file.id, file.originalName || 'Document');
+                                            }}
+                                            disabled={deletingId === file.id}
+                                            className="absolute top-2 right-2 p-1 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                                            title="Eliminar archivo"
+                                        >
+                                            <X size={14} />
+                                        </button>
+
+                                        {/* File Link */}
+                                        <a
+                                            href={file.path}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center flex-1"
+                                        >
+                                            <div className="flex-shrink-0 w-12 h-12 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-uhuru-blue border border-slate-700">
+                                                {file.fileType?.includes('image') ? (
+                                                    <img src={file.path} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <FileText size={24} />
+                                                )}
+                                            </div>
+                                            <div className="ml-3 overflow-hidden">
+                                                <p className="text-sm font-medium text-slate-200 truncate">{file.originalName || 'Document'}</p>
+                                                <p className="text-xs text-slate-500">{format(new Date(file.uploadedAt), 'MMM d, HH:mm')}</p>
+                                            </div>
+                                        </a>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

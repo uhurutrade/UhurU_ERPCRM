@@ -30,7 +30,7 @@ export default async function BankingPage() {
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-uhuru-blue to-uhuru-purple">
-                            Live Ledger
+                            General Ledger
                         </h1>
                         <p className="text-slate-400 text-lg">Manage your transactions and bank accounts.</p>
                     </div>
