@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { parseCSVLines, generateTransactionHash } from '@/lib/banking/parsers';
+import { parseBankStatement } from '@/lib/banking-parser';
 import { revalidatePath } from 'next/cache';
 
 export async function uploadBankStatement(formData: FormData, bankAccountId: string) {
@@ -13,7 +13,7 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
 
     try {
         const text = await file.text();
-        const rows = parseCSVLines(text);
+        const rows = parseBankStatement(text);
 
         if (rows.length === 0) {
             return { success: false, error: 'No valid transactions found in file' };
@@ -29,10 +29,9 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
         let duplicateCount = 0;
 
         for (const row of rows) {
-            const hash = generateTransactionHash(row);
-
+            // Check for duplicate based on hash
             const existing = await prisma.bankTransaction.findUnique({
-                where: { hash }
+                where: { hash: row.hash }
             });
 
             if (existing) {
@@ -46,7 +45,18 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
                     amount: row.amount,
                     description: row.description,
                     currency: row.currency,
-                    hash: hash,
+
+                    // Extended Fields
+                    fee: row.fee,
+                    externalId: row.externalId,
+                    counterparty: row.counterparty,
+                    merchant: row.merchant,
+                    reference: row.reference,
+                    type: row.type,
+                    balanceAfter: row.balanceAfter,
+                    exchangeRate: row.exchangeRate,
+
+                    hash: row.hash,
                     bankAccountId: bankAccountId,
                     bankStatementId: statement.id
                 }
@@ -61,9 +71,9 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
             message: `Imported ${importedCount} transactions. Skipped ${duplicateCount} duplicates.`
         };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Upload error:', error);
-        return { success: false, error: 'Failed to process file' };
+        return { success: false, error: error.message || 'Failed to process file' };
     }
 }
 

@@ -337,7 +337,14 @@ model BankTransaction {
 
   // Categorization
   category        String?
-  reference       String?
+  reference       String? // Payment Reference
+
+  // Extended Banking Data
+  counterparty    String?         // Payer Name / Payee Name / Beneficiary
+  merchant        String?         // Merchant Name (for card spend)
+  balanceAfter    Decimal?        @db.Decimal(15, 2) // Running Balance provided by bank
+  exchangeRate    Decimal?        @db.Decimal(15, 8) // FX Rate used
+  type            String?         // TRANSFER, CARD_PAYMENT, EXCHANGE, FEE, etc.
 
   // Deduplication hash
   hash            String          @unique

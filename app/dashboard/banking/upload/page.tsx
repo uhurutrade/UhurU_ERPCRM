@@ -70,7 +70,7 @@ export default function BankingUploadPage() {
                                 >
                                     {accounts.map((acc) => (
                                         <option key={acc.id} value={acc.id}>
-                                            {acc.bank.bankName} - {acc.currency} ({acc.accountNumber || acc.iban || '****'})
+                                            {acc.bank.bankName} - {acc.accountName} ({acc.currency}) - {acc.accountNumber || acc.iban || '****'}
                                         </option>
                                     ))}
                                 </select>
