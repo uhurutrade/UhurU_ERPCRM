@@ -60,8 +60,13 @@ ENV PORT 3000
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copiar Prisma schema y cliente generado
+# Copiar node_modules de producción (incluye Prisma client)
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Copiar Prisma schema
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Copiar cliente Prisma generado
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
