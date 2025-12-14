@@ -29,7 +29,7 @@ export default async function AuditLogPage() {
                         <ArrowLeft size={20} />
                         Back to Banking
                     </Link>
-                    <h1 className="text-3xl font-bold text-white mb-2">Transaction Graveyard</h1>
+                    <h1 className="text-3xl font-bold text-white mb-2">Transaction Avoided</h1>
                     <p className="text-slate-400">
                         Audit log of all deleted financial transactions. These records are permanent and read-only.
                     </p>

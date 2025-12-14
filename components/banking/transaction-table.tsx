@@ -233,7 +233,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                 <br /><br />
                                 This action will:
                                 <ul className="list-disc list-inside mt-2 text-slate-400 text-sm">
-                                    <li>Create a permanent record in the Audit Log ("Graveyard").</li>
+                                    <li>Create a permanent record in the Audit Log ("Avoided Transactions").</li>
                                     <li>Permanently remove the items from the active ledger.</li>
                                     <li>Delete any attached files.</li>
                                 </ul>
