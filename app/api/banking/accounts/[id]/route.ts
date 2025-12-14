@@ -76,11 +76,36 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
     try {
+        // 1. Check if there are transactions
+        const transactionCount = await prisma.bankTransaction.count({
+            where: { bankAccountId: params.id },
+        });
+
+        if (transactionCount > 0) {
+            // 2. If transactions exist, DO NOT DELETE. Archive instead.
+            await prisma.bankAccount.update({
+                where: { id: params.id },
+                data: { isActive: false },
+            });
+
+            return NextResponse.json({
+                success: true,
+                action: "archived",
+                message: "Account has associated transactions. It has been marked as INACTIVE instead of deleted, to preserve financial history."
+            });
+        }
+
+        // 3. If no transactions, safe to delete
         await prisma.bankAccount.delete({
             where: { id: params.id },
         });
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({
+            success: true,
+            action: "deleted",
+            message: "Account deleted successfully."
+        });
+
     } catch (error) {
         console.error("Error deleting account:", error);
         return NextResponse.json(

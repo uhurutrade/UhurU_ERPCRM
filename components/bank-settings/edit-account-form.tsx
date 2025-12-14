@@ -84,8 +84,22 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
                 method: "DELETE",
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
                 throw new Error("Failed to delete account");
+            }
+
+            setLoading(false); // Stop loading before showing modal
+
+            if (data.action === "archived") {
+                await confirm({
+                    title: "Account Deactivated",
+                    message: data.message || "This account has transactions and cannot be fully deleted. It has been marked as Inactive.",
+                    type: "info",
+                    confirmText: "Understood",
+                    cancelText: "",
+                });
             }
 
             router.push(`/dashboard/bank-settings`);
