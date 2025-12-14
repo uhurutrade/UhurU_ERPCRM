@@ -14,7 +14,7 @@ export async function POST(req: Request) {
             return new NextResponse("Invalid transaction IDs", { status: 400 });
         }
 
-        // 1. Fetch original transactions to be deleted
+        // 1. Fetch original transactions to be deleted (including attachments for audit)
         const transactionsToDelete = await prisma.bankTransaction.findMany({
             where: {
                 id: {
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
                         bank: true,
                     },
                 },
+                attachments: true, // Include attachments for audit log
             },
         });
 
@@ -55,12 +56,16 @@ export async function POST(req: Request) {
                 });
             }
 
-            // b. Delete attachments associated with these transactions
-            await tx.attachment.deleteMany({
+            // b. Unlink attachments (set transactionId to null) instead of deleting them
+            // This preserves the files for the audit log
+            await tx.attachment.updateMany({
                 where: {
                     transactionId: {
                         in: transactionIds
                     }
+                },
+                data: {
+                    transactionId: null
                 }
             });
 

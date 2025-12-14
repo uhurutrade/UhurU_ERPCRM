@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { Search, Eye, AlertCircle } from "lucide-react";
+import { Search, Eye, AlertCircle, Paperclip } from "lucide-react";
 import { DeletedTransaction } from "@prisma/client";
 
 interface AuditLogTableProps {
@@ -44,13 +44,14 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                             <th className="px-6 py-4">Amount</th>
                             <th className="px-6 py-4">Deleted By</th>
                             <th className="px-6 py-4">Values</th>
+                            <th className="px-6 py-4 text-center">📎</th>
                             <th className="px-6 py-4 text-right">Details</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-700 bg-slate-900">
                         {filteredLogs.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
+                                <td colSpan={8} className="px-6 py-8 text-center text-slate-500">
                                     No deleted transactions found.
                                 </td>
                             </tr>
@@ -77,6 +78,24 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                                             <span className="text-emerald-400">{log.bankName}</span>
                                             <span className="text-slate-500">{log.bankAccountName}</span>
                                         </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        {(() => {
+                                            try {
+                                                const snapshot = JSON.parse(log.fullSnapshot || "{}");
+                                                const hasAttachments = snapshot.attachments && snapshot.attachments.length > 0;
+                                                return hasAttachments ? (
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <Paperclip size={16} className="text-emerald-400" />
+                                                        <span className="text-xs text-slate-400">{snapshot.attachments.length}</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-slate-600">-</span>
+                                                );
+                                            } catch {
+                                                return <span className="text-slate-600">-</span>;
+                                            }
+                                        })()}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <button
@@ -122,6 +141,47 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                                     <p className="font-semibold text-white">{selectedLog.reason || "N/A"}</p>
                                 </div>
                             </div>
+
+                            {/* Attachments Section */}
+                            {(() => {
+                                try {
+                                    const snapshot = JSON.parse(selectedLog.fullSnapshot || "{}");
+                                    const attachments = snapshot.attachments || [];
+
+                                    if (attachments.length > 0) {
+                                        return (
+                                            <div className="p-4 bg-slate-800 rounded-lg">
+                                                <p className="text-xs text-slate-400 uppercase mb-3 flex items-center gap-2">
+                                                    <Paperclip size={14} />
+                                                    Attachments ({attachments.length})
+                                                </p>
+                                                <div className="space-y-2">
+                                                    {attachments.map((att: any, idx: number) => (
+                                                        <a
+                                                            key={idx}
+                                                            href={`/uploads/${att.path}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-2 p-2 bg-slate-900 rounded hover:bg-slate-700 transition-colors group"
+                                                        >
+                                                            <Paperclip size={14} className="text-emerald-400" />
+                                                            <span className="text-sm text-slate-300 group-hover:text-white flex-1 truncate">
+                                                                {att.originalName || att.path}
+                                                            </span>
+                                                            <span className="text-xs text-slate-500">
+                                                                {att.fileType || 'file'}
+                                                            </span>
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                } catch (e) {
+                                    console.error("Error parsing attachments:", e);
+                                }
+                                return null;
+                            })()}
 
                             <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 overflow-auto max-h-60">
                                 <p className="text-xs text-slate-500 mb-2 font-mono">FULL JSON SNAPSHOT</p>
