@@ -11,9 +11,10 @@ async function main() {
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
   await prisma.invoiceItem.deleteMany().catch(() => {});
-  await prisma.deletedTransaction.deleteMany().catch(() => {}); // New
+  await prisma.deletedTransaction.deleteMany().catch(() => {});
   await prisma.bankTransaction.deleteMany().catch(() => {});
-  await prisma.bankStatement.deleteMany().catch(() => {}); // New
+  await prisma.transactionCategory.deleteMany().catch(() => {}); // New
+  await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
   await prisma.taxObligation.deleteMany().catch(() => {});
   await prisma.invoice.deleteMany().catch(() => {});
@@ -25,6 +26,21 @@ async function main() {
   await prisma.cryptoWallet.deleteMany().catch(() => {});
   await prisma.organization.deleteMany().catch(() => {});
   await prisma.companySettings.deleteMany().catch(() => {});
+  
+  // ... (Users loop same as before)
+
+  // --- Transaction Categories ---
+  for (const cat of [] as any[]) {
+    await prisma.transactionCategory.create({
+        data: {
+            ...cat,
+            createdAt: new Date(cat.createdAt),
+            updatedAt: new Date(cat.updatedAt),
+        } as any
+    }).catch(e => console.log('Category error or exists'));
+  }
+  
+  // ... (rest of loops for CompanySettings, Banks, etc.)
   // We do NOT delete Users/Accounts/Sessions here to prevent accidental lockout.
   // Users are handled via upsert below.
 
@@ -1209,50 +1225,6 @@ async function main() {
     "updatedAt": "2025-12-14T18:29:17.015Z"
   },
   {
-    "id": "cmj627a37001zrjaqwkxds63i",
-    "externalId": "693baf9d-e626-a004-95ff-5910cced1323",
-    "date": "2025-12-12T00:00:00.000Z",
-    "description": "A Raul Ortega",
-    "amount": "-1173.96",
-    "currency": "USD",
-    "fee": "0",
-    "status": null,
-    "category": null,
-    "reference": "Dir Loan Repay",
-    "counterparty": "Raul Ortega Irus",
-    "merchant": null,
-    "balanceAfter": "2326.04",
-    "exchangeRate": "0.851819",
-    "type": "TRANSFER",
-    "hash": "bef49cbf6cc224372d2528c6f4e7ed2c3c4774a5c3f6f0ffc4ce666f77dd47f7",
-    "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
-    "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
-    "createdAt": "2025-12-14T18:29:30.452Z",
-    "updatedAt": "2025-12-14T18:29:30.452Z"
-  },
-  {
-    "id": "cmj627a3d0021rjaqomzcko9j",
-    "externalId": "693b128c-8361-a43c-b913-a88dbc253893",
-    "date": "2025-12-11T00:00:00.000Z",
-    "description": "Dinero añadido por PUROSYS",
-    "amount": "3500",
-    "currency": "USD",
-    "fee": "0",
-    "status": null,
-    "category": null,
-    "reference": "BRANCH 009969. SUB-CONTRACTING FEES",
-    "counterparty": "",
-    "merchant": null,
-    "balanceAfter": "3500",
-    "exchangeRate": null,
-    "type": "TOPUP",
-    "hash": "c1d76164e617e70f7214c15f6c753ffca3be3a9e6e11f9a8f7f768064163d28c",
-    "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
-    "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
-    "createdAt": "2025-12-14T18:29:30.458Z",
-    "updatedAt": "2025-12-14T18:29:30.458Z"
-  },
-  {
     "id": "cmj627z970025rjaq7dmbb1n0",
     "externalId": "69369b18-429e-a3ea-ae96-ac5d533889c9",
     "date": "2025-12-08T00:00:00.000Z",
@@ -1649,6 +1621,28 @@ async function main() {
     "updatedAt": "2025-12-14T18:30:03.169Z"
   },
   {
+    "id": "cmj627a3d0021rjaqomzcko9j",
+    "externalId": "693b128c-8361-a43c-b913-a88dbc253893",
+    "date": "2025-12-11T00:00:00.000Z",
+    "description": "Dinero añadido por PUROSYS",
+    "amount": "3500",
+    "currency": "USD",
+    "fee": "0",
+    "status": null,
+    "category": "aaa",
+    "reference": "BRANCH 009969. SUB-CONTRACTING FEES",
+    "counterparty": "",
+    "merchant": null,
+    "balanceAfter": "3500",
+    "exchangeRate": null,
+    "type": "TOPUP",
+    "hash": "c1d76164e617e70f7214c15f6c753ffca3be3a9e6e11f9a8f7f768064163d28c",
+    "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
+    "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
+    "createdAt": "2025-12-14T18:29:30.458Z",
+    "updatedAt": "2025-12-14T18:39:19.781Z"
+  },
+  {
     "id": "cmj627zc70035rjaqe6vpjhew",
     "externalId": "67d6d9d2-f646-aea3-afd0-01b420d9bc40",
     "date": "2025-03-16T00:00:00.000Z",
@@ -1713,6 +1707,28 @@ async function main() {
     "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
     "createdAt": "2025-12-14T18:30:03.187Z",
     "updatedAt": "2025-12-14T18:30:03.187Z"
+  },
+  {
+    "id": "cmj627a37001zrjaqwkxds63i",
+    "externalId": "693baf9d-e626-a004-95ff-5910cced1323",
+    "date": "2025-12-12T00:00:00.000Z",
+    "description": "A Raul Ortega",
+    "amount": "-1173.96",
+    "currency": "USD",
+    "fee": "0",
+    "status": null,
+    "category": "Loan Repay",
+    "reference": "Dir Loan Repay",
+    "counterparty": "Raul Ortega Irus",
+    "merchant": null,
+    "balanceAfter": "2326.04",
+    "exchangeRate": "0.851819",
+    "type": "TRANSFER",
+    "hash": "bef49cbf6cc224372d2528c6f4e7ed2c3c4774a5c3f6f0ffc4ce666f77dd47f7",
+    "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
+    "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
+    "createdAt": "2025-12-14T18:29:30.452Z",
+    "updatedAt": "2025-12-14T18:38:00.841Z"
   }
 ] as any[]) {
     await prisma.bankTransaction.create({

@@ -27,9 +27,12 @@ async function main() {
   const invoices = await prisma.invoice.findMany({ include: { items: true } });
 
   // 7. Transactions & Compliance & Logs
-  const bankStatements = await prisma.bankStatement.findMany(); // New
+  // --- TRANSACTION CATEGORIES ---
+  console.log('categories extraction...');
+  const transactionCategories = await prisma.transactionCategory.findMany(); // New
+  const bankStatements = await prisma.bankStatement.findMany();
   const transactions = await prisma.bankTransaction.findMany();
-  const deletedTransactions = await prisma.deletedTransaction.findMany(); // New
+  const deletedTransactions = await prisma.deletedTransaction.findMany();
   const taxObligations = await prisma.taxObligation.findMany();
 
   const seedContent = `
@@ -45,9 +48,10 @@ async function main() {
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
   await prisma.invoiceItem.deleteMany().catch(() => {});
-  await prisma.deletedTransaction.deleteMany().catch(() => {}); // New
+  await prisma.deletedTransaction.deleteMany().catch(() => {});
   await prisma.bankTransaction.deleteMany().catch(() => {});
-  await prisma.bankStatement.deleteMany().catch(() => {}); // New
+  await prisma.transactionCategory.deleteMany().catch(() => {}); // New
+  await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
   await prisma.taxObligation.deleteMany().catch(() => {});
   await prisma.invoice.deleteMany().catch(() => {});
@@ -59,6 +63,21 @@ async function main() {
   await prisma.cryptoWallet.deleteMany().catch(() => {});
   await prisma.organization.deleteMany().catch(() => {});
   await prisma.companySettings.deleteMany().catch(() => {});
+  
+  // ... (Users loop same as before)
+
+  // --- Transaction Categories ---
+  for (const cat of ${JSON.stringify(transactionCategories, null, 2)} as any[]) {
+    await prisma.transactionCategory.create({
+        data: {
+            ...cat,
+            createdAt: new Date(cat.createdAt),
+            updatedAt: new Date(cat.updatedAt),
+        } as any
+    }).catch(e => console.log('Category error or exists'));
+  }
+  
+  // ... (rest of loops for CompanySettings, Banks, etc.)
   // We do NOT delete Users/Accounts/Sessions here to prevent accidental lockout.
   // Users are handled via upsert below.
 

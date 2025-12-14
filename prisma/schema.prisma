@@ -559,3 +559,12 @@ model DeletedTransaction {
   // Raw Data (Backup)
   fullSnapshot    String?  @db.Text // JSON string of the complete original object
 }
+
+// Categories
+model TransactionCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

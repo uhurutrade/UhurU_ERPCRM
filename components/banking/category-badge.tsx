@@ -2,26 +2,67 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { updateTransactionCategory } from '@/app/actions/banking';
-import { Check, Plus, Tag } from 'lucide-react';
+import { getTransactionCategories, createTransactionCategory } from '@/app/actions/categories';
+import { Check, Plus, Tag, Palette } from 'lucide-react';
 
-const CATEGORIES = [
-    { name: 'Sales', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' },
-    { name: 'Marketing', color: 'bg-pink-500/10 text-pink-400 border-pink-500/20 hover:bg-pink-500/20' },
-    { name: 'Software', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20' },
-    { name: 'Travel', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' },
-    { name: 'Meals', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20' },
-    { name: 'Office', color: 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20' },
-    { name: 'Payroll', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20' },
-    { name: 'Taxes', color: 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' },
-    { name: 'Utilities', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20' },
+const PRESET_COLORS = [
+    { name: 'Emerald', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' },
+    { name: 'Pink', class: 'bg-pink-500/10 text-pink-400 border-pink-500/20 hover:bg-pink-500/20' },
+    { name: 'Purple', class: 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20' },
+    { name: 'Blue', class: 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' },
+    { name: 'Orange', class: 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20' },
+    { name: 'Slate', class: 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20' },
+    { name: 'Indigo', class: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20' },
+    { name: 'Red', class: 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' },
+    { name: 'Yellow', class: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20' },
+    { name: 'Teal', class: 'bg-teal-500/10 text-teal-400 border-teal-500/20 hover:bg-teal-500/20' },
+];
+
+const DEFAULT_CATEGORIES = [
+    { name: 'Sales', color: PRESET_COLORS[0].class },
+    { name: 'Marketing', color: PRESET_COLORS[1].class },
+    { name: 'Software', color: PRESET_COLORS[2].class },
+    { name: 'Travel', color: PRESET_COLORS[3].class },
+    { name: 'Meals', color: PRESET_COLORS[4].class },
+    { name: 'Office', color: PRESET_COLORS[5].class },
+    { name: 'Payroll', color: PRESET_COLORS[6].class },
+    { name: 'Taxes', color: PRESET_COLORS[7].class },
+    { name: 'Utilities', color: PRESET_COLORS[8].class },
 ];
 
 export function CategoryBadge({ transactionId, initialCategory }: { transactionId: string, initialCategory: string | null }) {
     const [category, setCategory] = useState(initialCategory);
+    const [categories, setCategories] = useState<any[]>(DEFAULT_CATEGORIES);
     const [isOpen, setIsOpen] = useState(false);
-    const [customCategory, setCustomCategory] = useState('');
+
+    // Custom Category State
     const [isCustomMode, setIsCustomMode] = useState(false);
+    const [customName, setCustomName] = useState('');
+    const [customColor, setCustomColor] = useState(PRESET_COLORS[5].class); // Default to Slate
+
     const menuRef = useRef<HTMLDivElement>(null);
+
+    // Fetch categories when opening the menu to ensure fresh data across rows
+    useEffect(() => {
+        if (isOpen) {
+            getTransactionCategories().then(res => {
+                if (res.success && res.categories && res.categories.length > 0) {
+                    // Merge DB categories with Default ones (deduplicating by name)
+                    const dbCats = res.categories.map((c: any) => ({ name: c.name, color: c.color }));
+                    const allCats = [...dbCats];
+
+                    // Add defaults if they don't exist
+                    DEFAULT_CATEGORIES.forEach(def => {
+                        if (!allCats.find(c => c.name === def.name)) {
+                            allCats.push(def);
+                        }
+                    });
+
+                    setCategories(allCats.sort((a, b) => a.name.localeCompare(b.name)));
+                }
+            });
+        }
+    }, [isOpen]);
 
     // Close on click outside
     useEffect(() => {
@@ -42,14 +83,26 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
         await updateTransactionCategory(transactionId, newCategory);
     };
 
-    const handleCustomSubmit = (e: React.FormEvent) => {
+    const handleCustomSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (customCategory.trim()) {
-            handleSelect(customCategory.trim());
+        if (customName.trim()) {
+            const name = customName.trim();
+            // Optimistic update
+            const newCat = { name, color: customColor };
+            setCategories(prev => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
+            setCategory(name);
+            setIsOpen(false);
+            setIsCustomMode(false);
+            setCustomName('');
+
+            // API calls
+            await createTransactionCategory(name, customColor); // Persist category
+            await updateTransactionCategory(transactionId, name); // Update transaction
         }
     };
 
-    const currentStyle = CATEGORIES.find(c => c.name === category)?.color || 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700';
+    const currentCat = categories.find(c => c.name === category);
+    const currentStyle = currentCat?.color || 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700';
 
     return (
         <div className="relative inline-block" ref={menuRef}>
@@ -66,11 +119,11 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                     {!isCustomMode ? (
                         <>
-                            <div className="p-1.5 grid grid-cols-1 gap-0.5">
-                                {CATEGORIES.map((cat) => (
+                            <div className="max-h-60 overflow-y-auto p-1.5 grid grid-cols-1 gap-0.5 custom-scrollbar">
+                                {categories.map((cat) => (
                                     <button
                                         key={cat.name}
                                         onClick={(e) => { e.stopPropagation(); handleSelect(cat.name); }}
@@ -92,35 +145,60 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
                                     onClick={(e) => { e.stopPropagation(); setIsCustomMode(true); }}
                                     className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-uhuru-blue transition-colors flex items-center gap-2"
                                 >
-                                    <Tag size={12} />
-                                    Custom Category...
+                                    <Plus size={12} />
+                                    New Category...
                                 </button>
                             </div>
                         </>
                     ) : (
-                        <form onSubmit={handleCustomSubmit} className="p-2" onClick={(e) => e.stopPropagation()}>
-                            <input
-                                autoFocus
-                                type="text"
-                                placeholder="Enter category..."
-                                value={customCategory}
-                                onChange={(e) => setCustomCategory(e.target.value)}
-                                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-uhuru-blue mb-2"
-                            />
+                        <form onSubmit={handleCustomSubmit} className="p-3" onClick={(e) => e.stopPropagation()}>
+                            <div className="mb-3">
+                                <label className="block text-xs font-semibold text-slate-500 mb-1">Name</label>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="e.g. Subscriptions"
+                                    value={customName}
+                                    onChange={(e) => setCustomName(e.target.value)}
+                                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-uhuru-blue"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-xs font-semibold text-slate-500 mb-1">Color</label>
+                                <div className="grid grid-cols-5 gap-2">
+                                    {PRESET_COLORS.map((color) => (
+                                        <button
+                                            key={color.name}
+                                            type="button"
+                                            onClick={() => setCustomColor(color.class)}
+                                            className={`
+                                                w-6 h-6 rounded-full flex items-center justify-center transition-all
+                                                ${color.class.split(' ')[0].replace('/10', '')}
+                                                ${customColor === color.class ? 'ring-2 ring-white scale-110' : 'opacity-70 hover:opacity-100'}
+                                            `}
+                                            title={color.name}
+                                        >
+                                            {customColor === color.class && <Check size={10} className="text-white" />}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setIsCustomMode(false)}
-                                    className="flex-1 py-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 rounded-md"
+                                    className="flex-1 py-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 rounded-md transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={!customCategory.trim()}
-                                    className="flex-1 py-1.5 text-xs text-white bg-uhuru-blue hover:bg-uhuru-blue-light rounded-md disabled:opacity-50"
+                                    disabled={!customName.trim()}
+                                    className="flex-1 py-1.5 text-xs text-white bg-uhuru-blue hover:bg-uhuru-blue-light rounded-md disabled:opacity-50 transition-colors font-medium shadow-uhuru-sm"
                                 >
-                                    Save
+                                    Create & Save
                                 </button>
                             </div>
                         </form>
