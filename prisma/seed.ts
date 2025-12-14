@@ -160,11 +160,11 @@ async function main() {
         "availableBalance": null,
         "lastBalanceUpdate": null,
         "isActive": true,
-        "isPrimary": true,
+        "isPrimary": false,
         "order": 0,
         "notes": null,
         "createdAt": "2025-12-14T08:39:19.504Z",
-        "updatedAt": "2025-12-14T09:29:13.671Z"
+        "updatedAt": "2025-12-14T09:50:38.935Z"
       }
     ]
   },
