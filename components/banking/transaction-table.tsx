@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Trash2, AlertTriangle, X, CheckSquare, Square } from 'lucide-react';
+import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip } from 'lucide-react';
 import { useConfirm } from '@/components/providers/modal-provider';
+import { TransactionDetailsModal } from './transaction-details-modal';
 
 type Transaction = {
     id: string;
@@ -13,11 +14,18 @@ type Transaction = {
     amount: number;
     currency: string;
     category: string | null;
+    status: string | null;
+    reference: string | null;
+    counterparty: string | null;
+    merchant: string | null;
     bankAccount: {
         bank: {
             bankName: string;
         };
+        accountName: string;
+        currency: string;
     };
+    attachments: any[]; // Extended via include
 };
 
 export function TransactionTable({ transactions }: { transactions: any[] }) {
@@ -26,6 +34,9 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteReason, setDeleteReason] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Viewing State
+    const [viewTransaction, setViewTransaction] = useState<Transaction | null>(null);
 
     // --- Selection Logic ---
     const handleSelectAll = () => {
@@ -127,18 +138,23 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                             <th className="py-3 px-4 font-medium">Account</th>
                             <th className="py-3 px-4 font-medium text-right">Amount</th>
                             <th className="py-3 px-4 font-medium">Category</th>
+                            {/* Attachments Column */}
+                            <th className="py-3 px-4 w-12 text-center text-slate-400">
+                                <Paperclip size={16} />
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="text-sm">
                         {transactions.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="py-8 text-center text-slate-500">
+                                <td colSpan={7} className="py-8 text-center text-slate-500">
                                     No transactions found.
                                 </td>
                             </tr>
                         ) : (
                             transactions.map((tx) => {
                                 const isSelected = selectedIds.has(tx.id);
+                                const hasAttachments = tx.attachments && tx.attachments.length > 0;
                                 return (
                                     <tr
                                         key={tx.id}
@@ -146,7 +162,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                             border-b border-slate-800 transition-colors cursor-pointer
                                             ${isSelected ? 'bg-emerald-900/20' : 'hover:bg-slate-800/50'}
                                         `}
-                                        onClick={() => handleSelectOne(tx.id)}
+                                        onClick={() => setViewTransaction(tx)}
                                     >
                                         <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                                             <button onClick={() => handleSelectOne(tx.id)}>
@@ -161,6 +177,7 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                         </td>
                                         <td className="py-3 px-4 text-white font-medium">
                                             {tx.description}
+                                            {tx.reference && <span className="block text-xs text-slate-500 mt-0.5">{tx.reference}</span>}
                                         </td>
                                         <td className="py-3 px-4 text-slate-500">
                                             <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
@@ -173,6 +190,14 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                                         <td className="py-3 px-4 text-slate-500">
                                             {tx.category || '-'}
                                         </td>
+                                        {/* Attachments Cell */}
+                                        <td className="py-3 px-4 text-center" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>
+                                            <div className="flex justify-center">
+                                                <button className={`p-1.5 rounded-lg transition-colors ${hasAttachments ? 'text-uhuru-blue bg-uhuru-blue/10' : 'text-slate-600 hover:text-slate-400'}`}>
+                                                    <Paperclip size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 )
                             })
@@ -180,6 +205,13 @@ export function TransactionTable({ transactions }: { transactions: any[] }) {
                     </tbody>
                 </table>
             </div>
+
+            {/* --- Transaction Details Modal (with Attachments) --- */}
+            <TransactionDetailsModal
+                isOpen={!!viewTransaction}
+                onClose={() => setViewTransaction(null)}
+                transaction={viewTransaction}
+            />
 
             {/* --- Super Confirmation Modal --- */}
             {isDeleteModalOpen && (

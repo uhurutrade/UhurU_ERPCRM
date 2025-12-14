@@ -103,7 +103,7 @@ export function ExchangeRatesWidget() {
                             onChange={(e) => setFromCurrency(e.target.value)}
                             className="bg-transparent text-sm text-uhuru-cyan font-bold focus:outline-none cursor-pointer"
                         >
-                            {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+                            {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code} className="bg-slate-900 text-white">{c.code}</option>)}
                         </select>
                     </div>
 
@@ -118,7 +118,7 @@ export function ExchangeRatesWidget() {
                             onChange={(e) => setToCurrency(e.target.value)}
                             className="bg-transparent text-sm text-white font-bold focus:outline-none cursor-pointer"
                         >
-                            {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+                            {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code} className="bg-slate-900 text-white">{c.code}</option>)}
                         </select>
                     </div>
                 </div>

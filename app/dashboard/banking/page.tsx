@@ -10,6 +10,7 @@ export default async function BankingPage() {
         orderBy: { date: 'desc' },
         take: 50,
         include: {
+            attachments: true,
             bankAccount: {
                 include: {
                     bank: {
