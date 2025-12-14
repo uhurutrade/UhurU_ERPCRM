@@ -33,7 +33,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/prisma ./prisma
 
 # Generar el cliente Prisma
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 # Deshabilitar telemetría de Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
