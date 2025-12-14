@@ -38,6 +38,27 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Start seeding...');
 
+  // --- CLEANUP (Delete existing data to enforce strict sync) ---
+  console.log('🧹 Cleaning up existing data (Transactions, Invoices, Settings, etc.)...');
+  // Order matters due to Foreign Keys
+  await prisma.attachment.deleteMany().catch(() => {});
+  await prisma.invoiceItem.deleteMany().catch(() => {});
+  await prisma.bankTransaction.deleteMany().catch(() => {});
+  await prisma.cryptoTransaction.deleteMany().catch(() => {});
+  await prisma.taxObligation.deleteMany().catch(() => {});
+  await prisma.invoice.deleteMany().catch(() => {});
+  await prisma.deal.deleteMany().catch(() => {});
+  await prisma.activity.deleteMany().catch(() => {});
+  await prisma.contact.deleteMany().catch(() => {});
+  await prisma.bankAccount.deleteMany().catch(() => {});
+  await prisma.bankStatement.deleteMany().catch(() => {});
+  await prisma.bank.deleteMany().catch(() => {});
+  await prisma.cryptoWallet.deleteMany().catch(() => {});
+  await prisma.organization.deleteMany().catch(() => {});
+  await prisma.companySettings.deleteMany().catch(() => {});
+  // We do NOT delete Users/Accounts/Sessions here to prevent accidental lockout.
+  // Users are handled via upsert below.
+
   // --- Users ---
   for (const user of ${JSON.stringify(users, null, 2)} as any[]) {
     await prisma.user.upsert({
