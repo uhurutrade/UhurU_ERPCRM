@@ -32,19 +32,19 @@ function normalizeDate(dateStr: string): { date: Date, inferred: boolean } {
         // 1. DD-MM-YYYY (e.g. 14-12-2025)
         if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(cleanStr)) {
             const [day, month, year] = cleanStr.split('-').map(Number);
-            return { date: new Date(year, month - 1, day), inferred: false };
+            return { date: new Date(Date.UTC(year, month - 1, day)), inferred: false };
         }
 
         // 2. DD/MM/YYYY (e.g. 14/12/2025)
         if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(cleanStr)) {
             const [day, month, year] = cleanStr.split('/').map(Number);
-            return { date: new Date(year, month - 1, day), inferred: false };
+            return { date: new Date(Date.UTC(year, month - 1, day)), inferred: false };
         }
 
         // 3. DD.MM.YYYY (e.g. 14.12.2025)
         if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(cleanStr)) {
             const [day, month, year] = cleanStr.split('.').map(Number);
-            return { date: new Date(year, month - 1, day), inferred: false };
+            return { date: new Date(Date.UTC(year, month - 1, day)), inferred: false };
         }
 
         // 4. Dec 14, 2025 (Textual) or ISO
