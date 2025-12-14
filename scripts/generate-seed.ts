@@ -74,7 +74,7 @@ async function main() {
       data: {
         ...bank,
         accounts: {
-            create: bank.accounts.map(acc => ({
+            create: bank.accounts.map((acc: any) => ({
                 ...acc,
                 bankId: undefined, // remove parent ref
                 lastBalanceUpdate: acc.lastBalanceUpdate ? new Date(acc.lastBalanceUpdate) : null,
@@ -147,7 +147,7 @@ async function main() {
             createdAt: new Date(inv.createdAt),
             updatedAt: new Date(inv.updatedAt),
             items: {
-                create: inv.items.map(item => ({
+                create: inv.items.map((item: any) => ({
                     ...item,
                     invoiceId: undefined,
                     createdAt: undefined, // InvoiceItem usually doesn't have timestamps but let's check schema
