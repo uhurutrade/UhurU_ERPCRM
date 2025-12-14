@@ -1,7 +1,5 @@
-import { auth, signOut } from "@/auth";
-
-// CORRECCIÓN: Se ELIMINA la exportación 'navItems' de este archivo
-// para cumplir con las restricciones del App Router de Next.js.
+import { auth } from "@/auth";
+import { Sidebar } from "@/components/dashboard/sidebar";
 
 export default async function DashboardLayout({
     children,
@@ -11,38 +9,20 @@ export default async function DashboardLayout({
     const session = await auth();
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-100">
-            {/* Sidebar */}
-            <aside className="w-64 border-r border-slate-800 p-4 flex flex-col">
-                <div className="text-xl font-bold mb-8 text-emerald-400">Management Outlook</div>
-
-                <nav className="flex-1 space-y-2">
-                    {/* Se mantienen los enlaces codificados, ya que la navegación visual no usa la variable navItems */}
-                    <a href="/dashboard" className="block px-4 py-2 rounded hover:bg-slate-800">Dashboard</a>
-                    <a href="/dashboard/crm" className="block px-4 py-2 rounded hover:bg-slate-800">CRM</a>
-                    <a href="/dashboard/erp" className="block px-4 py-2 rounded hover:bg-slate-800">ERP</a>
-                    <a href="/dashboard/banking" className="block px-4 py-2 rounded hover:bg-slate-800">Banca</a>
-                    <a href="/dashboard/compliance" className="block px-4 py-2 rounded hover:bg-slate-800 text-slate-400">Cumplimiento (UK)</a>
-                    <a href="/dashboard/company-settings" className="block px-4 py-2 rounded hover:bg-slate-800 text-emerald-400">Company Settings</a>
-                    <a href="/dashboard/bank-settings" className="block px-4 py-2 rounded hover:bg-slate-800 text-blue-400">Bank Settings</a>
-                </nav>
-
-                <div className="border-t border-slate-800 pt-4">
-                    <div className="text-sm text-slate-400 mb-2">{session?.user?.email}</div>
-                    <form action={async () => {
-                        "use server"
-                        await signOut();
-                    }}>
-                        <button className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800 rounded">
-                            Sign Out
-                        </button>
-                    </form>
-                </div>
-            </aside>
+        <div className="min-h-screen bg-background">
+            <Sidebar userEmail={session?.user?.email} />
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-slate-950 p-8">
-                {children}
+            <main className="ml-72 min-h-screen bg-background p-8 relative">
+                {/* Background decorative elements */}
+                <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                    <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
+                    <div className="absolute bottom-[-10%] left-[20%] w-[400px] h-[400px] rounded-full bg-emerald-500/10 blur-[100px]" />
+                </div>
+
+                <div className="relative z-10">
+                    {children}
+                </div>
             </main>
         </div>
     )
