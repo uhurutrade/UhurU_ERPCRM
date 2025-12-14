@@ -1,5 +1,4 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,7 +10,9 @@ import {
     Building2,
     Settings,
     LogOut,
-    FileText
+    FileText,
+    Menu,
+    X
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -28,74 +29,107 @@ const navItems = [
 
 export function Sidebar({ userEmail }: { userEmail?: string | null }) {
     const pathname = usePathname();
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Close sidebar on route change (mobile)
+    useEffect(() => {
+        setIsOpen(false);
+    }, [pathname]);
 
     return (
-        <aside className="w-72 h-screen fixed left-0 top-0 flex flex-col bg-uhuru-sidebar/80 backdrop-blur-xl border-r border-uhuru-border z-50">
-            <div className="p-8 pb-4">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                    Management Outlook
-                </h1>
-                <p className="text-xs text-uhuru-text-dim mt-1 uppercase tracking-widest">
-                    UhurU Trade Ltd
-                </p>
-            </div>
+        <>
+            {/* Mobile Toggle Button */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden fixed top-4 right-4 z-[60] p-3 bg-uhuru-card border border-uhuru-border rounded-xl text-white shadow-lg active:scale-95 transition-transform"
+            >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
 
-            <nav className="flex-1 px-4 space-y-2 overflow-y-auto py-4 no-scrollbar">
-                {navItems.map((item) => {
-                    const isActive = pathname === item.href;
-                    const Icon = item.icon;
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40 transition-opacity duration-300"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`
-                group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
-                ${isActive
-                                    ? "bg-uhuru-card border border-uhuru-border shadow-glow"
-                                    : "hover:bg-uhuru-hover/50 hover:translate-x-1"
-                                }
-              `}
-                        >
-                            <div className={`
-                p-2 rounded-lg bg-opacity-20 transition-all duration-300
-                ${isActive ? `${item.color.replace('text-', 'bg-')}/20 text-white` : "bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-white"}
-              `}>
-                                <Icon size={20} />
-                            </div>
-                            <span className={`
-                font-medium transition-colors
-                ${isActive ? "text-white" : "text-slate-400 group-hover:text-white"}
-              `}>
-                                {item.label}
-                            </span>
-                            {isActive && (
-                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                            )}
-                        </Link>
-                    );
-                })}
-            </nav>
-
-            <div className="p-6 border-t border-uhuru-border mt-auto bg-black/20">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
-                        {userEmail?.[0]?.toUpperCase() || "U"}
-                    </div>
-                    <div className="overflow-hidden">
-                        <p className="text-sm font-medium text-white truncate">{userEmail}</p>
-                        <p className="text-xs text-uhuru-text-dim">Administrator</p>
+            {/* Sidebar */}
+            <aside className={`
+                w-72 h-screen fixed left-0 top-0 flex flex-col 
+                bg-uhuru-sidebar/95 backdrop-blur-xl border-r border-uhuru-border 
+                z-50 transition-transform duration-300 ease-in-out
+                md:translate-x-0
+                ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
+            `}>
+                <div className="p-8 pb-4 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                            Management Outlook
+                        </h1>
+                        <p className="text-xs text-uhuru-text-dim mt-1 uppercase tracking-widest">
+                            UhurU Trade Ltd
+                        </p>
                     </div>
                 </div>
 
-                <button
-                    onClick={() => signOut()}
-                    className="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-uhuru-border hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 text-uhuru-text-dim transition-all duration-300 text-sm font-medium group"
-                >
-                    <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    Sign Out
-                </button>
-            </div>
-        </aside>
+                <nav className="flex-1 px-4 space-y-2 overflow-y-auto py-4 no-scrollbar">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        const Icon = item.icon;
+
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`
+                    group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
+                    ${isActive
+                                        ? "bg-uhuru-card border border-uhuru-border shadow-glow"
+                                        : "hover:bg-uhuru-hover/50 hover:translate-x-1"
+                                    }
+                  `}
+                            >
+                                <div className={`
+                    p-2 rounded-lg bg-opacity-20 transition-all duration-300
+                    ${isActive ? `${item.color.replace('text-', 'bg-')}/20 text-white` : "bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-white"}
+                  `}>
+                                    <Icon size={20} />
+                                </div>
+                                <span className={`
+                    font-medium transition-colors
+                    ${isActive ? "text-white" : "text-slate-400 group-hover:text-white"}
+                  `}>
+                                    {item.label}
+                                </span>
+                                {isActive && (
+                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
+                <div className="p-6 border-t border-uhuru-border mt-auto bg-black/20">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+                            {userEmail?.[0]?.toUpperCase() || "U"}
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-sm font-medium text-white truncate">{userEmail}</p>
+                            <p className="text-xs text-uhuru-text-dim">Administrator</p>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => signOut()}
+                        className="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-uhuru-border hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 text-uhuru-text-dim transition-all duration-300 text-sm font-medium group"
+                    >
+                        <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
+                        Sign Out
+                    </button>
+                </div>
+            </aside>
+        </>
     );
 }

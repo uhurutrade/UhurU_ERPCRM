@@ -13,7 +13,7 @@ export default async function DashboardLayout({
             <Sidebar userEmail={session?.user?.email} />
 
             {/* Main Content */}
-            <main className="ml-72 min-h-screen bg-background p-8 relative">
+            <main className="md:ml-72 min-h-screen bg-background p-4 md:p-8 relative transition-all duration-300">
                 {/* Background decorative elements */}
                 <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                     <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]" />
