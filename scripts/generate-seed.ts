@@ -42,6 +42,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
+  console.log('Generated at: ${new Date().toISOString()}');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data (Transactions, Invoices, Settings, etc.)...');
