@@ -33,12 +33,14 @@ export function TransactionTable({
     transactions,
     totalPages = 1,
     currentPage = 1,
-    totalItems = 0
+    totalItems = 0,
+    categories = []
 }: {
     transactions: any[],
     totalPages?: number,
     currentPage?: number,
-    totalItems?: number
+    totalItems?: number,
+    categories?: any[]
 }) {
     const router = useRouter();
     const pathname = usePathname();
@@ -286,7 +288,7 @@ export function TransactionTable({
                                             {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                         </td>
                                         <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
-                                            <CategoryBadge transactionId={tx.id} initialCategory={tx.category} />
+                                            <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
                                         </td>
                                         {/* Attachments Cell */}
                                         <td className="py-3 px-4 text-center hidden md:table-cell" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>

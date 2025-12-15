@@ -15,6 +15,7 @@ export async function getTransactionCategories() {
     }
 }
 
+
 export async function createTransactionCategory(name: string, color: string) {
     try {
         const category = await prisma.transactionCategory.create({
@@ -30,3 +31,25 @@ export async function createTransactionCategory(name: string, color: string) {
         return { success: false, error: 'Failed to create category' };
     }
 }
+
+export async function deleteTransactionCategory(name: string) {
+    try {
+        // 1. Set transactions with this category to null
+        await prisma.bankTransaction.updateMany({
+            where: { category: name },
+            data: { category: null }
+        });
+
+        // 2. Delete the category definition
+        await prisma.transactionCategory.delete({
+            where: { name: name }
+        });
+
+        revalidatePath('/dashboard/banking');
+        return { success: true };
+    } catch (error) {
+        console.error('Delete category error:', error);
+        return { success: false, error: 'Failed to delete category' };
+    }
+}
+

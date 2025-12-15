@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { updateTransactionCategory } from '@/app/actions/banking';
-import { getTransactionCategories, createTransactionCategory } from '@/app/actions/categories';
-import { Check, Plus, Tag, Palette } from 'lucide-react';
+import { getTransactionCategories, createTransactionCategory, deleteTransactionCategory } from '@/app/actions/categories';
+import { Check, Plus, Tag, Palette, Trash2, X } from 'lucide-react';
 
 const PRESET_COLORS = [
     { name: 'White', solid: 'bg-slate-100', class: 'bg-slate-100/10 text-slate-200 border-slate-100/20 hover:bg-slate-100/20' },
@@ -30,9 +30,21 @@ const DEFAULT_CATEGORIES = [
     { name: 'Utilities', color: PRESET_COLORS[8].class },
 ];
 
-export function CategoryBadge({ transactionId, initialCategory }: { transactionId: string, initialCategory: string | null }) {
+export function CategoryBadge({ transactionId, initialCategory, allCategories = [] }: { transactionId: string, initialCategory: string | null, allCategories?: any[] }) {
     const [category, setCategory] = useState(initialCategory);
-    const [categories, setCategories] = useState<any[]>(DEFAULT_CATEGORIES);
+
+    // Initialize with provided categories + defaults
+    const [categories, setCategories] = useState<any[]>(() => {
+        const dbCats = allCategories.map((c: any) => ({ name: c.name, color: c.color }));
+        const allCats = [...dbCats];
+        DEFAULT_CATEGORIES.forEach(def => {
+            if (!allCats.find(c => c.name === def.name)) {
+                allCats.push(def);
+            }
+        });
+        return allCats.sort((a, b) => a.name.localeCompare(b.name));
+    });
+
     const [isOpen, setIsOpen] = useState(false);
 
     // Custom Category State
@@ -46,18 +58,17 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
     useEffect(() => {
         if (isOpen) {
             getTransactionCategories().then(res => {
-                if (res.success && res.categories && res.categories.length > 0) {
+                if (res.success && res.categories) {
                     // Merge DB categories with Default ones (deduplicating by name)
                     const dbCats = res.categories.map((c: any) => ({ name: c.name, color: c.color }));
-                    const allCats = [...dbCats];
+                    // Only use dbCats that are NOT in current state? No, refresh all.
 
-                    // Add defaults if they don't exist
+                    const allCats = [...dbCats];
                     DEFAULT_CATEGORIES.forEach(def => {
                         if (!allCats.find(c => c.name === def.name)) {
                             allCats.push(def);
                         }
                     });
-
                     setCategories(allCats.sort((a, b) => a.name.localeCompare(b.name)));
                 }
             });
@@ -101,6 +112,23 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
         }
     };
 
+    const handleDeleteCategory = async (catName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm(`Delete category "${catName}"? This will set all related transactions to Uncategorized.`)) return;
+
+        // Optimistic update locally
+        setCategories(prev => prev.filter(c => c.name !== catName));
+        if (category === catName) {
+            setCategory(null);
+        }
+
+        const res = await deleteTransactionCategory(catName);
+        if (!res.success) {
+            alert("Failed to delete category");
+            // Re-fetch or revert if critical (skipping for now for UI responsiveness)
+        }
+    };
+
     const currentCat = categories.find(c => c.name === category);
     const currentStyle = currentCat?.color || 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700';
 
@@ -136,7 +164,12 @@ export function CategoryBadge({ transactionId, initialCategory }: { transactionI
                                             <div className={`w-2 h-2 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
                                             {cat.name}
                                         </div>
-                                        {cat.name === category && <Check size={12} className="text-emerald-400" />}
+                                        <div className="flex items-center gap-2">
+                                            {cat.name === category && <Check size={12} className="text-emerald-400" />}
+                                            <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 transition-all">
+                                                <X size={12} />
+                                            </div>
+                                        </div>
                                     </button>
                                 ))}
                             </div>

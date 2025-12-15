@@ -4,6 +4,7 @@ import { TransactionTable } from '@/components/banking/transaction-table';
 import { Upload, History } from 'lucide-react';
 import { ExchangeRatesWidget } from '@/components/banking/exchange-rates-widget';
 import { serializeData } from '@/lib/serialization';
+import { getTransactionCategories } from '@/app/actions/categories';
 
 export default async function BankingPage({
     searchParams
@@ -33,7 +34,7 @@ export default async function BankingPage({
     };
 
     // --- Execute Query ---
-    const [totalItems, transactions] = await Promise.all([
+    const [totalItems, transactions, categoriesRes] = await Promise.all([
         prisma.bankTransaction.count({ where: whereClause }),
         prisma.bankTransaction.findMany({
             where: whereClause,
@@ -52,8 +53,11 @@ export default async function BankingPage({
                     }
                 }
             }
-        })
+        }),
+        getTransactionCategories()
     ]);
+
+    const categories = categoriesRes.success ? categoriesRes.categories : [];
 
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -99,6 +103,7 @@ export default async function BankingPage({
                         totalPages={totalPages}
                         currentPage={currentPage}
                         totalItems={totalItems}
+                        categories={categories}
                     />
                 </div>
             </div>
