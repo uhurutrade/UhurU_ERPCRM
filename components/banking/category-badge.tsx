@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { updateTransactionCategory } from '@/app/actions/banking';
-import { getTransactionCategories, createTransactionCategory, deleteTransactionCategory } from '@/app/actions/categories';
-import { Check, Plus, Tag, Palette, Trash2, X } from 'lucide-react';
+import { getTransactionCategories, createTransactionCategory, deleteTransactionCategory, updateTransactionCategoryDefinition } from '@/app/actions/categories';
+import { Check, Plus, Tag, Palette, Trash2, X, Pencil } from 'lucide-react';
 
 const PRESET_COLORS = [
     { name: 'White', solid: 'bg-slate-100', class: 'bg-slate-100/10 text-slate-200 border-slate-100/20 hover:bg-slate-100/20' },
@@ -18,37 +18,19 @@ const PRESET_COLORS = [
     { name: 'Lime', solid: 'bg-lime-400', class: 'bg-lime-400/10 text-lime-300 border-lime-400/20 hover:bg-lime-400/20' },
 ];
 
-const DEFAULT_CATEGORIES = [
-    { name: 'Sales', color: PRESET_COLORS[0].class },
-    { name: 'Marketing', color: PRESET_COLORS[1].class },
-    { name: 'Software', color: PRESET_COLORS[2].class },
-    { name: 'Travel', color: PRESET_COLORS[3].class },
-    { name: 'Meals', color: PRESET_COLORS[4].class },
-    { name: 'Office', color: PRESET_COLORS[5].class },
-    { name: 'Payroll', color: PRESET_COLORS[6].class },
-    { name: 'Taxes', color: PRESET_COLORS[7].class },
-    { name: 'Utilities', color: PRESET_COLORS[8].class },
-];
-
 export function CategoryBadge({ transactionId, initialCategory, allCategories = [] }: { transactionId: string, initialCategory: string | null, allCategories?: any[] }) {
     const [category, setCategory] = useState(initialCategory);
 
-    // Initialize with provided categories + defaults
+    // Initialize with provided categories (server ensures they are populated)
     const [categories, setCategories] = useState<any[]>(() => {
-        const dbCats = allCategories.map((c: any) => ({ name: c.name, color: c.color }));
-        const allCats = [...dbCats];
-        DEFAULT_CATEGORIES.forEach(def => {
-            if (!allCats.find(c => c.name === def.name)) {
-                allCats.push(def);
-            }
-        });
-        return allCats.sort((a, b) => a.name.localeCompare(b.name));
+        return allCategories.sort((a, b) => a.name.localeCompare(b.name));
     });
 
     const [isOpen, setIsOpen] = useState(false);
 
     // Custom Category State
     const [isCustomMode, setIsCustomMode] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<string | null>(null); // Track if editing existing
     const [customName, setCustomName] = useState('');
     const [customColor, setCustomColor] = useState(PRESET_COLORS[5].class); // Default to Slate
 
@@ -59,17 +41,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
         if (isOpen) {
             getTransactionCategories().then(res => {
                 if (res.success && res.categories) {
-                    // Merge DB categories with Default ones (deduplicating by name)
-                    const dbCats = res.categories.map((c: any) => ({ name: c.name, color: c.color }));
-                    // Only use dbCats that are NOT in current state? No, refresh all.
-
-                    const allCats = [...dbCats];
-                    DEFAULT_CATEGORIES.forEach(def => {
-                        if (!allCats.find(c => c.name === def.name)) {
-                            allCats.push(def);
-                        }
-                    });
-                    setCategories(allCats.sort((a, b) => a.name.localeCompare(b.name)));
+                    setCategories(res.categories.sort((a: any, b: any) => a.name.localeCompare(b.name)));
                 }
             });
         }
@@ -98,18 +70,40 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
         e.preventDefault();
         if (customName.trim()) {
             const name = customName.trim();
-            // Optimistic update
-            const newCat = { name, color: customColor };
-            setCategories(prev => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
-            setCategory(name);
+
+            if (editingCategory) {
+                // --- EDIT MODE ---
+                await updateTransactionCategoryDefinition(editingCategory, name, customColor);
+
+                // Update local state
+                setCategories(prev => prev.map(c => c.name === editingCategory ? { name, color: customColor } : c));
+                if (category === editingCategory) setCategory(name);
+
+            } else {
+                // --- CREATE MODE ---
+                // Optimistic update
+                const newCat = { name, color: customColor };
+                setCategories(prev => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
+                setCategory(name);
+
+                await createTransactionCategory(name, customColor);
+                await updateTransactionCategory(transactionId, name);
+            }
+
             setIsOpen(false);
             setIsCustomMode(false);
+            setEditingCategory(null);
             setCustomName('');
-
-            // API calls
-            await createTransactionCategory(name, customColor); // Persist category
-            await updateTransactionCategory(transactionId, name); // Update transaction
+            setCustomColor(PRESET_COLORS[5].class);
         }
+    };
+
+    const handleEditClick = (cat: any, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEditingCategory(cat.name);
+        setCustomName(cat.name);
+        setCustomColor(cat.color);
+        setIsCustomMode(true);
     };
 
     const handleDeleteCategory = async (catName: string, e: React.MouseEvent) => {
@@ -156,7 +150,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                                         key={cat.name}
                                         onClick={(e) => { e.stopPropagation(); handleSelect(cat.name); }}
                                         className={`
-                                            w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between group
+                                            w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-3 group
                                             ${cat.name === category ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
                                         `}
                                     >
@@ -164,10 +158,14 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                                             <div className={`w-2 h-2 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
                                             {cat.name}
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {cat.name === category && <Check size={12} className="text-emerald-400" />}
-                                            <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 transition-all">
-                                                <X size={12} />
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {cat.name === category && <Check size={12} className="text-emerald-400 mr-1" />}
+
+                                            <div onClick={(e) => handleEditClick(cat, e)} className="p-1 text-slate-500 hover:text-uhuru-blue hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Edit Category">
+                                                <Pencil size={11} />
+                                            </div>
+                                            <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="p-1 text-slate-500 hover:text-rose-400 hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Delete Category">
+                                                <Trash2 size={11} />
                                             </div>
                                         </div>
                                     </button>
@@ -186,7 +184,9 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                     ) : (
                         <form onSubmit={handleCustomSubmit} className="p-3" onClick={(e) => e.stopPropagation()}>
                             <div className="mb-3">
-                                <label className="block text-xs font-semibold text-slate-500 mb-1">Name</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-1">
+                                    {editingCategory ? 'Edit Category Name' : 'New Category Name'}
+                                </label>
                                 <input
                                     autoFocus
                                     type="text"
@@ -231,7 +231,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                                     disabled={!customName.trim()}
                                     className="flex-1 py-1.5 text-xs text-white bg-uhuru-blue hover:bg-uhuru-blue-light rounded-md disabled:opacity-50 transition-colors font-medium shadow-uhuru-sm"
                                 >
-                                    Create & Save
+                                    {editingCategory ? 'Save Changes' : 'Create & Save'}
                                 </button>
                             </div>
                         </form>
