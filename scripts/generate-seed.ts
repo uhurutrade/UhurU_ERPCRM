@@ -13,27 +13,37 @@ async function main() {
   const companySettings = await prisma.companySettings.findMany();
 
   // 3. Banks & Accounts
-  // const banks = await prisma.bank.findMany({ include: { accounts: true } });
+  const banks = await prisma.bank.findMany();
+  const bankAccounts = await prisma.bankAccount.findMany();
 
-  // 4. Crypto Wallets
+  // 4. Crypto Wallets & Transactions
   const cryptoWallets = await prisma.cryptoWallet.findMany();
+  const cryptoTransactions = await prisma.cryptoTransaction.findMany();
 
   // 5. CRM
   const organizations = await prisma.organization.findMany();
   const contacts = await prisma.contact.findMany();
   const deals = await prisma.deal.findMany();
+  const leads = await prisma.lead.findMany();
+  const activities = await prisma.activity.findMany();
 
   // 6. Invoices
   const invoices = await prisma.invoice.findMany({ include: { items: true } });
 
   // 7. Transactions & Compliance & Logs
-  // --- TRANSACTION CATEGORIES ---
   console.log('categories extraction...');
   const transactionCategories = await prisma.transactionCategory.findMany();
-  // const bankStatements = await prisma.bankStatement.findMany();
-  // const transactions = await prisma.bankTransaction.findMany();
-  // const deletedTransactions = await prisma.deletedTransaction.findMany();
+  const bankStatements = await prisma.bankStatement.findMany();
+  const bankTransactions = await prisma.bankTransaction.findMany();
+  const attachments = await prisma.attachment.findMany();
+  const deletedTransactions = await prisma.deletedTransaction.findMany();
+
+  // 8. Other Tables
   const taxObligations = await prisma.taxObligation.findMany();
+  const fiscalYears = await prisma.fiscalYear.findMany();
+  const complianceEvents = await prisma.complianceEvent.findMany();
+  const tasks = await prisma.task.findMany();
+  const assets = await prisma.asset.findMany();
 
   const seedContent = `
 import { PrismaClient } from '@prisma/client';
@@ -45,29 +55,43 @@ async function main() {
   console.log('Generated at: ${new Date().toISOString()}');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
-  console.log('🧹 Cleaning up existing data (Transactions, Invoices, Settings, etc.)...');
+  console.log('🧹 Cleaning up existing data...');
+  
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
-  await prisma.invoiceItem.deleteMany().catch(() => {});
-  // await prisma.deletedTransaction.deleteMany().catch(() => {});
-  // await prisma.bankTransaction.deleteMany().catch(() => {});
-  await prisma.transactionCategory.deleteMany().catch(() => {}); 
-  // await prisma.bankStatement.deleteMany().catch(() => {});
+  await prisma.bankTransaction.deleteMany().catch(() => {});
+  await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
-  await prisma.taxObligation.deleteMany().catch(() => {});
+  
+  await prisma.invoiceItem.deleteMany().catch(() => {});
   await prisma.invoice.deleteMany().catch(() => {});
-  await prisma.deal.deleteMany().catch(() => {});
+  
   await prisma.activity.deleteMany().catch(() => {});
+  await prisma.deal.deleteMany().catch(() => {});
   await prisma.contact.deleteMany().catch(() => {});
-  // await prisma.bankAccount.deleteMany().catch(() => {});
-  // await prisma.bank.deleteMany().catch(() => {});
+  await prisma.lead.deleteMany().catch(() => {});
+  await prisma.task.deleteMany().catch(() => {});
+  
+  await prisma.taxObligation.deleteMany().catch(() => {});
+  await prisma.complianceEvent.deleteMany().catch(() => {});
+  await prisma.fiscalYear.deleteMany().catch(() => {});
+  
+  await prisma.bankAccount.deleteMany().catch(() => {}); // Delete accounts before banks
+  await prisma.bank.deleteMany().catch(() => {});
   await prisma.cryptoWallet.deleteMany().catch(() => {});
+  
   await prisma.organization.deleteMany().catch(() => {});
+  await prisma.transactionCategory.deleteMany().catch(() => {});
+  await prisma.deletedTransaction.deleteMany().catch(() => {});
+  await prisma.asset.deleteMany().catch(() => {});
   await prisma.companySettings.deleteMany().catch(() => {});
   
-  // ... (Users loop same as before)
+  // Note: We usually don't delete Users to prevent lockout, but if you want *everything* synced:
+  // await prisma.user.deleteMany().catch(() => {}); 
+  // We will use upsert for users.
 
-  // --- Transaction Categories ---
+  // --- 1. Transaction Categories ---
+  console.log('Seeding Categories...');
   for (const cat of ${JSON.stringify(transactionCategories, null, 2)} as any[]) {
     await prisma.transactionCategory.create({
         data: {
@@ -75,14 +99,27 @@ async function main() {
             createdAt: new Date(cat.createdAt),
             updatedAt: new Date(cat.updatedAt),
         } as any
-    }).catch(e => console.log('Category error or exists'));
+    }).catch(e => console.log('Category error or exists:', e.message));
   }
-  
-  // ... (rest of loops for CompanySettings, Banks, etc.)
-  // We do NOT delete Users/Accounts/Sessions here to prevent accidental lockout.
-  // Users are handled via upsert below.
 
-  // --- Users ---
+  // --- 2. Company Settings ---
+  console.log('Seeding Company Settings...');
+  for (const setting of ${JSON.stringify(companySettings, null, 2)} as any[]) {
+    await prisma.companySettings.create({
+        data: {
+            ...setting,
+            incorporationDate: new Date(setting.incorporationDate),
+            accountsNextDueDate: setting.accountsNextDueDate ? new Date(setting.accountsNextDueDate) : null,
+            confirmationNextDueDate: setting.confirmationNextDueDate ? new Date(setting.confirmationNextDueDate) : null,
+            vatRegistrationDate: setting.vatRegistrationDate ? new Date(setting.vatRegistrationDate) : null,
+            createdAt: new Date(setting.createdAt),
+            updatedAt: new Date(setting.updatedAt),
+        } as any
+    }).catch(e => console.log('Company settings error:', e.message));
+  }
+
+  // --- 3. Users ---
+  console.log('Seeding Users...');
   for (const user of ${JSON.stringify(users, null, 2)} as any[]) {
     await prisma.user.upsert({
       where: { email: user.email || '' },
@@ -92,47 +129,86 @@ async function main() {
         emailVerified: user.emailVerified ? new Date(user.emailVerified) : null,
         createdAt: new Date(user.createdAt),
         updatedAt: new Date(user.updatedAt),
-      } as any // Bypass strict typing for simplicity in seed
+      } as any
     });
   }
 
-  // --- Company Settings ---
-  for (const setting of ${JSON.stringify(companySettings, null, 2)} as any[]) {
-    await prisma.companySettings.create({
+  // --- 4. Assets ---
+  console.log('Seeding Assets...');
+  for (const asset of ${JSON.stringify(assets, null, 2)} as any[]) {
+    await prisma.asset.create({
         data: {
-            ...setting,
-            id: undefined, // Let new DB generate ID or keep? better keep if references exist.
-            incorporationDate: new Date(setting.incorporationDate),
-            accountsNextDueDate: setting.accountsNextDueDate ? new Date(setting.accountsNextDueDate) : null,
-            confirmationNextDueDate: setting.confirmationNextDueDate ? new Date(setting.confirmationNextDueDate) : null,
-            vatRegistrationDate: setting.vatRegistrationDate ? new Date(setting.vatRegistrationDate) : null,
-            createdAt: new Date(setting.createdAt),
-            updatedAt: new Date(setting.updatedAt),
+            ...asset,
+            purchaseDate: new Date(asset.purchaseDate),
+            cost: Number(asset.cost),
+            createdAt: new Date(asset.createdAt),
+            updatedAt: new Date(asset.updatedAt),
         } as any
-    }).catch(e => console.log('Company settings might already exist'));
+    }).catch(e => console.log('Asset error:', e.message));
   }
 
-  // --- Banks & Accounts ---
-  // SKIP: Banks and Accounts are preserved on VPS
-  /*
-  for (const bank of [] as any[]) {
-     // ...
+  // --- 5. Banks ---
+  console.log('Seeding Banks...');
+  for (const bank of ${JSON.stringify(banks, null, 2)} as any[]) {
+    await prisma.bank.create({
+        data: {
+            ...bank,
+            createdAt: new Date(bank.createdAt),
+            updatedAt: new Date(bank.updatedAt),
+        } as any
+    }).catch(e => console.log('Bank error:', e.message));
   }
-  */
 
-  // --- Crypto Wallets ---
+  // --- 6. Bank Accounts ---
+  console.log('Seeding Bank Accounts...');
+  for (const acc of ${JSON.stringify(bankAccounts, null, 2)} as any[]) {
+    await prisma.bankAccount.create({
+        data: {
+            ...acc,
+            currentBalance: acc.currentBalance ? Number(acc.currentBalance) : null,
+            availableBalance: acc.availableBalance ? Number(acc.availableBalance) : null,
+            lastBalanceUpdate: acc.lastBalanceUpdate ? new Date(acc.lastBalanceUpdate) : null,
+            createdAt: new Date(acc.createdAt),
+            updatedAt: new Date(acc.updatedAt),
+        } as any
+    }).catch(e => console.log('Bank Account error:', e.message));
+  }
+
+  // --- 7. Crypto Wallets ---
+  console.log('Seeding Crypto Wallets...');
   for (const wallet of ${JSON.stringify(cryptoWallets, null, 2)} as any[]) {
     await prisma.cryptoWallet.create({
       data: {
         ...wallet,
+        currentBalance: wallet.currentBalance ? Number(wallet.currentBalance) : null,
+        balanceUSD: wallet.balanceUSD ? Number(wallet.balanceUSD) : null,
         lastBalanceUpdate: wallet.lastBalanceUpdate ? new Date(wallet.lastBalanceUpdate) : null,
         createdAt: new Date(wallet.createdAt),
         updatedAt: new Date(wallet.updatedAt),
       } as any
-    }).catch(e => console.log('Wallet ' + wallet.walletName + ' error'));
+    }).catch(e => console.log('Wallet error:', e.message));
   }
 
-  // --- CRM: Organizations ---
+  // --- 8. Crypto Transactions ---
+  console.log('Seeding Crypto Transactions...');
+  for (const tx of ${JSON.stringify(cryptoTransactions, null, 2)} as any[]) {
+      await prisma.cryptoTransaction.create({
+          data: {
+              ...tx,
+              amount: Number(tx.amount),
+              amountUSD: tx.amountUSD ? Number(tx.amountUSD) : null,
+              exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null,
+              networkFee: tx.networkFee ? Number(tx.networkFee) : null,
+              networkFeeUSD: tx.networkFeeUSD ? Number(tx.networkFeeUSD) : null,
+              timestamp: new Date(tx.timestamp),
+              createdAt: new Date(tx.createdAt),
+              updatedAt: new Date(tx.updatedAt),
+          } as any
+      }).catch(e => console.log('Crypto Tx error:', e.message));
+  }
+
+  // --- 9. CRM: Organizations ---
+  console.log('Seeding Organizations...');
   for (const org of ${JSON.stringify(organizations, null, 2)} as any[]) {
     await prisma.organization.upsert({
         where: { id: org.id },
@@ -145,7 +221,8 @@ async function main() {
     });
   }
 
-  // --- CRM: Contacts ---
+  // --- 10. CRM: Contacts ---
+  console.log('Seeding Contacts...');
   for (const contact of ${JSON.stringify(contacts, null, 2)} as any[]) {
     await prisma.contact.create({
         data: {
@@ -153,10 +230,23 @@ async function main() {
             createdAt: new Date(contact.createdAt),
             updatedAt: new Date(contact.updatedAt),
         } as any
-    }).catch(e => console.log('Contact error'));
+    }).catch(e => console.log('Contact error:', e.message));
   }
   
- // --- CRM: Deals ---
+  // --- 11. CRM: Leads ---
+  console.log('Seeding Leads...');
+  for (const lead of ${JSON.stringify(leads, null, 2)} as any[]) {
+      await prisma.lead.create({
+          data: {
+              ...lead,
+              createdAt: new Date(lead.createdAt),
+              updatedAt: new Date(lead.updatedAt),
+          } as any
+      }).catch(e => console.log('Lead error:', e.message));
+  }
+
+  // --- 12. CRM: Deals ---
+  console.log('Seeding Deals...');
   for (const deal of ${JSON.stringify(deals, null, 2)} as any[]) {
     await prisma.deal.create({
         data: {
@@ -166,39 +256,113 @@ async function main() {
             createdAt: new Date(deal.createdAt),
             updatedAt: new Date(deal.updatedAt),
         } as any
-    }).catch(e => console.log('Deal error'));
+    }).catch(e => console.log('Deal error:', e.message));
+  }
+  
+  // --- 13. CRM: Activities ---
+  console.log('Seeding Activities...');
+  for (const act of ${JSON.stringify(activities, null, 2)} as any[]) {
+      await prisma.activity.create({
+          data: {
+              ...act,
+              date: new Date(act.date),
+          } as any
+      }).catch(e => console.log('Activity error:', e.message));
   }
 
-  // --- Invoices ---
+  // --- 14. Invoices ---
+  console.log('Seeding Invoices...');
   for (const inv of ${JSON.stringify(invoices, null, 2)} as any[]) {
     await prisma.invoice.create({
         data: {
             ...inv,
             date: new Date(inv.date),
             dueDate: new Date(inv.dueDate),
+            subtotal: Number(inv.subtotal),
+            taxRate: Number(inv.taxRate),
+            taxAmount: Number(inv.taxAmount),
+            total: Number(inv.total),
             createdAt: new Date(inv.createdAt),
             updatedAt: new Date(inv.updatedAt),
             items: {
                 create: inv.items.map((item: any) => ({
                     ...item,
                     invoiceId: undefined,
-                    createdAt: undefined, // InvoiceItem usually doesn't have timestamps but let's check schema
+                    quantity: Number(item.quantity),
+                    unitPrice: Number(item.unitPrice),
+                    total: Number(item.total),
                 }))
             }
         } as any
-    }).catch(e => console.log('Invoice error'));
+    }).catch(e => console.log('Invoice error:', e.message));
   }
 
-  // --- Bank Statements ---
-  // SKIP
+  // --- 15. Bank Statements ---
+  console.log('Seeding Bank Statements...');
+  for (const stmt of ${JSON.stringify(bankStatements, null, 2)} as any[]) {
+      await prisma.bankStatement.create({
+          data: {
+              ...stmt,
+              uploadedAt: new Date(stmt.uploadedAt),
+          } as any
+      }).catch(e => console.log('Bank Statement error:', e.message));
+  }
 
-  // --- Transactions ---
-  // SKIP
+  // --- 16. Bank Transactions ---
+  console.log('Seeding Bank Transactions...');
+  for (const tx of ${JSON.stringify(bankTransactions, null, 2)} as any[]) {
+      await prisma.bankTransaction.create({
+          data: {
+              ...tx,
+              date: new Date(tx.date),
+              amount: Number(tx.amount),
+              fee: tx.fee ? Number(tx.fee) : null,
+              balanceAfter: tx.balanceAfter ? Number(tx.balanceAfter) : null,
+              exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null,
+              createdAt: new Date(tx.createdAt),
+              updatedAt: new Date(tx.updatedAt),
+          } as any
+      }).catch(e => console.log('Bank Tx error:', e.message));
+  }
+  
+  // --- 17. Attachments ---
+  console.log('Seeding Attachments...');
+  for (const att of ${JSON.stringify(attachments, null, 2)} as any[]) {
+      await prisma.attachment.create({
+          data: {
+              ...att,
+              uploadedAt: new Date(att.uploadedAt),
+          } as any
+      }).catch(e => console.log('Attachment error:', e.message));
+  }
 
-  // --- Deleted Transactions (Audit Log) ---
-  // SKIP
+  // --- 18. Deleted Transactions Audit ---
+  console.log('Seeding Deleted Transactions Log...');
+  for (const del of ${JSON.stringify(deletedTransactions, null, 2)} as any[]) {
+      await prisma.deletedTransaction.create({
+          data: {
+              ...del,
+              amount: Number(del.amount),
+              date: new Date(del.date),
+              deletedAt: new Date(del.deletedAt),
+          } as any
+      }).catch(e => console.log('Deleted Tx error:', e.message));
+  }
 
-  // --- Tax Obligations ---
+  // --- 19. Fiscal Years ---
+  console.log('Seeding Fiscal Years...');
+  for (const fy of ${JSON.stringify(fiscalYears, null, 2)} as any[]) {
+      await prisma.fiscalYear.create({
+          data: {
+              ...fy,
+              startDate: new Date(fy.startDate),
+              endDate: new Date(fy.endDate),
+          } as any
+      }).catch(e => console.log('Fiscal Year error:', e.message));
+  }
+
+  // --- 20. Tax Obligations ---
+  console.log('Seeding Tax Obligations...');
   for (const tax of ${JSON.stringify(taxObligations, null, 2)} as any[]) {
     await prisma.taxObligation.create({
         data: {
@@ -211,7 +375,33 @@ async function main() {
             createdAt: new Date(tax.createdAt),
             updatedAt: new Date(tax.updatedAt),
         } as any
-    }).catch(e => console.log('Tax Obligation error'));
+    }).catch(e => console.log('Tax Obligation error:', e.message));
+  }
+  
+  // --- 21. Compliance Events ---
+  console.log('Seeding Compliance Events...');
+  for (const evt of ${JSON.stringify(complianceEvents, null, 2)} as any[]) {
+      await prisma.complianceEvent.create({
+          data: {
+              ...evt,
+              date: new Date(evt.date),
+              createdAt: new Date(evt.createdAt),
+              updatedAt: new Date(evt.updatedAt),
+          } as any
+      }).catch(e => console.log('Compliance Event error:', e.message));
+  }
+  
+  // --- 22. Tasks ---
+  console.log('Seeding Tasks...');
+  for (const task of ${JSON.stringify(tasks, null, 2)} as any[]) {
+      await prisma.task.create({
+          data: {
+              ...task,
+              dueDate: task.dueDate ? new Date(task.dueDate) : null,
+              createdAt: new Date(task.createdAt),
+              updatedAt: new Date(task.updatedAt),
+          } as any
+      }).catch(e => console.log('Task error:', e.message));
   }
 
   console.log('✅ Seeding finished.');
@@ -228,7 +418,7 @@ main()
 `;
 
   fs.writeFileSync('prisma/seed.ts', seedContent);
-  console.log('✅ prisma/seed.ts generado con los datos actuales.');
+  console.log('✅ prisma/seed.ts generado con TODO el contenido actual de la base de datos.');
 }
 
 main()
