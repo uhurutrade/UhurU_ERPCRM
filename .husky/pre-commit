@@ -1,0 +1,2 @@
+npm run generate-seed
+git add prisma/seed.ts
