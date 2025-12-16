@@ -16,7 +16,8 @@ ENV NODE_ENV production
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
-# Instalar dependencias de producción
+# Instalar dependencias de producción (sin Husky)
+ENV HUSKY=0
 RUN npm ci --only=production --legacy-peer-deps
 
 # ----------------------------------------------------
@@ -29,6 +30,7 @@ WORKDIR /app
 COPY . .
 
 # Instalar TODAS las dependencias (incluyendo dev) para tener Prisma CLI
+ENV HUSKY=0
 RUN npm ci --legacy-peer-deps
 
 # Generar el cliente Prisma
