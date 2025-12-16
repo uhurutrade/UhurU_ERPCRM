@@ -1,4 +1,7 @@
 import { auth } from "@/auth";
+
+export const dynamic = 'force-dynamic';
+
 import { Sidebar } from "@/components/dashboard/sidebar";
 import InactivityMonitor from "@/components/auth/inactivity-monitor";
 
