@@ -47,7 +47,7 @@ export default async function BankSettingsPage() {
             {/* Traditional Banks Section */}
             <section>
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold text-emerald-400">Traditional Banks</h2>
+                    <h2 className="text-2xl font-semibold text-emerald-400">Banking Institutions</h2>
                     <Link
                         href="/dashboard/bank-settings/add-bank"
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
@@ -125,10 +125,10 @@ export default async function BankSettingsPage() {
             {/* Crypto Wallets Section */}
             <section>
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold text-purple-400">Crypto Wallets</h2>
+                    <h2 className="text-2xl font-semibold text-yellow-200">Crypto Wallets</h2>
                     <Link
                         href="/dashboard/bank-settings/add-crypto-wallet"
-                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                        className="px-4 py-2 bg-yellow-300 hover:bg-yellow-400 text-slate-900 rounded-lg transition-colors font-semibold"
                     >
                         + Add Wallet
                     </Link>
@@ -139,7 +139,7 @@ export default async function BankSettingsPage() {
                         <p className="text-slate-400 mb-4">No crypto wallets registered yet</p>
                         <Link
                             href="/dashboard/bank-settings/add-crypto-wallet"
-                            className="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                            className="inline-block px-6 py-3 bg-yellow-300 hover:bg-yellow-400 text-slate-900 rounded-lg transition-colors font-semibold"
                         >
                             Add Your First Wallet
                         </Link>
@@ -157,7 +157,7 @@ export default async function BankSettingsPage() {
                                         <h3 className="text-lg font-semibold text-white mb-1">{wallet.walletName}</h3>
                                         <p className="text-sm text-slate-400">{wallet.walletType}</p>
                                     </div>
-                                    <span className="px-2 py-1 text-xs bg-purple-500 text-white rounded font-mono">
+                                    <span className="px-2 py-1 text-xs bg-yellow-200 text-slate-900 rounded font-mono font-semibold">
                                         {wallet.asset}
                                     </span>
                                 </div>
