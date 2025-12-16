@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles, Lock, AlertCircle } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Lock, AlertCircle, Sparkles, Shield, Zap, Globe } from "lucide-react";
 
 const CORRECT_PASSWORD = '12345678';
 const MAX_ATTEMPTS = 3;
@@ -81,6 +82,10 @@ export default function Home() {
             localStorage.removeItem('crm_attempts');
             localStorage.removeItem('crm_block');
             setAttempts(0);
+            const unlocked = sessionStorage.getItem('crm_unlocked');
+            if (!unlocked) {
+                sessionStorage.setItem('crm_unlocked', 'true');
+            }
             router.push('/dashboard');
         } else {
             const newAttempts = attempts + 1;
@@ -125,71 +130,107 @@ export default function Home() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-8 relative overflow-hidden bg-uhuru-base">
+        <main className="flex min-h-screen flex-col items-center justify-center p-8 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-uhuru-accent-blue/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-uhuru-accent-purple/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '2s' }}></div>
             </div>
 
-            {/* Header */}
-            <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex mb-16">
-                <div className="fixed left-0 top-0 flex w-full justify-center border-b border-uhuru-border bg-uhuru-base/80 backdrop-blur-xl pb-6 pt-8 lg:static lg:w-auto lg:rounded-2xl lg:border lg:bg-uhuru-card lg:p-6">
-                    <p className="text-white font-semibold text-lg">
-                        Uhuru Trade Ltd
-                    </p>
-                </div>
-            </div>
+            {/* Grid pattern overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
             {/* Main Content */}
-            <div className="relative flex place-items-center flex-col gap-12 z-10">
-                <div className="text-center max-w-4xl">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-uhuru-accent-blue/10 border border-uhuru-accent-blue/30 text-uhuru-accent-blue mb-6 backdrop-blur-sm">
-                        <Sparkles size={16} />
-                        <span className="text-sm font-medium">Enterprise Resource Planning & CRM</span>
+            <div className="relative z-10 max-w-6xl w-full">
+                {/* Logo Section */}
+                <div className="flex justify-center mb-10 animate-in fade-in slide-in-from-top duration-700">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 blur-3xl rounded-full"></div>
+                        <Image
+                            src="/images/uhuru-logo.png"
+                            alt="Uhuru Logo"
+                            width={400}
+                            height={150}
+                            className="relative drop-shadow-2xl"
+                            priority
+                        />
+                    </div>
+                </div>
+
+                {/* Hero Section */}
+                <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
+
+                    {/* Button Moved Here (Replacing previous Badge) */}
+                    <div className="mb-8 flex justify-center">
+                        <button
+                            onClick={() => setShowPasswordModal(true)}
+                            className="group inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl font-semibold text-lg transition-all shadow-lg shadow-emerald-900/50 hover:shadow-xl hover:shadow-emerald-900/60 transform hover:scale-105 active:scale-100"
+                        >
+                            <Lock size={18} />
+                            Access Platform
+                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
                     </div>
 
-                    <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-uhuru-accent-blue via-uhuru-accent-purple to-emerald-400">
-                            Management Outlook
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-200 to-blue-200">
+                            Strategic Management Outlook
                         </span>
-                        <br />
-                        <span className="text-white">ERP & CRM</span>
                     </h1>
 
-                    <p className="text-uhuru-text-muted text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-                        Secure Enterprise Resource Planning & Customer Relationship Management.
-                        Streamline your business operations with our powerful platform.
+                    <p className="text-slate-400 text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
+                        Unified command center for ERP, CRM & Legal Operations.
+                        Orchestrate your enterprise resources with precision and clarity.
                     </p>
-
-                    <button
-                        onClick={() => setShowPasswordModal(true)}
-                        className="inline-flex items-center gap-3 px-8 py-4 bg-uhuru-accent-blue hover:bg-blue-600 text-white rounded-xl font-semibold text-lg transition-all shadow-glow hover:shadow-lg transform hover:scale-105"
-                    >
-                        Enter ERP & CRM
-                        <ArrowRight size={20} />
-                    </button>
                 </div>
 
                 {/* Feature Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-5xl w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom duration-700" style={{ animationDelay: '400ms' }}>
                     {[
-                        { title: "Banking", desc: "Manage transactions and accounts" },
-                        { title: "CRM", desc: "Track leads and customer relationships" },
-                        { title: "Compliance", desc: "Stay on top of deadlines" }
-                    ].map((feature, i) => (
-                        <div key={i} className="p-6 rounded-2xl bg-uhuru-card backdrop-blur-sm border border-uhuru-border hover:border-uhuru-accent-blue/50 transition-all group">
-                            <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-uhuru-accent-blue transition-colors">
-                                {feature.title}
-                            </h3>
-                            <p className="text-uhuru-text-dim text-sm">{feature.desc}</p>
-                        </div>
-                    ))}
+                        {
+                            icon: Shield,
+                            title: "Secure & Compliant",
+                            desc: "Bank-grade security with UK compliance built-in",
+                            color: "from-emerald-500 to-teal-500"
+                        },
+                        {
+                            icon: Zap,
+                            title: "Real-Time Insights",
+                            desc: "Live financial data and business analytics",
+                            color: "from-blue-500 to-cyan-500"
+                        },
+                        {
+                            icon: Globe,
+                            title: "Multi-Currency",
+                            desc: "Manage transactions across global markets",
+                            color: "from-purple-500 to-pink-500"
+                        }
+                    ].map((feature, i) => {
+                        const Icon = feature.icon;
+                        return (
+                            <div
+                                key={i}
+                                className="group relative p-6 rounded-2xl bg-slate-900/50 backdrop-blur-sm border border-slate-800 hover:border-slate-700 transition-all duration-300 hover:transform hover:scale-105"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300" style={{ backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` }}></div>
+                                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${feature.color} mb-4`}>
+                                    <Icon className="text-white" size={24} />
+                                </div>
+                                <h3 className="text-white font-semibold text-lg mb-2">
+                                    {feature.title}
+                                </h3>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    {feature.desc}
+                                </p>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="absolute bottom-8 text-center text-uhuru-text-dim text-sm">
+            <div className="absolute bottom-8 text-center text-slate-500 text-sm z-10">
                 <p>© 2025 Uhuru Trade Ltd. All rights reserved.</p>
             </div>
 
@@ -202,7 +243,7 @@ export default function Home() {
                         className="relative w-full max-w-md transform transition-all duration-300"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="bg-gradient-card backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl p-6 mx-4">
+                        <div className="bg-gradient-to-br from-slate-900 to-slate-950 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl p-6 mx-4">
                             <button
                                 onClick={() => {
                                     setShowPasswordModal(false);
@@ -215,12 +256,12 @@ export default function Home() {
                             </button>
 
                             <div className="flex flex-col items-center text-center mb-6">
-                                <div className="mb-4 p-3 bg-slate-800/50 rounded-full border border-slate-700/50">
-                                    <Lock className="text-uhuru-blue" size={32} />
+                                <div className="mb-4 p-3 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                                    <Lock className="text-emerald-400" size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-1">Access Protected</h3>
-                                <p className="text-slate-300 text-sm">
-                                    Enter password to access the CRM
+                                <h3 className="text-xl font-bold text-white mb-1">Secure Access</h3>
+                                <p className="text-slate-400 text-sm">
+                                    Enter your password to continue
                                 </p>
                             </div>
 
@@ -231,7 +272,7 @@ export default function Home() {
                                     <p className="text-slate-400 text-sm mb-4">
                                         Please wait before trying again
                                     </p>
-                                    <div className="text-3xl font-bold text-uhuru-blue">
+                                    <div className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-blue-400">
                                         {formatTime(remainingTime)}
                                     </div>
                                 </div>
@@ -243,14 +284,14 @@ export default function Home() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             placeholder="Enter password"
-                                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-uhuru-blue transition-all"
+                                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                             autoFocus
                                         />
                                     </div>
 
                                     {error && (
                                         <div className="flex items-center gap-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg">
-                                            <AlertCircle className="text-rose-500" size={16} />
+                                            <AlertCircle className="text-rose-400" size={16} />
                                             <p className="text-rose-300 text-sm">{error}</p>
                                         </div>
                                     )}
@@ -258,9 +299,9 @@ export default function Home() {
                                     <button
                                         type="submit"
                                         disabled={!password}
-                                        className="w-full py-3 bg-uhuru-blue hover:bg-blue-600 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg font-semibold transition-all disabled:cursor-not-allowed"
+                                        className="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-500 text-white rounded-lg font-semibold transition-all disabled:cursor-not-allowed shadow-lg shadow-emerald-900/30 hover:shadow-xl hover:shadow-emerald-900/40"
                                     >
-                                        Unlock
+                                        Unlock Platform
                                     </button>
                                 </form>
                             )}
@@ -271,4 +312,3 @@ export default function Home() {
         </main>
     );
 }
-
