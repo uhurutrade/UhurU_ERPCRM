@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { updateTransactionCategory } from '@/app/actions/banking';
 import { getTransactionCategories, createTransactionCategory, deleteTransactionCategory, updateTransactionCategoryDefinition } from '@/app/actions/categories';
 import { Check, Plus, Tag, Palette, Trash2, X, Pencil } from 'lucide-react';
+import { useConfirm } from '@/components/providers/modal-provider';
 
 const PRESET_COLORS = [
     { name: 'White', solid: 'bg-slate-100', class: 'bg-slate-100/10 text-slate-200 border-slate-100/20 hover:bg-slate-100/20' },
@@ -20,6 +21,7 @@ const PRESET_COLORS = [
 
 export function CategoryBadge({ transactionId, initialCategory, allCategories = [] }: { transactionId: string, initialCategory: string | null, allCategories?: any[] }) {
     const [category, setCategory] = useState(initialCategory);
+    const { confirm } = useConfirm();
 
     // Initialize with provided categories (server ensures they are populated)
     const [categories, setCategories] = useState<any[]>(() => {
@@ -108,7 +110,16 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
 
     const handleDeleteCategory = async (catName: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!confirm(`Delete category "${catName}"? This will set all related transactions to Uncategorized.`)) return;
+
+        const confirmed = await confirm({
+            title: 'Delete Category',
+            message: `Are you sure you want to delete "${catName}"? This will set all related transactions to Uncategorized.`,
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+
+        if (!confirmed) return;
 
         // Optimistic update locally
         setCategories(prev => prev.filter(c => c.name !== catName));
@@ -118,7 +129,14 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
 
         const res = await deleteTransactionCategory(catName);
         if (!res.success) {
-            alert("Failed to delete category");
+            // Show error using confirm modal
+            await confirm({
+                title: 'Error',
+                message: 'Failed to delete category. Please try again.',
+                type: 'danger',
+                confirmText: 'OK',
+                cancelText: ''
+            });
             // Re-fetch or revert if critical (skipping for now for UI responsiveness)
         }
     };
@@ -141,7 +159,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute top-full right-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                     {!isCustomMode ? (
                         <>
                             <div className="max-h-60 overflow-y-auto p-1.5 grid grid-cols-1 gap-0.5 custom-scrollbar">
