@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Users,
@@ -16,7 +16,6 @@ import {
     Menu,
     X
 } from "lucide-react";
-import { signOut } from "next-auth/react";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-blue-400" },
@@ -31,12 +30,20 @@ const navItems = [
 
 export function Sidebar({ userEmail }: { userEmail?: string | null }) {
     const pathname = usePathname();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
     // Close sidebar on route change (mobile)
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
+
+    const handleLogout = () => {
+        // Clear session storage
+        sessionStorage.removeItem('crm_unlocked');
+        // Redirect to home page
+        router.push('/');
+    };
 
     return (
         <>
@@ -124,7 +131,7 @@ export function Sidebar({ userEmail }: { userEmail?: string | null }) {
                     </div>
 
                     <button
-                        onClick={() => signOut()}
+                        onClick={handleLogout}
                         className="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-uhuru-border hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 text-uhuru-text-dim transition-all duration-300 text-sm font-medium group"
                     >
                         <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
