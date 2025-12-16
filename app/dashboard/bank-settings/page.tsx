@@ -9,8 +9,7 @@ export default async function BankSettingsPage() {
     const banks = await prisma.bank.findMany({
         include: {
             accounts: {
-                // Note: Change this to { order: 'asc' } after restarting the server to pick up the new schema
-                orderBy: { currency: 'asc' }
+                orderBy: { order: 'asc' }
             }
         },
         orderBy: { bankName: 'asc' }
