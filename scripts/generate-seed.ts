@@ -4,48 +4,48 @@ const fs = require('fs');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🔄 Extrayendo datos de la base de datos local...');
+    console.log('🔄 Extrayendo datos de la base de datos local...');
 
-  // 1. Users
-  const users = await prisma.user.findMany();
+    // 1. Users
+    const users = await prisma.user.findMany();
 
-  // 2. Company Settings
-  const companySettings = await prisma.companySettings.findMany();
+    // 2. Company Settings
+    const companySettings = await prisma.companySettings.findMany();
 
-  // 3. Banks & Accounts
-  const banks = await prisma.bank.findMany();
-  const bankAccounts = await prisma.bankAccount.findMany();
+    // 3. Banks & Accounts
+    const banks = await prisma.bank.findMany();
+    const bankAccounts = await prisma.bankAccount.findMany();
 
-  // 4. Crypto Wallets & Transactions
-  const cryptoWallets = await prisma.cryptoWallet.findMany();
-  const cryptoTransactions = await prisma.cryptoTransaction.findMany();
+    // 4. Crypto Wallets & Transactions
+    const cryptoWallets = await prisma.cryptoWallet.findMany();
+    const cryptoTransactions = await prisma.cryptoTransaction.findMany();
 
-  // 5. CRM
-  const organizations = await prisma.organization.findMany();
-  const contacts = await prisma.contact.findMany();
-  const deals = await prisma.deal.findMany();
-  const leads = await prisma.lead.findMany();
-  const activities = await prisma.activity.findMany();
+    // 5. CRM
+    const organizations = await prisma.organization.findMany();
+    const contacts = await prisma.contact.findMany();
+    const deals = await prisma.deal.findMany();
+    const leads = await prisma.lead.findMany();
+    const activities = await prisma.activity.findMany();
 
-  // 6. Invoices
-  const invoices = await prisma.invoice.findMany({ include: { items: true } });
+    // 6. Invoices
+    const invoices = await prisma.invoice.findMany({ include: { items: true } });
 
-  // 7. Transactions & Compliance & Logs
-  console.log('categories extraction...');
-  const transactionCategories = await prisma.transactionCategory.findMany();
-  const bankStatements = await prisma.bankStatement.findMany();
-  const bankTransactions = await prisma.bankTransaction.findMany();
-  const attachments = await prisma.attachment.findMany();
-  const deletedTransactions = await prisma.deletedTransaction.findMany();
+    // 7. Transactions & Compliance & Logs
+    console.log('categories extraction...');
+    const transactionCategories = await prisma.transactionCategory.findMany();
+    const bankStatements = await prisma.bankStatement.findMany();
+    const bankTransactions = await prisma.bankTransaction.findMany();
+    const attachments = await prisma.attachment.findMany();
+    const deletedTransactions = await prisma.deletedTransaction.findMany();
 
-  // 8. Other Tables
-  const taxObligations = await prisma.taxObligation.findMany();
-  const fiscalYears = await prisma.fiscalYear.findMany();
-  const complianceEvents = await prisma.complianceEvent.findMany();
-  const tasks = await prisma.task.findMany();
-  const assets = await prisma.asset.findMany();
+    // 8. Other Tables
+    const taxObligations = await prisma.taxObligation.findMany();
+    const fiscalYears = await prisma.fiscalYear.findMany();
+    const complianceEvents = await prisma.complianceEvent.findMany();
+    const tasks = await prisma.task.findMany();
+    const assets = await prisma.asset.findMany();
 
-  const seedContent = `
+    const seedContent = `
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -417,15 +417,15 @@ main()
   });
 `;
 
-  fs.writeFileSync('prisma/seed.ts', seedContent);
-  console.log('✅ prisma/seed.ts generado con TODO el contenido actual de la base de datos.');
+    fs.writeFileSync('prisma/seed.ts', seedContent);
+    console.log('✅ prisma/seed.ts generado con TODO el contenido actual de la base de datos.');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
