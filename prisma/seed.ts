@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-16T18:09:14.459Z');
+  console.log('Generated at: 2025-12-16T18:21:15.522Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -1766,28 +1766,6 @@ async function main() {
     "bankStatementId": "cmj627z7y0023rjaqpycqwulx",
     "createdAt": "2025-12-14T18:30:03.187Z",
     "updatedAt": "2025-12-14T18:30:03.187Z"
-  },
-  {
-    "id": "cmj627a37001zrjaqwkxds63i",
-    "externalId": "693baf9d-e626-a004-95ff-5910cced1323",
-    "date": "2025-12-12T00:00:00.000Z",
-    "description": "A Raul Ortega",
-    "amount": "-1173.96",
-    "currency": "USD",
-    "fee": "0",
-    "status": null,
-    "category": "Loans",
-    "reference": "Dir Loan Repay",
-    "counterparty": "Raul Ortega Irus",
-    "merchant": null,
-    "balanceAfter": "2326.04",
-    "exchangeRate": "0.851819",
-    "type": "TRANSFER",
-    "hash": "bef49cbf6cc224372d2528c6f4e7ed2c3c4774a5c3f6f0ffc4ce666f77dd47f7",
-    "bankAccountId": "cmj61chrg0001rjaqiqc473pe",
-    "bankStatementId": "cmj627a32001xrjaqfpa6b3ae",
-    "createdAt": "2025-12-14T18:29:30.452Z",
-    "updatedAt": "2025-12-14T18:45:44.067Z"
   },
   {
     "id": "cmj626zll000grjaqvjles39s",

@@ -95,168 +95,175 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 transition-opacity duration-300" onClick={onClose}>
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+            {/* Modal Card */}
             <div
-                className="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-xl w-full flex flex-col shadow-2xl overflow-hidden max-h-[85vh]"
+                className="relative w-full max-w-md transform transition-all duration-300 scale-100 translate-y-0"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="p-5 border-b border-slate-700 flex justify-between items-start bg-slate-900/50">
-                    <div>
-                        <h2 className="text-xl font-bold text-white mb-1">Transaction Details</h2>
-                        <p className="text-slate-400 text-xs font-mono">{transaction.id}</p>
-                    </div>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-800 rounded-lg">
+                <div className="bg-gradient-card backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl p-6 mx-4 max-h-[80vh] overflow-y-auto">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                    >
                         <X size={20} />
                     </button>
-                </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-6">
-
-                    {/* Main Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <div>
-                                <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Amount</label>
-                                <div className={`text-2xl font-bold ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
-                                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Description</label>
-                                <div className="text-lg text-white font-medium">{transaction.description}</div>
-                            </div>
-
-                            {transaction.counterparty && (
-                                <div>
-                                    <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Counterparty</label>
-                                    <div className="text-slate-300">{transaction.counterparty}</div>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="space-y-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                            <div className="flex items-center gap-3">
-                                <Calendar className="text-purple-400" size={18} />
-                                <div>
-                                    <label className="text-xs text-slate-500 block">Date</label>
-                                    <span className="text-slate-200">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <CreditCard className="text-blue-400" size={18} />
-                                <div>
-                                    <label className="text-xs text-slate-500 block">Account</label>
-                                    <span className="text-slate-200">{transaction.bankAccount.bank.bankName} - {transaction.bankAccount.currency}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <Tag className="text-orange-400" size={18} />
-                                <div>
-                                    <label className="text-xs text-slate-500 block">Category</label>
-                                    <span className="text-slate-200">{transaction.category || 'Uncategorized'}</span>
-                                </div>
-                            </div>
-
-                            {transaction.reference && (
-                                <div className="flex items-center gap-3">
-                                    <FileText className="text-slate-400" size={18} />
-                                    <div>
-                                        <label className="text-xs text-slate-500 block">Reference</label>
-                                        <span className="text-slate-200">{transaction.reference}</span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    <div className="flex flex-col items-center text-center mb-6">
+                        <h3 className="text-xl font-bold text-white mb-1">Transaction Details</h3>
+                        <p className="text-xs text-slate-500 font-mono">{transaction.id}</p>
                     </div>
 
-                    {/* Attachments Section */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                                <Paperclip size={20} className="text-uhuru-blue" />
-                                Attachments
-                            </h3>
-                            <label className="cursor-pointer">
-                                <span className={`
+                    {/* Content */}
+                    <div className="space-y-4">
+
+                        {/* Main Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Amount</label>
+                                    <div className={`text-2xl font-bold ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                        {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Description</label>
+                                    <div className="text-lg text-white font-medium">{transaction.description}</div>
+                                </div>
+
+                                {transaction.counterparty && (
+                                    <div>
+                                        <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Counterparty</label>
+                                        <div className="text-slate-300">{transaction.counterparty}</div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                                <div className="flex items-center gap-3">
+                                    <Calendar className="text-purple-400" size={18} />
+                                    <div>
+                                        <label className="text-xs text-slate-500 block">Date</label>
+                                        <span className="text-slate-200">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <CreditCard className="text-blue-400" size={18} />
+                                    <div>
+                                        <label className="text-xs text-slate-500 block">Account</label>
+                                        <span className="text-slate-200">{transaction.bankAccount.bank.bankName} - {transaction.bankAccount.currency}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <Tag className="text-orange-400" size={18} />
+                                    <div>
+                                        <label className="text-xs text-slate-500 block">Category</label>
+                                        <span className="text-slate-200">{transaction.category || 'Uncategorized'}</span>
+                                    </div>
+                                </div>
+
+                                {transaction.reference && (
+                                    <div className="flex items-center gap-3">
+                                        <FileText className="text-slate-400" size={18} />
+                                        <div>
+                                            <label className="text-xs text-slate-500 block">Reference</label>
+                                            <span className="text-slate-200">{transaction.reference}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Attachments Section */}
+                        <div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                    <Paperclip size={20} className="text-uhuru-blue" />
+                                    Attachments
+                                </h3>
+                                <label className="cursor-pointer">
+                                    <span className={`
                                     flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
                                     ${uploading ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-uhuru-blue/10 text-uhuru-blue hover:bg-uhuru-blue/20'}
                                 `}>
-                                    {uploading ? 'Uploading...' : (
-                                        <>
-                                            <Upload size={14} />
-                                            Add File
-                                        </>
-                                    )}
-                                </span>
-                                <input
-                                    type="file"
-                                    className="hidden"
-                                    disabled={uploading}
-                                    onChange={handleFileUpload}
-                                />
-                            </label>
+                                        {uploading ? 'Uploading...' : (
+                                            <>
+                                                <Upload size={14} />
+                                                Add File
+                                            </>
+                                        )}
+                                    </span>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        disabled={uploading}
+                                        onChange={handleFileUpload}
+                                    />
+                                </label>
+                            </div>
+
+                            {transaction.attachments && transaction.attachments.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {transaction.attachments.map((file) => (
+                                        <div
+                                            key={file.id}
+                                            className="group relative flex items-center p-3 bg-slate-900 border border-slate-700 rounded-xl hover:border-uhuru-blue/50 transition-colors"
+                                        >
+                                            {/* Delete Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setConfirmDelete({ id: file.id, name: file.originalName || 'Document' });
+                                                }}
+                                                disabled={deletingId === file.id}
+                                                className="absolute top-2 right-2 p-1 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                                                title="Eliminar archivo"
+                                            >
+                                                <X size={14} />
+                                            </button>
+
+                                            {/* File Link */}
+                                            <a
+                                                href={file.path}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center flex-1"
+                                            >
+                                                <div className="flex-shrink-0 w-12 h-12 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-uhuru-blue border border-slate-700">
+                                                    {file.fileType?.includes('image') ? (
+                                                        <img src={file.path} alt="Preview" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <FileText size={24} />
+                                                    )}
+                                                </div>
+                                                <div className="ml-3 overflow-hidden">
+                                                    <p className="text-sm font-medium text-slate-200 truncate">{file.originalName || 'Document'}</p>
+                                                    <p className="text-xs text-slate-500">{format(new Date(file.uploadedAt), 'MMM d, HH:mm')}</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 bg-slate-900/30 rounded-xl border border-dashed border-slate-800">
+                                    <p className="text-slate-500 text-sm">No attachments yet. Upload receipts, invoices, or proofs.</p>
+                                </div>
+                            )}
                         </div>
 
-                        {transaction.attachments && transaction.attachments.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {transaction.attachments.map((file) => (
-                                    <div
-                                        key={file.id}
-                                        className="group relative flex items-center p-3 bg-slate-900 border border-slate-700 rounded-xl hover:border-uhuru-blue/50 transition-colors"
-                                    >
-                                        {/* Delete Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setConfirmDelete({ id: file.id, name: file.originalName || 'Document' });
-                                            }}
-                                            disabled={deletingId === file.id}
-                                            className="absolute top-2 right-2 p-1 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                                            title="Eliminar archivo"
-                                        >
-                                            <X size={14} />
-                                        </button>
-
-                                        {/* File Link */}
-                                        <a
-                                            href={file.path}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center flex-1"
-                                        >
-                                            <div className="flex-shrink-0 w-12 h-12 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-uhuru-blue border border-slate-700">
-                                                {file.fileType?.includes('image') ? (
-                                                    <img src={file.path} alt="Preview" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <FileText size={24} />
-                                                )}
-                                            </div>
-                                            <div className="ml-3 overflow-hidden">
-                                                <p className="text-sm font-medium text-slate-200 truncate">{file.originalName || 'Document'}</p>
-                                                <p className="text-xs text-slate-500">{format(new Date(file.uploadedAt), 'MMM d, HH:mm')}</p>
-                                            </div>
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 bg-slate-900/30 rounded-xl border border-dashed border-slate-800">
-                                <p className="text-slate-500 text-sm">No attachments yet. Upload receipts, invoices, or proofs.</p>
-                            </div>
-                        )}
                     </div>
-
                 </div>
             </div>
 
             {/* Delete Confirmation Modal */}
             {confirmDelete && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-slate-900 border border-red-900/50 rounded-2xl max-w-md w-full p-6 shadow-2xl">
                         <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
                             <X className="text-red-500" size={24} />
