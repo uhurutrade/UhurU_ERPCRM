@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-18T19:55:50.914Z');
+  console.log('Generated at: 2025-12-18T20:42:37.541Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -652,6 +652,8 @@ async function main() {
     "taxId": null,
     "legalName": null,
     "bankIban": null,
+    "linkedin": null,
+    "website": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   },
@@ -667,6 +669,8 @@ async function main() {
     "taxId": null,
     "legalName": null,
     "bankIban": null,
+    "linkedin": null,
+    "website": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   },
@@ -682,6 +686,8 @@ async function main() {
     "taxId": null,
     "legalName": null,
     "bankIban": null,
+    "linkedin": null,
+    "website": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   }
@@ -743,28 +749,6 @@ async function main() {
     "updatedAt": "2025-12-18T19:35:38.259Z"
   },
   {
-    "id": "cmjbubqc30008ha2lmwoutukl",
-    "title": "EcoEnergy Solar Panel Deployment",
-    "amount": "75000",
-    "currency": "GBP",
-    "stage": "PROPOSAL",
-    "closeDate": null,
-    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
-    "createdAt": "2025-12-18T19:35:38.259Z",
-    "updatedAt": "2025-12-18T19:35:38.259Z"
-  },
-  {
-    "id": "cmjbunne30007gui8sm4tcb7t",
-    "title": "Deal with Future Mobility Corp",
-    "amount": "0",
-    "currency": "GBP",
-    "stage": "PROSPECTING",
-    "closeDate": null,
-    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
-    "createdAt": "2025-12-18T19:44:54.316Z",
-    "updatedAt": "2025-12-18T19:44:54.316Z"
-  },
-  {
     "id": "cmjbunozn0009gui8jc90af29",
     "title": "Deal with Quantum Systems",
     "amount": "0",
@@ -774,6 +758,28 @@ async function main() {
     "organizationId": "cmjbubqbd0000ha2lp9ftb957",
     "createdAt": "2025-12-18T19:44:56.387Z",
     "updatedAt": "2025-12-18T19:44:56.387Z"
+  },
+  {
+    "id": "cmjbubqc30008ha2lmwoutukl",
+    "title": "EcoEnergy Solar Panel Deployment",
+    "amount": "75000",
+    "currency": "GBP",
+    "stage": "PROSPECTING",
+    "closeDate": null,
+    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
+    "createdAt": "2025-12-18T19:35:38.259Z",
+    "updatedAt": "2025-12-18T20:35:13.130Z"
+  },
+  {
+    "id": "cmjbunne30007gui8sm4tcb7t",
+    "title": "Deal with Future Mobility Corp",
+    "amount": "0",
+    "currency": "GBP",
+    "stage": "PROPOSAL",
+    "closeDate": null,
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "createdAt": "2025-12-18T19:44:54.316Z",
+    "updatedAt": "2025-12-18T20:35:19.916Z"
   }
 ] as any[]) {
     await prisma.deal.create({

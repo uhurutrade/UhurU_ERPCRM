@@ -6,7 +6,9 @@ import { updateContact } from '@/app/actions/crm';
 import {
     User, Mail, Phone, Briefcase, Building2,
     ShieldCheck, CreditCard, Hash, Landmark,
-    AlertCircle, Save, Trash2
+    AlertCircle, Save, Trash2, Linkedin, Globe,
+    ExternalLink, MapPin, MessageSquare, Plus,
+    Activity as ActivityIcon
 } from 'lucide-react';
 
 interface ContactDetailModalProps {
@@ -40,31 +42,38 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Professional Profile" size="xl">
-            <form onSubmit={handleSubmit} className="space-y-8 p-1">
-                {/* Profile Header */}
-                <div className="flex items-center gap-6 pb-6 border-b border-uhuru-border/50">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30 shadow-lg shadow-blue-500/10">
-                        {contact.name ? (
-                            <span className="text-3xl font-bold">{contact.name.charAt(0)}</span>
-                        ) : (
-                            <User size={40} />
-                        )}
+        <Modal isOpen={isOpen} onClose={onClose} title="Professional Profile" size="lg">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Header: Identity Card */}
+                <div className="flex items-center gap-5 p-1">
+                    <div className="relative group">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg border border-white/10 group-hover:scale-105 transition-transform">
+                            {contact.name.charAt(0)}
+                        </div>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                         <input
                             name="name"
                             defaultValue={contact.name}
-                            className="text-2xl font-bold bg-transparent border-none text-white focus:ring-0 w-full p-0"
+                            className="bg-transparent border-none p-0 text-xl font-bold text-white focus:ring-0 w-full placeholder:text-slate-600"
                             placeholder="Full Name"
                         />
-                        <div className="flex items-center gap-4 mt-2">
-                            <div className="flex items-center gap-1.5 text-uhuru-text-dim text-xs font-bold uppercase tracking-widest">
-                                <Building2 size={14} className="text-slate-500" />
+                        <div className="flex items-center gap-3 mt-1">
+                            <div className="flex items-center gap-1.5 text-uhuru-text-dim text-[11px] font-bold uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded-md border border-white/5">
+                                <Briefcase size={12} className="text-blue-400" />
+                                <input
+                                    name="role"
+                                    defaultValue={contact.role}
+                                    className="bg-transparent border-none p-0 focus:ring-0 w-24"
+                                    placeholder="Position"
+                                />
+                            </div>
+                            <div className="flex items-center gap-1.5 text-uhuru-text-dim text-[11px] font-bold uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded-md border border-white/5">
+                                <Building2 size={12} className="text-emerald-400" />
                                 <select
                                     name="organizationId"
                                     defaultValue={contact.organizationId || ''}
-                                    className="bg-transparent border-none p-0 focus:ring-0 text-white font-bold"
+                                    className="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold"
                                 >
                                     <option value="" className="bg-slate-900">Independent</option>
                                     {organizations.map(org => (
@@ -72,148 +81,214 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
                                     ))}
                                 </select>
                             </div>
-                            <div className="h-1 w-1 rounded-full bg-slate-700" />
-                            <div className="flex items-center gap-1.5 text-uhuru-text-dim text-xs font-bold uppercase tracking-widest">
-                                <Briefcase size={14} className="text-slate-500" />
-                                <input
-                                    name="role"
-                                    defaultValue={contact.role}
-                                    className="bg-transparent border-none p-0 focus:ring-0 w-32"
-                                    placeholder="Position / Role"
-                                />
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Contact Channels */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-2 mb-2">
-                            <h4 className="text-[10px] font-bold text-blue-400 uppercase tracking-[0.2em]">Contact Channels</h4>
-                            <div className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent" />
+                <div className="grid grid-cols-2 gap-6">
+                    {/* Left: Communication Channels */}
+                    <div className="space-y-5">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Connect</h4>
+                            <div className="h-px flex-1 bg-blue-500/10" />
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                    <Mail size={16} />
+                                </div>
                                 <input
                                     name="email"
                                     type="email"
                                     defaultValue={contact.email}
-                                    placeholder="Work Email"
-                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all font-medium"
+                                    placeholder="Email Address"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all"
                                 />
                             </div>
 
                             <div className="relative group">
-                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                    <Phone size={16} />
+                                </div>
                                 <input
                                     name="phone"
                                     defaultValue={contact.phone}
-                                    placeholder="Phone Contact"
-                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all font-medium"
+                                    placeholder="Phone Number"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all font-mono"
                                 />
                             </div>
                         </div>
 
-                        {/* FACTURABLE TOGGLE */}
-                        <div className="pt-4">
-                            <label className="relative flex items-center gap-4 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 cursor-pointer group hover:bg-blue-500/10 transition-all">
-                                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                                    <ShieldCheck size={20} />
+                        <div className="flex items-center gap-2 mb-1 pt-2">
+                            <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Digital Presence</h4>
+                            <div className="h-px flex-1 bg-indigo-500/10" />
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="relative group text-indigo-100 italic">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                                    <Linkedin size={16} />
                                 </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-bold text-white">Direct Billing</p>
-                                    <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tight">Enable personal billing details</p>
+                                <input
+                                    name="linkedin"
+                                    defaultValue={contact.linkedin}
+                                    placeholder="LinkedIn Profile URL"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+                                />
+                                {contact.linkedin && (
+                                    <a href={contact.linkedin} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-indigo-400 transition-colors">
+                                        <ExternalLink size={14} />
+                                    </a>
+                                )}
+                            </div>
+
+                            <div className="relative group">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                                    <Globe size={16} />
                                 </div>
-                                <div className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        name="isBillable"
-                                        checked={isBillable}
-                                        onChange={(e) => setIsBillable(e.target.checked)}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                                </div>
-                            </label>
+                                <input
+                                    name="website"
+                                    defaultValue={contact.website}
+                                    placeholder="Personal/Portfolio Website"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all"
+                                />
+                                {contact.website && (
+                                    <a href={contact.website} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-emerald-400 transition-colors">
+                                        <ExternalLink size={14} />
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Legal Data (Visible if isBillable) */}
-                    <div className={`space-y-6 transition-all duration-500 ${isBillable ? 'opacity-100 scale-100' : 'opacity-30 scale-95 pointer-events-none grayscale'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                            <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em]">Billing Dossier</h4>
-                            <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 to-transparent" />
+                    {/* Right: Operations & Billing */}
+                    <div className="space-y-5">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Dossier Fiscal</h4>
+                            <div className="h-px flex-1 bg-emerald-500/10" />
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/30 border border-white/5 cursor-pointer hover:bg-slate-800/50 transition-all border-dashed" onClick={() => setIsBillable(!isBillable)}>
+                            <input
+                                type="checkbox"
+                                name="isBillable"
+                                checked={isBillable}
+                                onChange={(e) => setIsBillable(e.target.checked)}
+                                className="hidden"
+                            />
+                            <div className={`p-1.5 rounded-lg border ${isBillable ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-600 border-white/5'}`}>
+                                <ShieldCheck size={18} />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-bold text-white">Direct Billing</p>
+                                <p className="text-[10px] text-uhuru-text-dim">Enable individual invoicing data</p>
+                            </div>
+                            <div className={`w-8 h-4 rounded-full relative transition-colors ${isBillable ? 'bg-emerald-500' : 'bg-slate-700'}`}>
+                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${isBillable ? 'left-4.5' : 'left-0.5'}`} style={{ left: isBillable ? '18px' : '2px' }} />
+                            </div>
+                        </div>
+
+                        <div className={`space-y-3 transition-all duration-300 ${isBillable ? 'opacity-100 translate-y-0' : 'opacity-20 pointer-events-none -translate-y-1'}`}>
                             <div className="relative group">
-                                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                                    <Hash size={16} />
+                                </div>
                                 <input
                                     name="taxId"
                                     defaultValue={contact.taxId}
-                                    placeholder="NIF / VAT / SSN"
-                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium"
+                                    placeholder="VAT / Tax ID Number"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all"
                                 />
                             </div>
 
                             <div className="relative group">
-                                <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                                    <Landmark size={16} />
+                                </div>
                                 <input
                                     name="legalName"
                                     defaultValue={contact.legalName}
-                                    placeholder="Full Legal Name for Invoicing"
-                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium"
+                                    placeholder="Legal Name for Invoices"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all"
                                 />
                             </div>
 
                             <div className="relative group">
-                                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                                    <CreditCard size={16} />
+                                </div>
                                 <input
                                     name="bankIban"
                                     defaultValue={contact.bankIban}
-                                    placeholder="Bank IBAN (Optional)"
-                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-mono"
+                                    placeholder="Bank Account (IBAN)"
+                                    className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all font-mono"
                                 />
                             </div>
                         </div>
+
+                        {!isBillable && (
+                            <div className="p-4 rounded-xl bg-slate-900/20 border border-white/5 text-center">
+                                <p className="text-[10px] text-uhuru-text-dim italic">Billing data is currently disabled for this professional profile.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Lower Actions */}
-                <div className="flex items-center justify-between pt-8 border-t border-uhuru-border/50">
+                {/* Lower Toolbar: Quick Metadata */}
+                <div className="flex items-center gap-4 py-3 px-4 bg-slate-900/30 rounded-2xl border border-white/5">
+                    <div className="flex-1 flex items-center gap-6">
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Engagement</span>
+                            <div className="flex items-center gap-1 text-blue-400">
+                                <ActivityIcon size={12} />
+                                <span className="text-xs font-bold font-mono">High</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col border-l border-white/5 pl-6">
+                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Member Since</span>
+                            <span className="text-xs font-bold text-slate-300 font-mono">{new Date(contact.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <button type="button" className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 transition-colors" title="Log Activity">
+                            <Plus size={16} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Footer Footer */}
+                <div className="flex items-center justify-between pt-4">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-3 rounded-2xl text-sm font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all"
+                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all border border-transparent hover:border-white/5"
                     >
-                        Close
+                        Discard Changes
                     </button>
 
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-600/20 transition-all active:scale-95 disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/20 transition-all active:scale-95 disabled:opacity-50"
                     >
                         {isSubmitting ? (
                             <>
-                                <Save size={18} className="animate-pulse" />
-                                Processing...
+                                <Save size={14} className="animate-pulse" />
+                                Synchronizing...
                             </>
                         ) : (
                             <>
-                                <Save size={18} />
-                                Update Profile
+                                <Save size={14} />
+                                Save Profile
                             </>
                         )}
                     </button>
                 </div>
 
                 {error && (
-                    <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-sm font-bold animate-in fade-in zoom-in duration-300">
-                        <AlertCircle size={18} />
+                    <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 text-rose-400 text-[11px] font-bold animate-in fade-in zoom-in duration-300">
+                        <AlertCircle size={14} />
                         {error}
                     </div>
                 )}

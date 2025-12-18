@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Users, Building2, Target, Zap, ChevronDown } from 'lucide-react';
+import { Plus, Users, Building2, Target, Zap, MoreVertical } from 'lucide-react';
 import { DealModal } from './modals/deal-modal';
 import { OrganizationModal } from './modals/organization-modal';
 import { ContactModal } from './modals/contact-modal';
@@ -18,8 +18,8 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
     const closeModal = () => setActiveModal(null);
 
     return (
-        <div className="relative flex gap-3">
-            {/* Quick Action Button */}
+        <div className="relative flex gap-3 flex-wrap md:flex-nowrap">
+            {/* Quick Action: New Deal */}
             <button
                 onClick={() => setActiveModal('deal')}
                 className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95 whitespace-nowrap"
@@ -27,16 +27,32 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                 <Plus size={18} /> New Deal
             </button>
 
-            {/* Dropdown Toggle */}
+            {/* Quick Action: New Contact */}
+            <button
+                onClick={() => setActiveModal('contact')}
+                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-600/20 transition-all active:scale-95 whitespace-nowrap"
+            >
+                <Users size={18} /> New Contact
+            </button>
+
+            {/* Quick Action: New Organization */}
+            <button
+                onClick={() => setActiveModal('org')}
+                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 whitespace-nowrap"
+            >
+                <Building2 size={18} /> Organization
+            </button>
+
+            {/* Dropdown for other actions */}
             <div className="relative">
                 <button
                     onClick={() => setShowDropdown(!showDropdown)}
                     className={`flex items-center justify-center p-2.5 rounded-xl border font-bold transition-all shadow-sm ${showDropdown
-                            ? 'bg-slate-800 border-indigo-500 text-white'
-                            : 'bg-uhuru-card border-uhuru-border text-uhuru-text-dim hover:text-white hover:border-slate-700'
+                        ? 'bg-slate-800 border-indigo-500 text-white'
+                        : 'bg-uhuru-card border-uhuru-border text-uhuru-text-dim hover:text-white hover:border-slate-700'
                         }`}
                 >
-                    <ChevronDown size={20} className={`transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />
+                    <MoreVertical size={20} className={`transition-transform duration-300 ${showDropdown ? 'rotate-90' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -48,7 +64,7 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                         />
                         <div className="absolute right-0 mt-3 w-56 bg-uhuru-card border border-uhuru-border rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in duration-200">
                             <div className="px-4 py-2 mb-1">
-                                <span className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest">Create New Record</span>
+                                <span className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest">More Actions</span>
                             </div>
 
                             <button
@@ -61,36 +77,10 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                                 <span className="font-bold">New Lead</span>
                             </button>
 
-                            <button
-                                onClick={() => { setActiveModal('contact'); setShowDropdown(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-uhuru-text-dim hover:text-white hover:bg-slate-800/80 transition-colors"
-                            >
-                                <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-400">
-                                    <Users size={14} />
-                                </div>
-                                <span className="font-bold">New Contact</span>
-                            </button>
-
-                            <button
-                                onClick={() => { setActiveModal('org'); setShowDropdown(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-uhuru-text-dim hover:text-white hover:bg-slate-800/80 transition-colors"
-                            >
-                                <div className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400">
-                                    <Building2 size={14} />
-                                </div>
-                                <span className="font-bold">Organization</span>
-                            </button>
-
                             <div className="mt-2 pt-2 border-t border-uhuru-border">
-                                <button
-                                    onClick={() => { setActiveModal('deal'); setShowDropdown(false); }}
-                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-uhuru-text-dim hover:text-white hover:bg-slate-800/80 transition-colors"
-                                >
-                                    <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400">
-                                        <Target size={14} />
-                                    </div>
-                                    <span className="font-bold">Opportunity / Deal</span>
-                                </button>
+                                <div className="px-4 py-2">
+                                    <p className="text-[10px] text-uhuru-text-muted italic">Capture new opportunities quickly.</p>
+                                </div>
                             </div>
                         </div>
                     </>

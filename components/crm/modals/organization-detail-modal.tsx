@@ -40,7 +40,7 @@ export function OrganizationDetailModal({ isOpen, onClose, organization }: Organ
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Company Dossier" size="xl">
+        <Modal isOpen={isOpen} onClose={onClose} title="Company Dossier" size="lg">
             <form onSubmit={handleSubmit} className="space-y-8 p-1">
                 {/* Header Header */}
                 <div className="flex items-center gap-6 pb-6 border-b border-uhuru-border/50">

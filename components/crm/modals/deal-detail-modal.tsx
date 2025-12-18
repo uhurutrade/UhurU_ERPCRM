@@ -6,7 +6,8 @@ import { updateDealStage } from '@/app/actions/crm';
 import {
     Target, Building2, Calendar, DollarSign,
     ShieldCheck, Hash, Landmark, CreditCard,
-    AlertCircle, Save, ArrowRight, CheckCircle2
+    AlertCircle, Save, ArrowRight, CheckCircle2,
+    Archive
 } from 'lucide-react';
 
 interface DealDetailModalProps {
@@ -37,7 +38,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Opportunity Intelligence" size="xl">
+        <Modal isOpen={isOpen} onClose={onClose} title="Opportunity Intelligence" size="lg">
             <div className="space-y-8 p-1">
                 {/* Deal Header */}
                 <div className="flex items-center gap-6 pb-6 border-b border-uhuru-border/50">
@@ -74,8 +75,8 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
                                     key={s}
                                     onClick={() => handleStageChange(s)}
                                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${deal.stage === s
-                                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
-                                            : 'bg-slate-900/50 border-uhuru-border text-uhuru-text-dim hover:border-slate-700 hover:text-white'
+                                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                                        : 'bg-slate-900/50 border-uhuru-border text-uhuru-text-dim hover:border-slate-700 hover:text-white'
                                         }`}
                                 >
                                     <span className="text-xs font-bold uppercase tracking-widest">{s}</span>

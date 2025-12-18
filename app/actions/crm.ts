@@ -77,6 +77,8 @@ export async function createContact(formData: FormData) {
     const email = formData.get('email') as string;
     const phone = formData.get('phone') as string;
     const role = formData.get('role') as string;
+    const linkedin = formData.get('linkedin') as string;
+    const website = formData.get('website') as string;
     const organizationId = formData.get('organizationId') as string;
 
     if (!name) return { error: 'Name is required' };
@@ -88,6 +90,8 @@ export async function createContact(formData: FormData) {
                 email,
                 phone,
                 role,
+                linkedin,
+                website,
                 organizationId: organizationId || null,
                 isClient: true // Default to client for now
             }
@@ -104,6 +108,8 @@ export async function updateContact(id: string, formData: FormData) {
     const email = formData.get('email') as string;
     const phone = formData.get('phone') as string;
     const role = formData.get('role') as string;
+    const linkedin = formData.get('linkedin') as string;
+    const website = formData.get('website') as string;
     const organizationId = formData.get('organizationId') as string;
     const isBillable = formData.get('isBillable') === 'on';
     const taxId = formData.get('taxId') as string;
@@ -118,8 +124,10 @@ export async function updateContact(id: string, formData: FormData) {
                 email,
                 phone,
                 role,
+                linkedin,
+                website,
                 organizationId: organizationId || null,
-                isBillable,
+                isBillable: Boolean(isBillable),
                 taxId,
                 legalName,
                 bankIban
@@ -128,6 +136,7 @@ export async function updateContact(id: string, formData: FormData) {
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
+        console.error('Update Contact Error:', error);
         return { error: 'Failed to update contact' };
     }
 }

@@ -19,7 +19,7 @@ export function LeadDetailModal({ isOpen, onClose, lead, onConvert }: LeadDetail
     if (!lead) return null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Lead Intelligence" size="xl">
+        <Modal isOpen={isOpen} onClose={onClose} title="Lead Intelligence" size="lg">
             <div className="space-y-8 p-1">
                 {/* Lead Header */}
                 <div className="flex items-center gap-6 pb-6 border-b border-uhuru-border/50">
@@ -86,8 +86,8 @@ export function LeadDetailModal({ isOpen, onClose, lead, onConvert }: LeadDetail
                             <div className="flex justify-between items-center">
                                 <span className="text-xs font-bold text-uhuru-text-dim uppercase tracking-widest">Pipeline Phase</span>
                                 <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${lead.status === 'NEW' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                        lead.status === 'QUALIFIED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                            'bg-slate-800 text-slate-400 border-slate-700'
+                                    lead.status === 'QUALIFIED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                        'bg-slate-800 text-slate-400 border-slate-700'
                                     }`}>
                                     {lead.status}
                                 </span>
