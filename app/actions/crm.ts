@@ -25,6 +25,41 @@ export async function createOrganization(formData: FormData) {
     }
 }
 
+export async function updateOrganization(id: string, formData: FormData) {
+    const isBillable = formData.get('isBillable') === 'on';
+    const taxId = formData.get('taxId') as string;
+    const legalName = formData.get('legalName') as string;
+    const bankName = formData.get('bankName') as string;
+    const bankIban = formData.get('bankIban') as string;
+    const bankSwift = formData.get('bankSwift') as string;
+    const name = formData.get('name') as string;
+    const sector = formData.get('sector') as string;
+    const website = formData.get('website') as string;
+    const address = formData.get('address') as string;
+
+    try {
+        await prisma.organization.update({
+            where: { id },
+            data: {
+                name,
+                sector,
+                website,
+                address,
+                isBillable,
+                taxId,
+                legalName,
+                bankName,
+                bankIban,
+                bankSwift
+            }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to update organization' };
+    }
+}
+
 export async function deleteOrganization(id: string) {
     try {
         await prisma.organization.delete({ where: { id } });
@@ -61,6 +96,39 @@ export async function createContact(formData: FormData) {
         return { success: true };
     } catch (error) {
         return { error: 'Failed to create contact' };
+    }
+}
+
+export async function updateContact(id: string, formData: FormData) {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const role = formData.get('role') as string;
+    const organizationId = formData.get('organizationId') as string;
+    const isBillable = formData.get('isBillable') === 'on';
+    const taxId = formData.get('taxId') as string;
+    const legalName = formData.get('legalName') as string;
+    const bankIban = formData.get('bankIban') as string;
+
+    try {
+        await prisma.contact.update({
+            where: { id },
+            data: {
+                name,
+                email,
+                phone,
+                role,
+                organizationId: organizationId || null,
+                isBillable,
+                taxId,
+                legalName,
+                bankIban
+            }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to update contact' };
     }
 }
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { updateDealStage } from '@/app/actions/crm';
 import { MoreHorizontal, Plus, Building2 } from 'lucide-react';
 import { DealModal } from './modals/deal-modal';
+import { DealDetailModal } from './modals/deal-detail-modal';
 
 const STAGES = [
     { id: 'PROSPECTING', label: 'Prospecting', color: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
@@ -16,6 +17,7 @@ const STAGES = [
 export function KanbanBoard({ deals, organizations }: { deals: any[], organizations: any[] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStage, setSelectedStage] = useState('PROSPECTING');
+    const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
 
     const openAddModal = (stageId: string) => {
         setSelectedStage(stageId);
@@ -67,20 +69,24 @@ export function KanbanBoard({ deals, organizations }: { deals: any[], organizati
                                     key={deal.id}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, deal.id)}
-                                    className="bg-uhuru-card p-4 rounded-xl border border-uhuru-border cursor-move group hover:border-indigo-500/30 transition-all shadow-sm"
+                                    onClick={() => setSelectedDeal(deal)}
+                                    className="bg-uhuru-card p-4 rounded-xl border border-uhuru-border cursor-pointer group hover:border-indigo-500/30 transition-all shadow-sm"
                                 >
                                     <div className="text-sm font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">
                                         {deal.title}
                                     </div>
                                     <div className="text-[11px] text-uhuru-text-dim mb-3 flex items-center gap-1">
                                         <Building2 size={12} />
-                                        {deal.organization.name}
+                                        {deal.organization?.name || 'Unknown Entity'}
                                     </div>
                                     <div className="flex justify-between items-center text-xs pt-2 border-t border-uhuru-border/50">
                                         <span className="font-bold text-indigo-400">
                                             {new Intl.NumberFormat('en-GB', { style: 'currency', currency: deal.currency }).format(Number(deal.amount))}
                                         </span>
-                                        <button className="text-slate-500 hover:text-white transition-colors">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setSelectedDeal(deal); }}
+                                            className="text-slate-500 hover:text-white transition-colors"
+                                        >
                                             <MoreHorizontal size={16} />
                                         </button>
                                     </div>
@@ -103,6 +109,13 @@ export function KanbanBoard({ deals, organizations }: { deals: any[], organizati
                 onClose={() => setIsModalOpen(false)}
                 organizations={organizations}
                 initialStage={selectedStage}
+            />
+
+            <DealDetailModal
+                isOpen={!!selectedDeal}
+                onClose={() => setSelectedDeal(null)}
+                deal={selectedDeal}
+                organizations={organizations}
             />
         </div>
     );

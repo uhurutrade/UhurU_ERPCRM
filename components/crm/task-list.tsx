@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toggleTask, deleteTask } from '@/app/actions/crm';
 import { Trash2, Loader2, ClipboardList, CheckCircle2, Circle } from 'lucide-react';
+import { useConfirm } from '@/components/providers/modal-provider';
 
 interface TaskListProps {
     tasks: any[];
@@ -10,6 +11,7 @@ interface TaskListProps {
 
 export function TaskList({ tasks }: { tasks: any[] }) {
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     async function handleToggle(id: string, currentStatus: boolean) {
         setProcessingId(id);
@@ -23,7 +25,13 @@ export function TaskList({ tasks }: { tasks: any[] }) {
     }
 
     async function handleDelete(id: string) {
-        if (confirm('Delete this task?')) {
+        const ok = await confirm({
+            title: "Delete Task",
+            message: "Are you sure you want to delete this task?",
+            type: "danger"
+        });
+
+        if (ok) {
             await deleteTask(id);
         }
     }
@@ -66,8 +74,8 @@ export function TaskList({ tasks }: { tasks: any[] }) {
                             </td>
                             <td className="py-4 px-6">
                                 <span className={`text-[11px] font-bold ${!task.completed && task.dueDate && new Date(task.dueDate) < new Date()
-                                        ? 'text-rose-400'
-                                        : 'text-slate-500'
+                                    ? 'text-rose-400'
+                                    : 'text-slate-500'
                                     } uppercase`}>
                                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No Deadline'}
                                 </span>

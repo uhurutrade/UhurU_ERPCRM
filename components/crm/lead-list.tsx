@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { deleteLead, convertLeadToDeal } from '@/app/actions/crm';
 import { Target, Trash2, Loader2, ArrowRight, Users } from 'lucide-react';
+import { LeadDetailModal } from './modals/lead-detail-modal';
+import { useConfirm } from '@/components/providers/modal-provider';
 
 interface LeadListProps {
     leads: any[];
@@ -11,6 +13,8 @@ interface LeadListProps {
 
 export function LeadList({ leads, organizations }: LeadListProps) {
     const [isConverting, setIsConverting] = useState<string | null>(null);
+    const [selectedLead, setSelectedLead] = useState<any | null>(null);
+    const { confirm } = useConfirm();
 
     async function handleConvert(leadId: string) {
         // For simplicity, we'll just use the first organization or a default one
@@ -30,8 +34,15 @@ export function LeadList({ leads, organizations }: LeadListProps) {
         }
     }
 
-    async function handleDelete(id: string) {
-        if (confirm('Are you sure you want to delete this lead?')) {
+    async function handleDelete(e: React.MouseEvent, id: string) {
+        e.stopPropagation();
+        const ok = await confirm({
+            title: "Delete Lead",
+            message: "Are you sure you want to delete this lead?",
+            type: "danger"
+        });
+
+        if (ok) {
             await deleteLead(id);
         }
     }
@@ -50,7 +61,11 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                 </thead>
                 <tbody className="divide-y divide-uhuru-border">
                     {leads.map((lead) => (
-                        <tr key={lead.id} className="hover:bg-slate-800/40 transition-colors group">
+                        <tr
+                            key={lead.id}
+                            onClick={() => setSelectedLead(lead)}
+                            className="hover:bg-slate-800/40 transition-colors group cursor-pointer"
+                        >
                             <td className="py-4 px-6">
                                 <span className="px-2 py-1 rounded text-[9px] font-bold bg-slate-800 text-slate-400 uppercase border border-slate-700">
                                     {lead.source || 'General'}
@@ -75,7 +90,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                                 <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     {lead.status !== 'QUALIFIED' && (
                                         <button
-                                            onClick={() => handleConvert(lead.id)}
+                                            onClick={(e) => { e.stopPropagation(); handleConvert(lead.id); }}
                                             disabled={isConverting === lead.id}
                                             className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-lg text-[10px] font-bold uppercase transition-all border border-indigo-600/20"
                                         >

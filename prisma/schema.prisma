@@ -61,7 +61,15 @@ model Organization {
   deals       Deal[]
   
   // CORRECCIÓN: Se añade la relación inversa para Invoice (factura)
-  invoices    Invoice[] // <--- LÍNEA AÑADIDA
+  invoices    Invoice[] 
+  
+  // Billing Info
+  isBillable  Boolean   @default(false)
+  taxId       String?   // VAT/NIF
+  legalName   String?
+  bankName    String?
+  bankIban    String?
+  bankSwift   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,6 +86,12 @@ model Contact {
   activities     Activity[]
 
   isClient       Boolean       @default(false)
+  
+  // Billing Info (for individuals)
+  isBillable     Boolean       @default(false)
+  taxId          String?
+  legalName      String?
+  bankIban       String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

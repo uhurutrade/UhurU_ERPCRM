@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-18T19:42:52.372Z');
+  console.log('Generated at: 2025-12-18T19:55:50.914Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -601,6 +601,12 @@ async function main() {
     "sector": "Technology",
     "website": "https://globaltech.example.com",
     "address": "123 Innovation Drive, London, UK",
+    "isBillable": false,
+    "taxId": null,
+    "legalName": null,
+    "bankName": null,
+    "bankIban": null,
+    "bankSwift": null,
     "createdAt": "2025-12-18T19:35:38.234Z",
     "updatedAt": "2025-12-18T19:35:38.234Z"
   },
@@ -610,6 +616,12 @@ async function main() {
     "sector": "Renewable Energy",
     "website": "https://ecoenergy.example.com",
     "address": "45 Green Way, Manchester, UK",
+    "isBillable": false,
+    "taxId": null,
+    "legalName": null,
+    "bankName": null,
+    "bankIban": null,
+    "bankSwift": null,
     "createdAt": "2025-12-18T19:35:38.245Z",
     "updatedAt": "2025-12-18T19:35:38.245Z"
   }
@@ -636,6 +648,10 @@ async function main() {
     "role": "CTO",
     "organizationId": "cmjbubqbd0000ha2lp9ftb957",
     "isClient": false,
+    "isBillable": false,
+    "taxId": null,
+    "legalName": null,
+    "bankIban": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   },
@@ -647,6 +663,10 @@ async function main() {
     "role": "Procurement Manager",
     "organizationId": "cmjbubqbd0000ha2lp9ftb957",
     "isClient": false,
+    "isBillable": false,
+    "taxId": null,
+    "legalName": null,
+    "bankIban": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   },
@@ -658,6 +678,10 @@ async function main() {
     "role": "CEO",
     "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
     "isClient": false,
+    "isBillable": false,
+    "taxId": null,
+    "legalName": null,
+    "bankIban": null,
     "createdAt": "2025-12-18T19:35:38.248Z",
     "updatedAt": "2025-12-18T19:35:38.248Z"
   }
@@ -679,20 +703,20 @@ async function main() {
     "name": "Future Mobility Corp",
     "email": "info@futuremobility.example.com",
     "source": "LinkedIn",
-    "status": "NEW",
+    "status": "QUALIFIED",
     "notes": "Interested in fleet management software.",
     "createdAt": "2025-12-18T19:35:38.254Z",
-    "updatedAt": "2025-12-18T19:35:38.254Z"
+    "updatedAt": "2025-12-18T19:44:54.320Z"
   },
   {
     "id": "cmjbubqby0006ha2l8f435hvm",
     "name": "Quantum Systems",
     "email": "sales@quantumsys.example.com",
     "source": "Website",
-    "status": "CONTACTED",
+    "status": "QUALIFIED",
     "notes": "Looking for a custom ERP solution.",
     "createdAt": "2025-12-18T19:35:38.254Z",
-    "updatedAt": "2025-12-18T19:35:38.254Z"
+    "updatedAt": "2025-12-18T19:44:56.427Z"
   }
 ] as any[]) {
       await prisma.lead.create({
@@ -728,6 +752,28 @@ async function main() {
     "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
     "createdAt": "2025-12-18T19:35:38.259Z",
     "updatedAt": "2025-12-18T19:35:38.259Z"
+  },
+  {
+    "id": "cmjbunne30007gui8sm4tcb7t",
+    "title": "Deal with Future Mobility Corp",
+    "amount": "0",
+    "currency": "GBP",
+    "stage": "PROSPECTING",
+    "closeDate": null,
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "createdAt": "2025-12-18T19:44:54.316Z",
+    "updatedAt": "2025-12-18T19:44:54.316Z"
+  },
+  {
+    "id": "cmjbunozn0009gui8jc90af29",
+    "title": "Deal with Quantum Systems",
+    "amount": "0",
+    "currency": "GBP",
+    "stage": "PROSPECTING",
+    "closeDate": null,
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "createdAt": "2025-12-18T19:44:56.387Z",
+    "updatedAt": "2025-12-18T19:44:56.387Z"
   }
 ] as any[]) {
     await prisma.deal.create({
@@ -5905,24 +5951,24 @@ async function main() {
   console.log('Seeding Tasks...');
   for (const task of [
   {
-    "id": "cmjbubqc70009ha2l1hlh93g8",
-    "title": "Follow up with Alice Thompson",
-    "description": "Send the updated proposal for the tech upgrade.",
-    "dueDate": "2025-12-20T19:35:38.262Z",
-    "completed": false,
-    "assignedToId": null,
-    "createdAt": "2025-12-18T19:35:38.264Z",
-    "updatedAt": "2025-12-18T19:35:38.264Z"
-  },
-  {
     "id": "cmjbubqc7000aha2lz6owzjr9",
     "title": "Initial Discovery Call with Quantum Systems",
     "description": "Pre-meeting research on their current tech stack.",
     "dueDate": "2025-12-19T19:35:38.262Z",
-    "completed": false,
+    "completed": true,
     "assignedToId": null,
     "createdAt": "2025-12-18T19:35:38.264Z",
-    "updatedAt": "2025-12-18T19:35:38.264Z"
+    "updatedAt": "2025-12-18T19:44:16.465Z"
+  },
+  {
+    "id": "cmjbubqc70009ha2l1hlh93g8",
+    "title": "Follow up with Alice Thompson",
+    "description": "Send the updated proposal for the tech upgrade.",
+    "dueDate": "2025-12-20T19:35:38.262Z",
+    "completed": true,
+    "assignedToId": null,
+    "createdAt": "2025-12-18T19:35:38.264Z",
+    "updatedAt": "2025-12-18T19:44:20.716Z"
   }
 ] as any[]) {
       await prisma.task.create({

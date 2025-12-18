@@ -2,10 +2,23 @@
 
 import { Building2, Globe, MapPin, Trash2 } from 'lucide-react';
 import { deleteOrganization } from '@/app/actions/crm';
+import { useState } from 'react';
+import { OrganizationDetailModal } from './modals/organization-detail-modal';
+import { useConfirm } from '@/components/providers/modal-provider';
 
 export function OrganizationList({ organizations }: { organizations: any[] }) {
-    async function handleDelete(id: string) {
-        if (confirm('Are you sure you want to delete this organization? This may fail if there are associated records.')) {
+    const [selectedOrg, setSelectedOrg] = useState<any | null>(null);
+    const { confirm } = useConfirm();
+
+    async function handleDelete(e: React.MouseEvent, id: string) {
+        e.stopPropagation();
+        const ok = await confirm({
+            title: "Delete Organization",
+            message: "Are you sure you want to delete this organization? This may fail if there are associated records.",
+            type: "danger"
+        });
+
+        if (ok) {
             const res = await deleteOrganization(id);
             if (res.error) alert(res.error);
         }
@@ -13,7 +26,11 @@ export function OrganizationList({ organizations }: { organizations: any[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {organizations.map((org) => (
-                <div key={org.id} className="bg-uhuru-card backdrop-blur-md rounded-2xl border border-uhuru-border p-6 group hover:border-emerald-500/30 transition-all duration-300 shadow-card">
+                <div
+                    key={org.id}
+                    onClick={() => setSelectedOrg(org)}
+                    className="bg-uhuru-card backdrop-blur-md rounded-2xl border border-uhuru-border p-6 group hover:border-emerald-500/30 transition-all duration-300 shadow-card cursor-pointer"
+                >
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform">
@@ -44,7 +61,7 @@ export function OrganizationList({ organizations }: { organizations: any[] }) {
                         <div className="flex gap-2">
                             <button className="px-3 py-1.5 rounded-lg bg-slate-800 text-[10px] font-bold text-white border border-slate-700 hover:bg-slate-700 transition-colors">Details</button>
                             <button
-                                onClick={() => handleDelete(org.id)}
+                                onClick={(e) => handleDelete(e, org.id)}
                                 className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
                             >
                                 <Trash2 size={16} />
@@ -60,6 +77,12 @@ export function OrganizationList({ organizations }: { organizations: any[] }) {
                     <p className="font-medium italic">Your organization directory is currently empty.</p>
                 </div>
             )}
+
+            <OrganizationDetailModal
+                isOpen={!!selectedOrg}
+                onClose={() => setSelectedOrg(null)}
+                organization={selectedOrg}
+            />
         </div>
     );
 }

@@ -147,7 +147,7 @@ export default async function CRMPage({
             <div className="flex-1 min-h-[500px]">
                 {view === 'pipeline' && <KanbanBoard deals={deals} organizations={organizations} />}
                 {view === 'leads' && <LeadList leads={leads} organizations={organizations} />}
-                {view === 'contacts' && <ContactList contacts={contacts} />}
+                {view === 'contacts' && <ContactList contacts={contacts} organizations={organizations} />}
                 {view === 'organizations' && <OrganizationList organizations={organizations} />}
                 {view === 'tasks' && <TaskList tasks={tasks} />}
             </div>
@@ -170,8 +170,8 @@ export default async function CRMPage({
                         {activities.map((act) => (
                             <div key={act.id} className="bg-uhuru-card/50 p-5 rounded-2xl border border-uhuru-border flex items-start gap-4 hover:bg-uhuru-card transition-all group">
                                 <div className={`p-2.5 rounded-xl border ${act.type === 'CALL' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                        act.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                            'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                    act.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                        'bg-purple-500/10 text-purple-400 border-purple-500/20'
                                     }`}>
                                     {act.type === 'CALL' ? <Phone size={18} /> :
                                         act.type === 'EMAIL' ? <Mail size={18} /> :
