@@ -99,7 +99,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                                         </button>
                                     )}
                                     <button
-                                        onClick={() => handleDelete(lead.id)}
+                                        onClick={(e) => handleDelete(e, lead.id)}
                                         className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
                                     >
                                         <Trash2 size={14} />
