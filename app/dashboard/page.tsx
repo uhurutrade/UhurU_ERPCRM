@@ -40,7 +40,9 @@ export default async function DashboardPage() {
             where: { bankAccountId: account.id },
             _sum: { amount: true }
         });
-        account.currentBalance = balanceCtx._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+        // Convert to Number safely for display and sorting
+        const sum = balanceCtx._sum.amount ? Number(balanceCtx._sum.amount) : 0;
+        (account as any).currentBalance = sum;
     }
 
     // Sort by balance desc and take top 12 for display

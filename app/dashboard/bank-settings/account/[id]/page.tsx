@@ -32,7 +32,8 @@ export default async function EditAccountPage({ params }: EditAccountPageProps) 
 
     // Override the stored balance with the calculated one to ensure it matches the "sum and subtraction of movements"
     // We treat the stored currentBalance as the calculated one for display
-    account.currentBalance = balanceResult._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+    const currentSum = balanceResult._sum.amount ? Number(balanceResult._sum.amount) : 0;
+    (account as any).currentBalance = currentSum;
 
     if (!account) {
         notFound();

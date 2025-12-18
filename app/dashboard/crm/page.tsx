@@ -16,14 +16,6 @@ export default async function CRMPage({
     const view = searchParams.view || 'pipeline';
     const query = searchParams.q || '';
 
-    // Data Fetching with Search Support
-    const searchFilter = query ? {
-        OR: [
-            { name: { contains: query, mode: 'insensitive' } as any },
-            { email: { contains: query, mode: 'insensitive' } as any }
-        ]
-    } : {};
-
     const leadsCount = await prisma.lead.count({ where: { status: 'NEW' } });
     const pendingTasksCount = await prisma.task.count({ where: { completed: false } });
 

@@ -28,8 +28,9 @@ export default async function BankSettingsPage() {
                 where: { bankAccountId: account.id },
                 _sum: { amount: true }
             });
-            // Override the stored balance
-            account.currentBalance = balanceCtx._sum.amount || new (await import("@prisma/client/runtime/library")).Decimal(0);
+            // Override the stored balance safely as a Number
+            const sum = balanceCtx._sum.amount ? Number(balanceCtx._sum.amount) : 0;
+            (account as any).currentBalance = sum;
         }
     }
 
