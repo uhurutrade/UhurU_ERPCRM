@@ -1,42 +1,63 @@
 'use client';
 
-import { Building2, Globe, MapPin } from 'lucide-react';
+import { Building2, Globe, MapPin, Trash2 } from 'lucide-react';
+import { deleteOrganization } from '@/app/actions/crm';
 
 export function OrganizationList({ organizations }: { organizations: any[] }) {
+    async function handleDelete(id: string) {
+        if (confirm('Are you sure you want to delete this organization? This may fail if there are associated records.')) {
+            const res = await deleteOrganization(id);
+            if (res.error) alert(res.error);
+        }
+    }
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {organizations.map((org) => (
-                <div key={org.id} className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                                <Building2 size={20} />
+                <div key={org.id} className="bg-uhuru-card backdrop-blur-md rounded-2xl border border-uhuru-border p-6 group hover:border-emerald-500/30 transition-all duration-300 shadow-card">
+                    <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform">
+                                <Building2 size={24} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 dark:text-white">{org.name}</h3>
-                                <span className="text-xs text-slate-500 uppercase tracking-wider">{org.sector || 'Unknown Sector'}</span>
+                                <h3 className="font-bold text-white text-lg">{org.name}</h3>
+                                <span className="text-[10px] text-uhuru-text-dim font-bold uppercase tracking-[0.1em]">{org.sector || 'General Business'}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 pt-2">
                         {org.website && (
-                            <a href={org.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                                <Globe size={16} /> {org.website.replace(/^https?:\/\//, '')}
+                            <a href={org.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+                                <Globe size={14} /> {org.website.replace(/^https?:\/\//, '')}
                             </a>
                         )}
                         {org.address && (
-                            <div className="flex items-center gap-2 text-slate-500">
-                                <MapPin size={16} /> {org.address}
+                            <div className="flex items-center gap-2 text-xs text-uhuru-text-muted">
+                                <MapPin size={14} /> {org.address}
                             </div>
                         )}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-uhuru-border flex justify-between items-center">
+                        <span className="text-[10px] text-uhuru-text-dim font-bold uppercase">Actions</span>
+                        <div className="flex gap-2">
+                            <button className="px-3 py-1.5 rounded-lg bg-slate-800 text-[10px] font-bold text-white border border-slate-700 hover:bg-slate-700 transition-colors">Details</button>
+                            <button
+                                onClick={() => handleDelete(org.id)}
+                                className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             ))}
 
             {organizations.length === 0 && (
-                <div className="col-span-full py-12 text-center text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-                    No organizations found.
+                <div className="col-span-full py-20 text-center text-uhuru-text-dim bg-uhuru-card/50 rounded-2xl border border-dashed border-uhuru-border">
+                    <Building2 className="mx-auto mb-4 opacity-20" size={48} />
+                    <p className="font-medium italic">Your organization directory is currently empty.</p>
                 </div>
             )}
         </div>

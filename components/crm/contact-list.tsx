@@ -1,63 +1,81 @@
 'use client';
 
-import { Users, Mail, Phone, Building2 } from 'lucide-react';
+import { Users, Mail, Phone, Building2, Trash2 } from 'lucide-react';
+import { deleteContact } from '@/app/actions/crm';
 
 export function ContactList({ contacts }: { contacts: any[] }) {
+    async function handleDelete(id: string) {
+        if (confirm('Delete this contact?')) {
+            await deleteContact(id);
+        }
+    }
+
     return (
-        <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 overflow-hidden shadow-sm">
-            <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 dark:bg-slate-900/50">
-                    <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+        <div className="bg-uhuru-card backdrop-blur-md rounded-2xl border border-uhuru-border overflow-hidden shadow-card">
+            <table className="w-full text-left">
+                <thead className="bg-slate-900/40">
+                    <tr className="border-b border-uhuru-border text-uhuru-text-muted text-[10px] font-bold uppercase tracking-widest">
                         <th className="py-4 px-6">Name</th>
                         <th className="py-4 px-6 hidden md:table-cell">Organization</th>
                         <th className="py-4 px-6">Contact Info</th>
-                        <th className="py-4 px-6 hidden md:table-cell">Role</th>
+                        <th className="py-4 px-6 hidden md:table-cell text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-uhuru-border">
                     {contacts.map((contact) => (
-                        <tr key={contact.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr key={contact.id} className="hover:bg-slate-800/40 transition-colors group">
                             <td className="py-4 px-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-medium text-sm">
+                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-uhuru-text-muted font-bold text-xs border border-slate-700">
                                         {contact.name.charAt(0)}
                                     </div>
-                                    <div className="font-medium text-slate-900 dark:text-white">{contact.name}</div>
+                                    <div className="font-bold text-white text-sm">{contact.name}</div>
                                 </div>
                             </td>
                             <td className="py-4 px-6 hidden md:table-cell">
                                 {contact.organization ? (
-                                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                                        <Building2 size={14} />
+                                    <div className="flex items-center gap-2 text-slate-300">
+                                        <Building2 size={14} className="text-slate-500" />
                                         {contact.organization.name}
                                     </div>
                                 ) : (
-                                    <span className="text-slate-400">-</span>
+                                    <span className="text-slate-500 text-xs italic">Independent</span>
                                 )}
                             </td>
                             <td className="py-4 px-6">
                                 <div className="space-y-1">
                                     {contact.email && (
-                                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                                            <Mail size={14} /> {contact.email}
+                                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                                            <Mail size={12} /> {contact.email}
                                         </div>
                                     )}
                                     {contact.phone && (
-                                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                                            <Phone size={14} /> {contact.phone}
+                                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                                            <Phone size={12} /> {contact.phone}
                                         </div>
                                     )}
                                 </div>
                             </td>
-                            <td className="py-4 px-6 text-sm text-slate-500 hidden md:table-cell">
-                                {contact.role || '-'}
+                            <td className="py-4 px-6 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase bg-slate-800 px-2 py-0.5 rounded mr-2">
+                                        {contact.role || 'Contact'}
+                                    </span>
+                                    <button
+                                        onClick={() => handleDelete(contact.id)}
+                                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
                     {contacts.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="py-12 text-center text-slate-500">
-                                No contacts found.
+                            <td colSpan={4} className="py-20 text-center text-uhuru-text-dim">
+                                <Users className="mx-auto mb-4 opacity-10" size={48} />
+                                <p className="text-sm italic">No contacts found in your database.</p>
                             </td>
                         </tr>
                     )}

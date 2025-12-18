@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-18T18:55:12.588Z');
+  console.log('Generated at: 2025-12-18T19:42:52.372Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -594,7 +594,26 @@ async function main() {
 
   // --- 9. CRM: Organizations ---
   console.log('Seeding Organizations...');
-  for (const org of [] as any[]) {
+  for (const org of [
+  {
+    "id": "cmjbubqbd0000ha2lp9ftb957",
+    "name": "Global Tech Solutions",
+    "sector": "Technology",
+    "website": "https://globaltech.example.com",
+    "address": "123 Innovation Drive, London, UK",
+    "createdAt": "2025-12-18T19:35:38.234Z",
+    "updatedAt": "2025-12-18T19:35:38.234Z"
+  },
+  {
+    "id": "cmjbubqbo0001ha2l5skvvqm9",
+    "name": "EcoEnergy Partners",
+    "sector": "Renewable Energy",
+    "website": "https://ecoenergy.example.com",
+    "address": "45 Green Way, Manchester, UK",
+    "createdAt": "2025-12-18T19:35:38.245Z",
+    "updatedAt": "2025-12-18T19:35:38.245Z"
+  }
+] as any[]) {
     await prisma.organization.upsert({
         where: { id: org.id },
         update: {},
@@ -608,7 +627,41 @@ async function main() {
 
   // --- 10. CRM: Contacts ---
   console.log('Seeding Contacts...');
-  for (const contact of [] as any[]) {
+  for (const contact of [
+  {
+    "id": "cmjbubqbs0002ha2lij18uemd",
+    "name": "Alice Thompson",
+    "email": "alice@globaltech.example.com",
+    "phone": "+44 7700 900123",
+    "role": "CTO",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "isClient": false,
+    "createdAt": "2025-12-18T19:35:38.248Z",
+    "updatedAt": "2025-12-18T19:35:38.248Z"
+  },
+  {
+    "id": "cmjbubqbs0003ha2lztz1oomp",
+    "name": "Bob Richards",
+    "email": "bob@globaltech.example.com",
+    "phone": "+44 7700 900456",
+    "role": "Procurement Manager",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "isClient": false,
+    "createdAt": "2025-12-18T19:35:38.248Z",
+    "updatedAt": "2025-12-18T19:35:38.248Z"
+  },
+  {
+    "id": "cmjbubqbs0004ha2l85t1emdf",
+    "name": "Charlie Smith",
+    "email": "charlie@ecoenergy.example.com",
+    "phone": "+44 7700 900789",
+    "role": "CEO",
+    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
+    "isClient": false,
+    "createdAt": "2025-12-18T19:35:38.248Z",
+    "updatedAt": "2025-12-18T19:35:38.248Z"
+  }
+] as any[]) {
     await prisma.contact.create({
         data: {
             ...contact,
@@ -620,7 +673,28 @@ async function main() {
   
   // --- 11. CRM: Leads ---
   console.log('Seeding Leads...');
-  for (const lead of [] as any[]) {
+  for (const lead of [
+  {
+    "id": "cmjbubqby0005ha2l4vbvxkda",
+    "name": "Future Mobility Corp",
+    "email": "info@futuremobility.example.com",
+    "source": "LinkedIn",
+    "status": "NEW",
+    "notes": "Interested in fleet management software.",
+    "createdAt": "2025-12-18T19:35:38.254Z",
+    "updatedAt": "2025-12-18T19:35:38.254Z"
+  },
+  {
+    "id": "cmjbubqby0006ha2l8f435hvm",
+    "name": "Quantum Systems",
+    "email": "sales@quantumsys.example.com",
+    "source": "Website",
+    "status": "CONTACTED",
+    "notes": "Looking for a custom ERP solution.",
+    "createdAt": "2025-12-18T19:35:38.254Z",
+    "updatedAt": "2025-12-18T19:35:38.254Z"
+  }
+] as any[]) {
       await prisma.lead.create({
           data: {
               ...lead,
@@ -632,7 +706,30 @@ async function main() {
 
   // --- 12. CRM: Deals ---
   console.log('Seeding Deals...');
-  for (const deal of [] as any[]) {
+  for (const deal of [
+  {
+    "id": "cmjbubqc30007ha2l0j6tpsib",
+    "title": "Global Tech Infrastructure Upgrade",
+    "amount": "150000",
+    "currency": "GBP",
+    "stage": "NEGOTIATION",
+    "closeDate": null,
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "createdAt": "2025-12-18T19:35:38.259Z",
+    "updatedAt": "2025-12-18T19:35:38.259Z"
+  },
+  {
+    "id": "cmjbubqc30008ha2lmwoutukl",
+    "title": "EcoEnergy Solar Panel Deployment",
+    "amount": "75000",
+    "currency": "GBP",
+    "stage": "PROPOSAL",
+    "closeDate": null,
+    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
+    "createdAt": "2025-12-18T19:35:38.259Z",
+    "updatedAt": "2025-12-18T19:35:38.259Z"
+  }
+] as any[]) {
     await prisma.deal.create({
         data: {
             ...deal,
@@ -5806,7 +5903,28 @@ async function main() {
   
   // --- 22. Tasks ---
   console.log('Seeding Tasks...');
-  for (const task of [] as any[]) {
+  for (const task of [
+  {
+    "id": "cmjbubqc70009ha2l1hlh93g8",
+    "title": "Follow up with Alice Thompson",
+    "description": "Send the updated proposal for the tech upgrade.",
+    "dueDate": "2025-12-20T19:35:38.262Z",
+    "completed": false,
+    "assignedToId": null,
+    "createdAt": "2025-12-18T19:35:38.264Z",
+    "updatedAt": "2025-12-18T19:35:38.264Z"
+  },
+  {
+    "id": "cmjbubqc7000aha2lz6owzjr9",
+    "title": "Initial Discovery Call with Quantum Systems",
+    "description": "Pre-meeting research on their current tech stack.",
+    "dueDate": "2025-12-19T19:35:38.262Z",
+    "completed": false,
+    "assignedToId": null,
+    "createdAt": "2025-12-18T19:35:38.264Z",
+    "updatedAt": "2025-12-18T19:35:38.264Z"
+  }
+] as any[]) {
       await prisma.task.create({
           data: {
               ...task,

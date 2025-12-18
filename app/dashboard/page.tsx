@@ -87,7 +87,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Leads Card */}
-                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+                <Link href="/dashboard/crm?view=leads" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400">
                             <Users size={24} />
@@ -99,12 +99,12 @@ export default async function DashboardPage() {
                     <h3 className="text-uhuru-text-muted text-sm font-medium">New Leads</h3>
                     <p className="text-3xl font-bold text-white mt-1 tracking-tight">{leads}</p>
                     <div className="mt-4 flex items-center text-xs text-blue-400 bg-blue-500/10 w-fit px-2 py-1 rounded-full">
-                        <span>{leads > 0 ? 'Potential Opportunities' : 'No new leads'}</span>
+                        <span>Capture rate active</span>
                     </div>
-                </div>
+                </Link>
 
                 {/* Tasks Card */}
-                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-amber-500/30 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] transition-all duration-300">
+                <Link href="/dashboard/crm?view=tasks" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-amber-500/30 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
                             <ClipboardList size={24} />
@@ -116,9 +116,9 @@ export default async function DashboardPage() {
                     <h3 className="text-uhuru-text-muted text-sm font-medium">Pending Tasks</h3>
                     <p className="text-3xl font-bold text-white mt-1 tracking-tight">{tasks}</p>
                     <div className="mt-4 flex items-center text-xs text-amber-400 bg-amber-500/10 w-fit px-2 py-1 rounded-full">
-                        <span>{tasks} items requiring attention</span>
+                        <span>Requires attention</span>
                     </div>
-                </div>
+                </Link>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

@@ -25,6 +25,16 @@ export async function createOrganization(formData: FormData) {
     }
 }
 
+export async function deleteOrganization(id: string) {
+    try {
+        await prisma.organization.delete({ where: { id } });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to delete organization. It might have associated contacts or deals.' };
+    }
+}
+
 // --- Contacts ---
 
 export async function createContact(formData: FormData) {
@@ -51,6 +61,16 @@ export async function createContact(formData: FormData) {
         return { success: true };
     } catch (error) {
         return { error: 'Failed to create contact' };
+    }
+}
+
+export async function deleteContact(id: string) {
+    try {
+        await prisma.contact.delete({ where: { id } });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to delete contact' };
     }
 }
 
@@ -90,5 +110,123 @@ export async function updateDealStage(dealId: string, newStage: string) {
         return { success: true };
     } catch (error) {
         return { error: 'Failed to update deal stage' };
+    }
+}
+
+export async function deleteDeal(id: string) {
+    try {
+        await prisma.deal.delete({ where: { id } });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to delete deal' };
+    }
+}
+
+// --- Leads ---
+
+export async function createLead(formData: FormData) {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const source = formData.get('source') as string;
+    const notes = formData.get('notes') as string;
+
+    if (!name) return { error: 'Name is required' };
+
+    try {
+        await prisma.lead.create({
+            data: { name, email, source, notes }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to create lead' };
+    }
+}
+
+export async function deleteLead(id: string) {
+    try {
+        await prisma.lead.delete({ where: { id } });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to delete lead' };
+    }
+}
+
+export async function convertLeadToDeal(leadId: string, orgId: string) {
+    try {
+        const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+        if (!lead) throw new Error('Lead not found');
+
+        // Create deal from lead
+        await prisma.deal.create({
+            data: {
+                title: `Deal with ${lead.name}`,
+                amount: 0,
+                stage: 'PROSPECTING',
+                organizationId: orgId
+            }
+        });
+
+        // Update lead status
+        await prisma.lead.update({
+            where: { id: leadId },
+            data: { status: 'QUALIFIED' }
+        });
+
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to convert lead to deal' };
+    }
+}
+
+// --- Tasks ---
+
+export async function createTask(formData: FormData) {
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const dueDate = formData.get('dueDate') as string;
+    const assignedToId = formData.get('assignedToId') as string;
+
+    if (!title) return { error: 'Title is required' };
+
+    try {
+        await prisma.task.create({
+            data: {
+                title,
+                description,
+                dueDate: dueDate ? new Date(dueDate) : null,
+                assignedToId: assignedToId || null
+            }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to create task' };
+    }
+}
+
+export async function toggleTask(id: string, completed: boolean) {
+    try {
+        await prisma.task.update({
+            where: { id },
+            data: { completed }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to toggle task' };
+    }
+}
+
+export async function deleteTask(id: string) {
+    try {
+        await prisma.task.delete({ where: { id } });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to delete task' };
     }
 }
