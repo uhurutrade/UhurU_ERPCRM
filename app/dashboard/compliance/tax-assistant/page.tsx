@@ -45,8 +45,9 @@ export default function TaxAssistantPage() {
         scrollToBottom();
     }, [messages]);
 
-    // Fetch docs on load
+    // Fetch data on load
     useEffect(() => {
+        // Fetch docs
         fetch('/api/compliance/documents', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
