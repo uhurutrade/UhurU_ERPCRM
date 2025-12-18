@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { DeadlineCard } from '@/components/compliance/deadline-card';
 import { calculateVATDeadline, calculateCorpTaxPaymentDeadline, calculateAccountsDeadline, calculateConfirmationStatementDeadline, ObligationType } from '@/lib/compliance/uk-tax';
+import Link from 'next/link';
 
 export default async function CompliancePage() {
     // Fetch current fiscal year and obligations
@@ -50,6 +51,30 @@ export default async function CompliancePage() {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Fiscal Compliance (UK)</h1>
                 <p className="text-slate-500 dark:text-slate-400">Track your HMRC and Companies House obligations.</p>
+            </div>
+
+            {/* AI Tax Assistant Promo */}
+            <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border border-emerald-500/20 p-6 md:p-8">
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/20 blur-3xl rounded-full" />
+
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">New</span>
+                            <h2 className="text-xl font-bold text-white">AI Tax Assistant (RAG)</h2>
+                        </div>
+                        <p className="text-slate-300 max-w-xl">
+                            Train the assistant with your previous tax declarations. It will analyze your ERP data against your historical filings to automate your returns.
+                        </p>
+                    </div>
+
+                    <Link
+                        href="/dashboard/compliance/tax-assistant"
+                        className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-medium shadow-lg shadow-emerald-500/25 transition-all active:scale-95 whitespace-nowrap"
+                    >
+                        Open Assistant
+                    </Link>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

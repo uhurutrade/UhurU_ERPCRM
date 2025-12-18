@@ -568,3 +568,24 @@ model TransactionCategory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model ComplianceDocument {
+  id            String   @id @default(cuid())
+  filename      String
+  fileType      String?  // PDF, CSV, etc
+  documentType  String?  // TAX_RETURN, HMRC_LETTER, etc.
+  
+  // Storage
+  path          String
+  size          Int?
+  
+  // RAG Status
+  isProcessed   Boolean  @default(false) // True if "vectors" generated
+  vectorId      String?  // Reference ID in vector database
+
+  // Context
+  fiscalYear    String?  // e.g. "2024"
+  
+  uploadedBy    String?
+  uploadedAt    DateTime @default(now())
+}
