@@ -5,13 +5,14 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-18T17:07:42.962Z');
+  console.log('Generated at: 2025-12-18T17:53:45.706Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
   
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
+  await prisma.complianceDocument.deleteMany().catch(() => {});
   await prisma.bankTransaction.deleteMany().catch(() => {});
   await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
@@ -5814,6 +5815,70 @@ async function main() {
               updatedAt: new Date(task.updatedAt),
           } as any
       }).catch(e => console.log('Task error:', e.message));
+  }
+
+  // --- 23. Compliance Documents ---
+  console.log('Seeding Compliance Documents (RAG Knowledge Base)...');
+  for (const doc of [
+  {
+    "id": "cmjbp5dnw0000x9vzo82yjrvk",
+    "filename": "CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "fileType": "application/pdf",
+    "documentType": "TAX_UPLOAD",
+    "path": "uploads/CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "size": 3028,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-18T17:10:43.820Z"
+  },
+  {
+    "id": "cmjbpbiaf0000v71kutj80wpp",
+    "filename": "CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "fileType": "application/pdf",
+    "documentType": "TAX_UPLOAD",
+    "path": "uploads/CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "size": 3028,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-18T17:15:29.751Z"
+  },
+  {
+    "id": "cmjbql0f90000y6uqkehqlbv2",
+    "filename": "invoice_INV25-8 (2).pdf",
+    "fileType": "application/pdf",
+    "documentType": "TAX_UPLOAD",
+    "path": "uploads/invoice_INV25-8 (2).pdf",
+    "size": 47482,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-18T17:50:52.774Z"
+  },
+  {
+    "id": "cmjboy09w000011r14wuutg4h",
+    "filename": "CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "fileType": "application/pdf",
+    "documentType": "TAX_UPLOAD",
+    "path": "uploads/CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
+    "size": 3028,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-18T17:04:59.876Z"
+  }
+] as any[]) {
+      await prisma.complianceDocument.create({
+          data: {
+              ...doc,
+              uploadedAt: new Date(doc.uploadedAt),
+          } as any
+      }).catch(e => console.log('Compliance Doc error:', e.message));
   }
 
   console.log('✅ Seeding finished.');

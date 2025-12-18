@@ -1,5 +1,7 @@
 "use client";
 
+import { useConfirm } from "@/components/providers/modal-provider";
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, FileText, Bot, ArrowRight, ShieldCheck, Sparkles, Send, X, AlertCircle, Loader2, Database, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -27,17 +29,58 @@ export default function TaxAssistantPage() {
     // DB synced state
     const [activeDocs, setActiveDocs] = useState<Document[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const { confirm } = useConfirm();
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Filtered docs
+    const filteredDocs = activeDocs.filter(doc =>
+        doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // --- Effects ---
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
+    // Fetch docs on load
+    useEffect(() => {
+        fetch('/api/compliance/documents', { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setActiveDocs(data);
+            })
+            .catch(console.error);
+    }, []);
+
     // --- Handlers ---
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        const confirmed = await confirm({
+            title: "Delete Document",
+            message: "Are you sure you want to permanently delete this document? This action cannot be undone.",
+            type: "danger",
+            confirmText: "Delete",
+            cancelText: "Keep Document"
+        });
+
+        if (!confirmed) return;
+
+        try {
+            const res = await fetch(`/api/compliance/documents?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setActiveDocs(prev => prev.filter(d => d.id !== id));
+            }
+        } catch (error) {
+            alert("Failed to delete");
+        }
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,28 +96,33 @@ export default function TaxAssistantPage() {
                 method: 'POST',
                 body: formData
             });
+
             const data = await res.json();
 
             if (res.ok) {
                 // Add to visible list
-                setActiveDocs(prev => [...prev, {
+                setActiveDocs(prev => [{
                     id: data.document.id,
                     filename: data.document.filename,
-                    uploadedAt: new Date().toISOString(),
+                    uploadedAt: data.document.uploadedAt || new Date().toISOString(),
                     isProcessed: true
-                }]);
+                }, ...prev]);
 
                 // Notify via chat
                 setMessages(prev => [...prev, {
                     role: 'assistant',
                     content: `✅ I have securely indexed **${file.name}**. I can now answer questions based on this document.`
                 }]);
+            } else {
+                alert(`Upload failed: ${data.error || 'Unknown error'}`);
             }
         } catch (error) {
             console.error(error);
-            alert("Failed to upload document");
+            alert("Failed to upload document: Network error");
         } finally {
             setIsUploading(false);
+            // Reset input so same file can be selected again
+            e.target.value = '';
         }
     };
 
@@ -123,7 +171,7 @@ export default function TaxAssistantPage() {
         <div className="h-[calc(100vh-6rem)] max-w-7xl mx-auto p-4 md:p-6 animate-in fade-in duration-500 flex flex-col gap-6">
 
             {/* Header */}
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
                         <Bot className="text-emerald-400" size={32} />
@@ -139,10 +187,10 @@ export default function TaxAssistantPage() {
             </div>
 
             {/* Split Layout */}
-            <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden min-h-0">
 
-                {/* LEFT: Chat Interface (60%) */}
-                <div className="flex-[3] flex flex-col bg-uhuru-card border border-uhuru-border rounded-2xl overflow-hidden shadow-2xl">
+                {/* LEFT: Chat Interface (Stretched) */}
+                <div className="flex-[4] flex flex-col bg-uhuru-card border border-uhuru-border rounded-2xl overflow-hidden shadow-2xl min-h-0">
                     <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-700">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -173,7 +221,7 @@ export default function TaxAssistantPage() {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="p-4 bg-slate-900/50 border-t border-uhuru-border">
+                    <div className="p-4 bg-slate-900/50 border-t border-uhuru-border shrink-0">
                         <form onSubmit={handleSendMessage} className="relative">
                             <input
                                 type="text"
@@ -190,74 +238,84 @@ export default function TaxAssistantPage() {
                     </div>
                 </div>
 
-                {/* RIGHT: Document Vault (40%) */}
-                <div className="flex-[2] flex flex-col gap-4 min-w-[300px]">
-                    {/* Upload Card */}
-                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-center text-center relative group overflow-hidden">
-                        <div className="absolute inset-0 bg-grid-slate-700/20 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] pointer-events-none" />
+                {/* RIGHT: Document Vault (Compact) */}
+                <div className="flex-[1.5] flex flex-col gap-3 min-w-[300px] h-full min-h-0">
+                    {/* Upload Card - Now very compact */}
+                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-3 flex flex-row items-center gap-4 relative group shrink-0">
+                        <div className="absolute inset-0 bg-grid-slate-700/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] pointer-events-none" />
 
-                        <div className="relative z-10 space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-xl">
-                                {isUploading ? (
-                                    <Loader2 className="animate-spin text-emerald-400" size={28} />
-                                ) : (
-                                    <Upload className="text-slate-400 group-hover:text-emerald-400" size={28} />
-                                )}
-                            </div>
-                            <div>
-                                <h3 className="text-white font-medium">Secure Upload</h3>
-                                <p className="text-slate-400 text-xs mt-1 max-w-[200px] mx-auto">
-                                    Tax Documents, Company Submissions, Official Letters
-                                </p>
-                            </div>
-
-                            <label className="cursor-pointer inline-flex px-6 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-sm font-medium">
-                                Select Document
-                                <input type="file" className="hidden" onChange={handleFileUpload} />
-                            </label>
+                        <div className="relative z-10 w-10 h-10 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shrink-0">
+                            {isUploading ? (
+                                <Loader2 className="animate-spin text-emerald-400" size={18} />
+                            ) : (
+                                <Upload className="text-slate-400 group-hover:text-emerald-400" size={18} />
+                            )}
                         </div>
+
+                        <div className="relative z-10 flex-1 min-w-0">
+                            <h3 className="text-white text-xs font-semibold">Secure Upload</h3>
+                            <p className="text-slate-500 text-[9px] truncate">
+                                Tax Docs & CMR Letters
+                            </p>
+                        </div>
+
+                        <label className="relative z-10 cursor-pointer px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-[10px] font-bold shrink-0">
+                            {isUploading ? "Uploading..." : "Select"}
+                            <input type="file" className="hidden" onChange={handleFileUpload} />
+                        </label>
                     </div>
 
-                    {/* Database View */}
-                    <div className="flex-1 bg-uhuru-card border border-uhuru-border rounded-2xl p-4 overflow-hidden flex flex-col">
-                        <div className="flex items-center gap-2 mb-4 pb-4 border-b border-uhuru-border">
-                            <Database size={16} className="text-indigo-400" />
-                            <h3 className="text-sm font-semibold text-white">Knowledge Base (VPS)</h3>
-                            <span className="ml-auto text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">
-                                {activeDocs.length} Docs
-                            </span>
+                    {/* Database View (Extended to Bottom) */}
+                    <div className="flex-1 bg-uhuru-card border border-uhuru-border rounded-xl p-3 overflow-hidden flex flex-col min-h-0 relative">
+                        {/* Header with Search */}
+                        <div className="flex flex-col gap-2 mb-3 shrink-0">
+                            <div className="flex items-center gap-2 pb-2 border-b border-uhuru-border">
+                                <Database size={14} className="text-indigo-400" />
+                                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Knowledge Base</h3>
+                                <span className="ml-auto text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 font-mono">
+                                    {filteredDocs.length}
+                                </span>
+                            </div>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-1.5 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto space-y-2 pr-2 scrollbar-thin">
-                            {activeDocs.length === 0 ? (
-                                <div className="text-center py-10 text-slate-500">
-                                    <p className="text-xs">No documents indexed yet.</p>
+                        <div className="flex-1 overflow-y-auto space-y-1.5 pr-1.5 scrollbar-thin bg-black/10 rounded-lg p-1.5 min-h-0">
+                            {filteredDocs.length === 0 ? (
+                                <div className="text-center py-6 text-slate-500">
+                                    <p className="text-[10px]">Empty vault.</p>
                                 </div>
                             ) : (
-                                activeDocs.map((doc) => (
-                                    <div key={doc.id} className="group flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-colors">
-                                        <div className="shrink-0 p-2 bg-slate-800 rounded-lg text-indigo-400">
-                                            <FileText size={18} />
+                                filteredDocs.map((doc) => (
+                                    <div key={doc.id} className="group flex items-center gap-2 p-2 rounded-lg bg-slate-800/40 border border-slate-700/50 hover:border-emerald-500/30 hover:bg-slate-800 transition-all shrink-0">
+                                        <div className="shrink-0 p-1.5 bg-slate-700/30 rounded text-emerald-400">
+                                            <FileText size={14} />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-sm text-slate-200 truncate font-medium">{doc.filename}</p>
-                                            <p className="text-[10px] text-slate-500 flex items-center gap-1">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                                Indexed • {new Date(doc.uploadedAt).toLocaleDateString()}
-                                            </p>
+                                            <p className="text-xs text-slate-200 truncate font-medium group-hover:text-white">{doc.filename}</p>
+                                            <div className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                                <span className="w-1 h-1 rounded-full bg-emerald-500/80 shadow-[0_0_4px_rgba(16,185,129,0.5)]" />
+                                                {new Date(doc.uploadedAt).toLocaleDateString()}
+                                            </div>
                                         </div>
+                                        <button
+                                            onClick={(e) => handleDelete(doc.id, e)}
+                                            className="p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded transition-all opacity-0 group-hover:opacity-100"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={13} />
+                                        </button>
                                     </div>
                                 ))
                             )}
                         </div>
-                    </div>
-
-                    {/* Info Card */}
-                    <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                        <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-2">How RAG Works</h4>
-                        <p className="text-indigo-200/80 text-xs leading-relaxed">
-                            When you ask a question, the system searches these specific documents in your VPS database to find the relevant clauses and figures, then generates a compliant answer.
-                        </p>
                     </div>
                 </div>
             </div>

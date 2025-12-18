@@ -44,6 +44,7 @@ async function main() {
     const complianceEvents = await prisma.complianceEvent.findMany();
     const tasks = await prisma.task.findMany();
     const assets = await prisma.asset.findMany();
+    const complianceDocuments = await prisma.complianceDocument.findMany();
 
     const seedContent = `
 import { PrismaClient } from '@prisma/client';
@@ -59,6 +60,7 @@ async function main() {
   
   // Order matters due to Foreign Keys
   await prisma.attachment.deleteMany().catch(() => {});
+  await prisma.complianceDocument.deleteMany().catch(() => {});
   await prisma.bankTransaction.deleteMany().catch(() => {});
   await prisma.bankStatement.deleteMany().catch(() => {});
   await prisma.cryptoTransaction.deleteMany().catch(() => {});
@@ -402,6 +404,17 @@ async function main() {
               updatedAt: new Date(task.updatedAt),
           } as any
       }).catch(e => console.log('Task error:', e.message));
+  }
+
+  // --- 23. Compliance Documents ---
+  console.log('Seeding Compliance Documents (RAG Knowledge Base)...');
+  for (const doc of ${JSON.stringify(complianceDocuments, null, 2)} as any[]) {
+      await prisma.complianceDocument.create({
+          data: {
+              ...doc,
+              uploadedAt: new Date(doc.uploadedAt),
+          } as any
+      }).catch(e => console.log('Compliance Doc error:', e.message));
   }
 
   console.log('✅ Seeding finished.');

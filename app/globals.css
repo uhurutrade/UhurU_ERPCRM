@@ -91,4 +91,5 @@ body {
 
 .bg-gradient-card:hover {
   @apply transform scale-[1.01] border-uhuru-accent-green/30 shadow-glow;
-}
+}/* Cache Buster: jue 18 dic 2025 18:20:26 CET */
+/* Force Rebuild */
