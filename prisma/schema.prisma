@@ -580,12 +580,30 @@ model ComplianceDocument {
   size          Int?
   
   // RAG Status
-  isProcessed   Boolean  @default(false) // True if "vectors" generated
-  vectorId      String?  // Reference ID in vector database
+  isProcessed   Boolean  @default(false)
+  vectorId      String?  
+  
+  chunks        DocumentChunk[]
 
   // Context
   fiscalYear    String?  // e.g. "2024"
   
   uploadedBy    String?
   uploadedAt    DateTime @default(now())
+}
+
+model DocumentChunk {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    ComplianceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  content     String   @db.Text
+  tokenCount  Int?
+  
+  // Storage for embedding (serialized vector)
+  embedding   String?  @db.Text // Store as JSON string [0.1, 0.2, ...]
+  
+  createdAt   DateTime @default(now())
+
+  @@index([documentId])
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import { ingestDocument } from '@/lib/ai/rag-engine';
 
 export async function POST(req: Request) {
     try {
@@ -45,6 +46,15 @@ export async function POST(req: Request) {
                 documentType: 'TAX_UPLOAD'
             }
         });
+
+        // 3. TRIGGER RAG INGESTION (Chunking & Mock Vectorization)
+        // We do it asynchronously or waiting, but for this demo we'll wait 
+        // to ensure the user sees 'Processed' status.
+        try {
+            await ingestDocument(doc.id, relativePath);
+        } catch (ragError) {
+            console.error("RAG Ingestion failing but file saved:", ragError);
+        }
 
         return NextResponse.json({ success: true, document: doc });
 

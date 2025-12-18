@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-18T18:10:57.070Z');
+  console.log('Generated at: 2025-12-18T18:23:04.150Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5871,6 +5871,19 @@ async function main() {
     "fiscalYear": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T17:04:59.876Z"
+  },
+  {
+    "id": "cmjbrptkw0003gui8po77d6rb",
+    "filename": "Plataformas - Añadir tiendas.doc",
+    "fileType": "application/msword",
+    "documentType": "TAX_UPLOAD",
+    "path": "uploads/Plataformas - Añadir tiendas.doc",
+    "size": 25088,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-18T18:22:36.800Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({

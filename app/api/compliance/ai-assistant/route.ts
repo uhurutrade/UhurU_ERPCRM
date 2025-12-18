@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { retrieveContext } from '@/lib/ai/rag-engine';
 
 export async function POST(req: Request) {
     try {
@@ -15,8 +16,6 @@ export async function POST(req: Request) {
         const openai = new OpenAI({ apiKey });
         const { message, contextFiles } = await req.json();
 
-        // 2. Simulate RAG Retrieval (In a real app, we would query a vector DB here)
-        // For this demo, we'll pretend we read the uploaded files and found relevant info.
         let systemPrompt = `You are an expert UK Tax Consultant for HMRC and Companies House compliance. 
         You help the user prepare their tax obligations based on their ERP data and uploaded documents.
         
@@ -24,18 +23,28 @@ export async function POST(req: Request) {
         
         Keep responses professional, concise, and focused on UK tax law (VAT, Corporation Tax).`;
 
-        if (contextFiles && contextFiles.length > 0) {
+        // 2. RAG RETRIEVAL (Search relevant chunks in your VPS vault)
+        let ragContext = "";
+        try {
+            ragContext = await retrieveContext(message);
+        } catch (ragError) {
+            console.error("RAG Retrieval failed:", ragError);
+        }
+
+        if (ragContext) {
+            systemPrompt += `\n\nRELEVANT INFORMATION FROM YOUR DOCUMENTS:\n${ragContext}`;
+        } else if (contextFiles && contextFiles.length > 0) {
             systemPrompt += `\n\nCONTEXT FROM UPLOADED FILES:\nThe user has uploaded ${contextFiles.length} documents. Assume these contain valid historical tax data.`;
         }
 
         // 3. Call OpenAI
         const completion = await openai.chat.completions.create({
-            model: "gpt-4", // Or gpt-3.5-turbo if you prefer speed/cost
+            model: "gpt-4",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: message }
             ],
-            temperature: 0.2, // Low temperature for factual responses
+            temperature: 0.2,
         });
 
         const reply = completion.choices[0].message.content;
