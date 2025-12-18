@@ -114,11 +114,23 @@ export default function TaxAssistantPage() {
                     content: `✅ I have securely indexed **${file.name}**. I can now answer questions based on this document.`
                 }]);
             } else {
-                alert(`Upload failed: ${data.error || 'Unknown error'}`);
+                await confirm({
+                    title: "Upload Failed",
+                    message: data.error || "There was an error saving your document to the VPS vault.",
+                    type: "danger",
+                    confirmText: "Understood",
+                    cancelText: "" // Hide cancel button for alerts
+                });
             }
         } catch (error) {
             console.error(error);
-            alert("Failed to upload document: Network error");
+            await confirm({
+                title: "Network Error",
+                message: "Could not reach the server. Please check your connection or VPS status.",
+                type: "danger",
+                confirmText: "Retry Later",
+                cancelText: ""
+            });
         } finally {
             setIsUploading(false);
             // Reset input so same file can be selected again
