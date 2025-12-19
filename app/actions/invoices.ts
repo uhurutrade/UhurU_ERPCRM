@@ -193,7 +193,7 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
                         { counterparty: { contains: integerPart, mode: 'insensitive' } }
                     ] : []),
                     // Also try specific issuer keywords if they are strong
-                    ...issuerKeywords.filter(k => k.length > 4).map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } }))
+                    ...issuerKeywords.filter((k: string) => k.length > 4).map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } }))
                 ]
             },
             include: { bankAccount: { include: { bank: true } }, attachments: true },
