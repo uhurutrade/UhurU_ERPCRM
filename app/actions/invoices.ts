@@ -152,15 +152,16 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
 
     // Initial search: Wide enough to find both exact and converted amounts
     // We'll search for transactions in the date range with a pre-filter to ensure likely matches are fetched
-    const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 3).slice(0, 4);
+    const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 3).slice(0, 6);
     const amountStrDot = amount.toFixed(2);
     const amountStrComma = amountStrDot.replace('.', ',');
+    const integerPart = amountStrDot.split('.')[0];
 
     // Calculate a 10% margin for DB filtering
     const minAmount = amount * 0.9;
     const maxAmount = amount * 1.1;
 
-    console.log(`[InvoiceMatch] Searching for: issuer=${issuer}, amount=${amount}, date=${targetDate.toISOString()}`);
+    console.log(`[InvoiceMatch] Searching for: issuer=${issuer}, amount=${amount}, integerPart=${integerPart}`);
 
     const candidates = await prisma.bankTransaction.findMany({
         where: {
@@ -169,9 +170,10 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
                 // 1. Amount matches within 10% (direct or negative for receipts)
                 { amount: { gte: minAmount, lte: maxAmount } },
                 { amount: { gte: -maxAmount, lte: -minAmount } },
-                // 2. Exact amount digits found in description (dot or comma)
+                // 2. Exact amount digits found in description (dot, comma or just the integer part)
                 { description: { contains: amountStrDot, mode: 'insensitive' } },
                 { description: { contains: amountStrComma, mode: 'insensitive' } },
+                ...(integerPart.length >= 3 ? [{ description: { contains: integerPart, mode: 'insensitive' } }] : []),
                 // 3. Any issuer keywords in description/counterparty/merchant
                 ...issuerKeywords.map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } })),
                 ...issuerKeywords.map((kw: string) => ({ counterparty: { contains: kw, mode: 'insensitive' } })),
