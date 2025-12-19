@@ -151,10 +151,26 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
     const dateEnd = new Date(targetDate.getTime() + (730 * 24 * 60 * 60 * 1000));
 
     // Initial search: Wide enough to find both exact and converted amounts
-    // We'll search for transactions in the date range and then filter/score
+    // We'll search for transactions in the date range with a pre-filter to ensure likely matches are fetched
+    const issuerKeywords = (issuer || '').split(/\s+/).filter((w: string) => w.length > 3).slice(0, 3);
+    const amountStrDot = amount.toFixed(2);
+    const amountStrComma = amountStrDot.replace('.', ',');
+
     const candidates = await prisma.bankTransaction.findMany({
         where: {
-            date: { gte: dateStart, lte: dateEnd }
+            date: { gte: dateStart, lte: dateEnd },
+            OR: [
+                // 1. Amount matches roughly (FX/Conversion - up to 80% variation)
+                { amount: { gte: amount * 0.2, lte: amount * 2.5 } },
+                { amount: { gte: -amount * 2.5, lte: -amount * 0.2 } },
+                // 2. Exact amount digits found in description (dot or comma)
+                { description: { contains: amountStrDot, mode: 'insensitive' } },
+                { description: { contains: amountStrComma, mode: 'insensitive' } },
+                // 3. Any issuer keywords in description/counterparty/merchant
+                ...issuerKeywords.map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } })),
+                ...issuerKeywords.map((kw: string) => ({ counterparty: { contains: kw, mode: 'insensitive' } })),
+                ...issuerKeywords.map((kw: string) => ({ merchant: { contains: kw, mode: 'insensitive' } }))
+            ]
         },
         include: {
             bankAccount: {
@@ -162,7 +178,8 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
             },
             attachments: true
         },
-        take: 30 // Broad candidancy
+        orderBy: { date: 'desc' },
+        take: 100
     });
 
     // Score and filter candidates
@@ -177,13 +194,17 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
 
         // Logical check: Is the amount mentioned in the description? 
         // (Crucial for card payments in foreign currencies)
-        const amountString = amount.toFixed(2);
-        const amountInDesc = cleanDesc.includes(amountString);
+        const amountStrDot = amount.toFixed(2);
+        const amountStrComma = amountStrDot.replace('.', ',');
+        const amountInDesc = cleanDesc.includes(amountStrDot) || cleanDesc.includes(amountStrComma);
+        const integerPart = amountStrDot.split('.')[0];
+        const integerInDesc = integerPart.length > 2 && cleanDesc.includes(integerPart);
 
         if (percentDiff < 0.001) score += 60; // Perfect match
         else if (amountInDesc) score += 55;    // Exact amount mention in text (e.g. "transaction of 538.82 GBP")
         else if (percentDiff < 0.02) score += 40; // Very close
-        else if (percentDiff < 0.2) score += 15;  // Broad range (+/- 20%) to account for exchange rates
+        else if (percentDiff < 0.4) score += 15;  // Broad range (+/- 40%) to account for exchange rates/fees
+        else if (integerInDesc) score += 10;   // At least the integer part matched (e.g. "538" in description)
 
         // --- 2. Currency & Exchange Rate Scoring ---
         if (m.currency === currency) {
