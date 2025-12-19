@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T13:36:00.981Z');
+  console.log('Generated at: 2025-12-19T13:41:38.003Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -6034,6 +6034,26 @@ async function main() {
     "isCompleted": false,
     "createdAt": "2025-12-19T13:28:48.913Z",
     "updatedAt": "2025-12-19T13:28:48.913Z"
+  },
+  {
+    "id": "cmjcwzrhn000ndxeouqr5o6kk",
+    "title": "Corporation Tax Filing Deadline",
+    "description": "The company's Corporation Tax return must be filed by this date.",
+    "date": "2024-02-28T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:38:04.908Z",
+    "updatedAt": "2025-12-19T13:38:04.908Z"
+  },
+  {
+    "id": "cmjcx1x9d000rdxeog3pop7it",
+    "title": "Filing Corporation Tax Return",
+    "description": "Deadline to file the Corporation Tax Return for accounting period ending on 2023-04-01.",
+    "date": "2024-04-01T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:39:45.697Z",
+    "updatedAt": "2025-12-19T13:39:45.697Z"
   }
 ] as any[]) {
       await prisma.complianceEvent.create({
@@ -6621,6 +6641,44 @@ async function main() {
     "supersededById": null
   },
   {
+    "id": "cmjcwz9v4000ldxeos7pjh1f7",
+    "filename": "Capital_Contributions_Schedule_CH.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151454353-897285064.docx",
+    "size": 36761,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:37:42.064Z",
+    "documentDate": "2023-11-01T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "CAPITAL_CONTRIBUTIONS_SCHEDULE",
+      "deadlines": [],
+      "summaryEN": "This document outlines the schedule and terms for capital contributions to the UK LTD company.",
+      "summaryES": "Este documento detalla el cronograma y los términos para las contribuciones de capital a la empresa LTD en el Reino Unido.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-11-01",
+      "vatLiability": {
+        "reason": "Capital contributions typically do not involve VAT as they are not considered a taxable supply.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "filename": "Capital_Contributions_Schedule_CH.docx"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Review the terms carefully and ensure all capital contributions align with the company's growth plans.",
+      "strategicInsightES": "Revise los términos con cuidado y asegúrese de que todas las contribuciones de capital se alineen con los planes de crecimiento de la empresa."
+    },
+    "fileHash": "bd391d5944c0640941685352ba7e5a5b281cc511b056e2be79fb112c564b3f90",
+    "isSuperseded": false,
+    "strategicInsights": "Review the terms carefully and ensure all capital contributions align with the company's growth plans.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
     "id": "cmjcwna2e000edxeolnk18fl4",
     "filename": "142390 150824-01L.pdf",
     "fileType": "application/pdf",
@@ -6805,6 +6863,210 @@ async function main() {
     "fileHash": "0a79facf40b0097e46f708cd5090829d819751c9599bb84b927ec1f6da40ded9",
     "isSuperseded": false,
     "strategicInsights": "Ensure the activation code is used before the expiry date to avoid delays in accessing online Corporation Tax services.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwz3wq000kdxeoh0flap4i",
+    "filename": "Profit_and_Loss_Statement_CH.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151450668-426389267.docx",
+    "size": 36986,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:37:34.346Z",
+    "documentDate": "2023-10-15T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "PROFIT_AND_LOSS_STATEMENT",
+      "deadlines": [],
+      "summaryEN": "This document is a Profit and Loss Statement for a UK LTD company, relevant for assessing financial performance. It doesn't contain specific deadlines but plays a significant role in determining the company's VAT liability and strategic direction.",
+      "summaryES": "Este documento es un Estado de Pérdidas y Ganancias para una empresa LTD del Reino Unido, relevante para evaluar el rendimiento financiero. No contiene fechas límites específicas, pero desempeña un papel importante en la determinación de la responsabilidad del IVA de la empresa y en la dirección estratégica.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-10-15",
+      "vatLiability": {
+        "reason": "Financial statements are generally used to assess the VAT status of a company and aid in accurate reporting.",
+        "mustCharge": true
+      },
+      "extractedFacts": {
+        "country": "UK",
+        "documentType": "Profit and Loss Statement"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "The Profit and Loss Statement is crucial for assessing the financial health of your company. It helps identify areas of strength and weakness, allowing for informed strategic decisions. Regularly review and compare these statements to adjust business strategies as needed.",
+      "strategicInsightES": "El Estado de Pérdidas y Ganancias es crucial para evaluar la salud financiera de su empresa. Ayuda a identificar áreas de fortaleza y debilidad, permitiendo tomar decisiones estratégicas informadas. Revise y compare regularmente estos estados para ajustar las estrategias comerciales según sea necesario."
+    },
+    "fileHash": "cdea156765705207a69acd792a14cac5c90900b462df61f82aa80e468793840d",
+    "isSuperseded": false,
+    "strategicInsights": "The Profit and Loss Statement is crucial for assessing the financial health of your company. It helps identify areas of strength and weakness, allowing for informed strategic decisions. Regularly review and compare these statements to adjust business strategies as needed.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwzrhi000mdxeod74uki54",
+    "filename": "CT600_Form_HMRC_P1.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151465446-302046896.docx",
+    "size": 36847,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:38:04.902Z",
+    "documentDate": "2023-05-15T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "CT600_CORPORATION_TAX",
+      "deadlines": [
+        {
+          "date": "2024-02-28",
+          "title": "Corporation Tax Filing Deadline",
+          "description": "The company's Corporation Tax return must be filed by this date."
+        }
+      ],
+      "summaryEN": "This document is a CT600 form that needs to be filed for Corporation Tax purposes by the specified deadline.",
+      "summaryES": "Este documento es un formulario CT600 que debe presentarse para fines del Impuesto de Sociedades antes de la fecha límite especificada.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-05-15",
+      "vatLiability": {
+        "reason": "The document is related to Corporation Tax, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "issuer": "HMRC",
+        "formNumber": "CT600",
+        "relatedTax": "Corporation Tax"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure all financial records for the fiscal year are in order for an accurate and on-time CT600 Corporation Tax filing.",
+      "strategicInsightES": "Asegúrese de que todos los registros financieros para el año fiscal estén en orden para una presentación precisa y puntual del impuesto CT600."
+    },
+    "fileHash": "e06d9270df1c77ad75bab85fbd6ffd71f7850bbe9c4cb69e61c59ebb5f04e01c",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure all financial records for the fiscal year are in order for an accurate and on-time CT600 Corporation Tax filing.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcx0b2l000odxeowdfafeso",
+    "filename": "Capital_Gains_Report_HMRC_P1.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151484916-841211008.docx",
+    "size": 36719,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:38:30.285Z",
+    "documentDate": null,
+    "extractedData": {
+      "docTopic": "HMRC_CAPITAL_GAINS_REPORT",
+      "deadlines": [],
+      "summaryEN": "This document seems to pertain to capital gains and its reporting to HMRC.",
+      "summaryES": "Este documento parece estar relacionado con las ganancias de capital y su reporte a HMRC.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "This document pertains to capital gains, which is not directly related to VAT liabilities.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure that all necessary documentation for capital gains is thoroughly reviewed and submitted to HMRC to avoid penalties.",
+      "strategicInsightES": "Asegúrese de que toda la documentación necesaria para las ganancias de capital sea revisada y enviada a HMRC para evitar sanciones."
+    },
+    "fileHash": "dd46dce9670ecbac1a0167676ac74e329a17d5c2edc69281b2cd6590773ffc89",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that all necessary documentation for capital gains is thoroughly reviewed and submitted to HMRC to avoid penalties.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcx1c2k000pdxeowglc73dk",
+    "filename": "Balance_Sheet_CH.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151544745-334797640.docx",
+    "size": 36828,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:39:18.237Z",
+    "documentDate": "2023-10-15T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "BALANCE_SHEET",
+      "deadlines": [],
+      "summaryEN": "The document is a balance sheet for a UK Ltd company, relevant for understanding the company's financial position as of the document date.",
+      "summaryES": "El documento es un balance general para una empresa Ltd del Reino Unido, relevante para comprender la posición financiera de la empresa a la fecha del documento.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-10-15",
+      "vatLiability": {
+        "reason": "Balance sheets do not inherently determine VAT liability.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure that the company's financial position is accurately reflected and compliant with the Companies Act 2006. Regularly review financial statements for accuracy and strategic decision-making.",
+      "strategicInsightES": "Asegúrese de que la posición financiera de la empresa se refleje con precisión y cumpla con la Ley de Sociedades de 2006. Revise regularmente los estados financieros para garantizar su precisión y para la toma de decisiones estratégicas."
+    },
+    "fileHash": "3199084d3f07c73fa4d2dbe610041b8c63b403a413ead82e2ecebcd5c8c57400",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that the company's financial position is accurately reflected and compliant with the Companies Act 2006. Regularly review financial statements for accuracy and strategic decision-making.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcx1x98000qdxeorym2ko5t",
+    "filename": "CT600_Form_HMRC_P2.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766151558246-559948700.docx",
+    "size": 36745,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:39:45.693Z",
+    "documentDate": "2023-04-01T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "HMRC_CORPORATION_TAX_RETURN",
+      "deadlines": [
+        {
+          "date": "2024-04-01",
+          "title": "Filing Corporation Tax Return",
+          "description": "Deadline to file the Corporation Tax Return for accounting period ending on 2023-04-01."
+        }
+      ],
+      "summaryEN": "This document is a Corporation Tax Return (CT600) required for submission to HMRC. It signals the need for accurate financial reporting for the accounting period ending April 1, 2023, with a submission deadline of April 1, 2024.",
+      "summaryES": "Este documento es una Declaración del Impuesto de Sociedades (CT600) que debe presentarse ante HMRC. Señala la necesidad de reportes financieros precisos para el período contable que termina el 1 de abril de 2023, con una fecha límite de presentación del 1 de abril de 2024.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-04-01",
+      "vatLiability": {
+        "reason": "Corporation Tax Return documentation does not directly relate to VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "form": "CT600",
+        "periodEnd": "2023-04-01",
+        "requiredBy": "HMRC",
+        "submissionDeadline": "2024-04-01"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure that the Corporation Tax Return is accurate and submitted by the deadline to avoid penalties. Consider professional assistance if needed for accuracy.",
+      "strategicInsightES": "Asegúrese de que la Declaración de Impuesto de Sociedades sea precisa y se presente antes de la fecha límite para evitar sanciones. Considere asistencia profesional si es necesario para exactitud."
+    },
+    "fileHash": "a72ae74ac4d3f28f550b7fa69b2be76fcbdef9dc2ccdec01428874f69f0a530f",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that the Corporation Tax Return is accurate and submitted by the deadline to avoid penalties. Consider professional assistance if needed for accuracy.",
     "userNotes": null,
     "supersededById": null
   }
