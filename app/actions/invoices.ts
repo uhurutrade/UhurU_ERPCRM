@@ -146,46 +146,63 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
     const targetDate = new Date(date);
     const dateVal = isNaN(targetDate.getTime()) ? new Date() : targetDate;
 
-    // Search window: +/- 730 days (2 years)
-    const dateStart = new Date(dateVal.getTime() - (730 * 24 * 60 * 60 * 1000));
-    const dateEnd = new Date(dateVal.getTime() + (730 * 24 * 60 * 60 * 1000));
+    // Search window: +/- 1000 days (~2.7 years) to protect against AI date hallucinations
+    const dateStart = new Date(dateVal.getTime() - (1000 * 24 * 60 * 60 * 1000));
+    const dateEnd = new Date(dateVal.getTime() + (1000 * 24 * 60 * 60 * 1000));
 
-    const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 3).slice(0, 6);
+    const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 2).slice(0, 8);
     const amountStrDot = safeAmount.toFixed(2);
     const amountStrComma = amountStrDot.replace('.', ',');
     const integerPart = amountStrDot.split('.')[0];
 
     console.log(`[InvoiceMatch] START: issuer=${issuer}, amount=${safeAmount}, integer=${integerPart}, date=${dateVal.toISOString()}`);
 
-    const candidates = await prisma.bankTransaction.findMany({
+    // STAGE 1: Standard Search with Window
+    let candidates = await prisma.bankTransaction.findMany({
         where: {
             date: { gte: dateStart, lte: dateEnd },
             OR: [
-                // 1. Amount matches within 10%
-                { amount: { gte: safeAmount * 0.9, lte: safeAmount * 1.1 } },
-                { amount: { gte: -safeAmount * 1.1, lte: -safeAmount * 0.9 } },
-                // 2. String matches (dot, comma, or integer)
+                { amount: { gte: safeAmount * 0.1, lte: safeAmount * 3.0 } }, // Very broad FX
+                { amount: { gte: -safeAmount * 3.0, lte: -safeAmount * 0.1 } },
                 { description: { contains: amountStrDot, mode: 'insensitive' } },
                 { description: { contains: amountStrComma, mode: 'insensitive' } },
                 ...(integerPart.length >= 3 ? [
                     { description: { contains: integerPart, mode: 'insensitive' } },
                     { counterparty: { contains: integerPart, mode: 'insensitive' } }
                 ] : []),
-                // 3. Issuer match
                 ...issuerKeywords.map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } })),
                 ...issuerKeywords.map((kw: string) => ({ counterparty: { contains: kw, mode: 'insensitive' } })),
                 ...issuerKeywords.map((kw: string) => ({ merchant: { contains: kw, mode: 'insensitive' } }))
             ]
         },
-        include: {
-            bankAccount: { include: { bank: true } },
-            attachments: true
-        },
+        include: { bankAccount: { include: { bank: true } }, attachments: true },
         orderBy: { date: 'desc' },
-        take: 300
+        take: 200
     });
 
-    console.log(`[InvoiceMatch] DB Found ${candidates.length} candidates.`);
+    // STAGE 2: Global Fallback (If window finds nothing, search purely by amount/text)
+    if (candidates.length === 0 && safeAmount > 0) {
+        console.log(`[InvoiceMatch] STAGE 1 returned 0. Performing Global Fallback...`);
+        candidates = await prisma.bankTransaction.findMany({
+            where: {
+                OR: [
+                    { description: { contains: amountStrDot, mode: 'insensitive' } },
+                    { description: { contains: amountStrComma, mode: 'insensitive' } },
+                    ...(integerPart.length >= 3 ? [
+                        { description: { contains: integerPart, mode: 'insensitive' } },
+                        { counterparty: { contains: integerPart, mode: 'insensitive' } }
+                    ] : []),
+                    // Also try specific issuer keywords if they are strong
+                    ...issuerKeywords.filter(k => k.length > 4).map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } }))
+                ]
+            },
+            include: { bankAccount: { include: { bank: true } }, attachments: true },
+            orderBy: { date: 'desc' },
+            take: 100
+        });
+    }
+
+    console.log(`[InvoiceMatch] DB Found ${candidates.length} total candidates.`);
 
     return candidates.map(m => {
         let score = 0;
