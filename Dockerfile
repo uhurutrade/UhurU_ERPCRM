@@ -61,6 +61,7 @@ ENV PORT 3000
 # Copiar Next.js standalone
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Copiar node_modules de producción (incluye Prisma client)
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules

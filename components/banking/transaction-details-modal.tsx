@@ -230,14 +230,14 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
 
                                             {/* File Link */}
                                             <a
-                                                href={file.path}
+                                                href={file.path.startsWith('/uploads/') ? `/api/uploads/${file.path.replace('/uploads/', '')}` : file.path}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center flex-1"
                                             >
                                                 <div className="flex-shrink-0 w-12 h-12 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-uhuru-blue border border-slate-700">
                                                     {file.fileType?.includes('image') ? (
-                                                        <img src={file.path} alt="Preview" className="w-full h-full object-cover" />
+                                                        <img src={file.path.startsWith('/uploads/') ? `/api/uploads/${file.path.replace('/uploads/', '')}` : file.path} alt="Preview" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <FileText size={24} />
                                                     )}

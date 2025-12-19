@@ -56,21 +56,21 @@ export default async function InvoicesPage() {
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-indigo-500/30 transition-all duration-300">
                     <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Outgoing Invoices</div>
                     <div className="text-3xl font-bold text-white tracking-tight">{invoices.length}</div>
-                    <div className="mt-4 flex items-center text-[10px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
+                    <div className="mt-4 flex items-center text-[11px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Total Records</span>
                     </div>
                 </div>
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 transition-all duration-300">
                     <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Processed Documents</div>
                     <div className="text-3xl font-bold text-white tracking-tight">{allRecentAttachments.length}</div>
-                    <div className="mt-4 flex items-center text-[10px] text-blue-400 font-bold bg-blue-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
+                    <div className="mt-4 flex items-center text-[11px] text-blue-400 font-bold bg-blue-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Matched & Unmatched</span>
                     </div>
                 </div>
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-amber-500/30 transition-all duration-300">
                     <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Awaiting Matching</div>
                     <div className="text-3xl font-bold text-white tracking-tight text-amber-500">{unassignedAttachments.length}</div>
-                    <div className="mt-4 flex items-center text-[10px] text-amber-400 font-bold bg-amber-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
+                    <div className="mt-4 flex items-center text-[11px] text-amber-400 font-bold bg-amber-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Verification needed</span>
                     </div>
                 </div>
@@ -98,7 +98,7 @@ export default async function InvoicesPage() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <p className="text-sm font-bold text-white truncate">{att.originalName}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter ${att.transactionId ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tight ${att.transactionId ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
                                                 {att.transactionId ? 'MATCHED' : 'UNASSIGNED'}
                                             </span>
                                         </div>
@@ -107,13 +107,13 @@ export default async function InvoicesPage() {
                                             <div className="flex items-center gap-1">
                                                 {(att as any).extractedData?.documentRole === 'EMITTED' ? (
                                                     <>
-                                                        <ArrowUpRight size={10} className="text-uhuru-blue" />
-                                                        <span className="text-[9px] font-black text-uhuru-blue tracking-widest uppercase">Sales</span>
+                                                        <ArrowUpRight size={11} className="text-uhuru-blue" />
+                                                        <span className="text-[10px] font-black text-uhuru-blue tracking-wider uppercase">Sales</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <ArrowDownLeft size={10} className="text-rose-500" />
-                                                        <span className="text-[9px] font-black text-rose-500 tracking-widest uppercase">Expense</span>
+                                                        <ArrowDownLeft size={11} className="text-rose-500" />
+                                                        <span className="text-[10px] font-black text-rose-500 tracking-wider uppercase">Expense</span>
                                                     </>
                                                 )}
                                             </div>
@@ -122,12 +122,12 @@ export default async function InvoicesPage() {
 
                                             {/* Payment Status */}
                                             {att.transactionId ? (
-                                                <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">PAID</span>
+                                                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">PAID</span>
                                             ) : (
                                                 (att as any).extractedData?.documentRole === 'RECEIVED' ? (
-                                                    <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest px-1.5 py-0.5 bg-amber-500/10 rounded border border-amber-500/20">A PAGAR / WAITING</span>
+                                                    <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 rounded border border-amber-500/20">A PAGAR / WAITING</span>
                                                 ) : (
-                                                    <span className="text-[9px] font-bold text-uhuru-blue uppercase tracking-widest px-1.5 py-0.5 bg-uhuru-blue/10 rounded border border-uhuru-blue/20">AWAITING COLLECTION</span>
+                                                    <span className="text-[10px] font-bold text-uhuru-blue uppercase tracking-widest px-2 py-0.5 bg-uhuru-blue/10 rounded border border-uhuru-blue/20">AWAITING COLLECTION</span>
                                                 )
                                             )}
 
@@ -156,7 +156,7 @@ export default async function InvoicesPage() {
                                                 <p className="text-[10px] text-uhuru-text-dim italic">No data</p>
                                             )}
                                             <Link
-                                                href={att.path}
+                                                href={att.path.startsWith('/uploads/') ? `/api/uploads/${att.path.replace('/uploads/', '')}` : att.path}
                                                 target="_blank"
                                                 className="text-[10px] font-bold text-indigo-400 hover:underline uppercase tracking-widest block mt-1"
                                             >
