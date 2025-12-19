@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:00:24.472Z');
+  console.log('Generated at: 2025-12-19T12:22:14.538Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -761,17 +761,6 @@ async function main() {
     "updatedAt": "2025-12-18T19:44:56.387Z"
   },
   {
-    "id": "cmjbubqc30008ha2lmwoutukl",
-    "title": "EcoEnergy Solar Panel Deployment",
-    "amount": "75000",
-    "currency": "GBP",
-    "stage": "PROSPECTING",
-    "closeDate": null,
-    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
-    "createdAt": "2025-12-18T19:35:38.259Z",
-    "updatedAt": "2025-12-18T20:35:13.130Z"
-  },
-  {
     "id": "cmjbunne30007gui8sm4tcb7t",
     "title": "Deal with Future Mobility Corp",
     "amount": "0",
@@ -781,6 +770,28 @@ async function main() {
     "organizationId": "cmjbubqbd0000ha2lp9ftb957",
     "createdAt": "2025-12-18T19:44:54.316Z",
     "updatedAt": "2025-12-18T20:35:19.916Z"
+  },
+  {
+    "id": "cmjbubqc30008ha2lmwoutukl",
+    "title": "EcoEnergy Solar Panel Deployment",
+    "amount": "75000",
+    "currency": "GBP",
+    "stage": "PROSPECTING",
+    "closeDate": null,
+    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
+    "createdAt": "2025-12-18T19:35:38.259Z",
+    "updatedAt": "2025-12-19T12:03:22.216Z"
+  },
+  {
+    "id": "cmjctl9dv0002ia7lo246g33g",
+    "title": "test",
+    "amount": "1111",
+    "currency": "GBP",
+    "stage": "NEGOTIATION",
+    "closeDate": null,
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "createdAt": "2025-12-19T12:02:49.411Z",
+    "updatedAt": "2025-12-19T12:03:39.216Z"
   }
 ] as any[]) {
     await prisma.deal.create({
@@ -5810,102 +5821,6 @@ async function main() {
   // --- 17. Attachments ---
   console.log('Seeding Attachments...');
   for (const att of [
-  {
-    "id": "cmj5ozep100019kw2qgkpdsoy",
-    "path": "/uploads/attachments/1765714768157-76204959.pdf",
-    "fileType": "application/pdf",
-    "originalName": "invoice_INV25-8 (1).pdf",
-    "extractedData": null,
-    "transactionId": null,
-    "uploadedAt": "2025-12-14T12:19:28.165Z"
-  },
-  {
-    "id": "cmj5p1xbp00039kw21vd90tra",
-    "path": "/uploads/attachments/1765714885617-125972166.pdf",
-    "fileType": "application/pdf",
-    "originalName": "INV25-7.pdf",
-    "extractedData": null,
-    "transactionId": null,
-    "uploadedAt": "2025-12-14T12:21:25.621Z"
-  },
-  {
-    "id": "cmj5p8fkn00059kw2qzmo4uqv",
-    "path": "/uploads/attachments/1765715189200-210844698.png",
-    "fileType": "image/png",
-    "originalName": "descarga.png",
-    "extractedData": null,
-    "transactionId": null,
-    "uploadedAt": "2025-12-14T12:26:29.207Z"
-  },
-  {
-    "id": "cmj5p937x00079kw22stoam3u",
-    "path": "/uploads/attachments/1765715219850-93510644.png",
-    "fileType": "image/png",
-    "originalName": "descarga.png",
-    "extractedData": null,
-    "transactionId": null,
-    "uploadedAt": "2025-12-14T12:26:59.853Z"
-  },
-  {
-    "id": "cmj5p9o5m00099kw2xael2l4e",
-    "path": "/uploads/attachments/1765715246982-223742510.png",
-    "fileType": "image/png",
-    "originalName": "linkedin4.png",
-    "extractedData": null,
-    "transactionId": null,
-    "uploadedAt": "2025-12-14T12:27:26.986Z"
-  },
-  {
-    "id": "cmjcp77lz0000q5k3iy8r01n8",
-    "path": "/uploads/invoices/1766138393022-374233281.pdf",
-    "fileType": "application/pdf",
-    "originalName": "invoice_INV25-8 (2).pdf",
-    "extractedData": {
-      "date": null,
-      "amount": null,
-      "issuer": "Invoice Company",
-      "reason": "The filename suggests it is an invoice (INV25-8). However, no specific invoice details such as date, amount, or currency could be extracted due to unreadable content.",
-      "currency": null,
-      "isInvoice": true,
-      "confidence": 0.8
-    },
-    "transactionId": null,
-    "uploadedAt": "2025-12-19T09:59:55.464Z"
-  },
-  {
-    "id": "cmjcp9c8d0001q5k3mdsfpcz2",
-    "path": "/uploads/invoices/1766138492319-836395785.pdf",
-    "fileType": "application/pdf",
-    "originalName": "INV25-7.pdf",
-    "extractedData": {
-      "date": "2023-10-01",
-      "amount": 0,
-      "issuer": "Unknown",
-      "reason": "The filename indicates it is an invoice (INV25-7). However, no text content was successfully extracted to corroborate specific details.",
-      "currency": "USD",
-      "isInvoice": true,
-      "confidence": 0.5
-    },
-    "transactionId": null,
-    "uploadedAt": "2025-12-19T10:01:34.765Z"
-  },
-  {
-    "id": "cmjcpt2x600002e35avfo35r3",
-    "path": "/uploads/invoices/1766139413305-977694897.pdf",
-    "fileType": "application/pdf",
-    "originalName": "invoice_INV25-8 (2).pdf",
-    "extractedData": {
-      "date": "Unknown",
-      "amount": 0,
-      "issuer": "Unknown",
-      "reason": "The filename contains 'invoice' suggesting it is an invoice, but the actual content could not be extracted. Therefore, while it appears to be an invoice, specific details like issuer, date, and amount cannot be confirmed.",
-      "currency": "USD",
-      "isInvoice": true,
-      "confidence": 0.8
-    },
-    "transactionId": null,
-    "uploadedAt": "2025-12-19T10:16:55.819Z"
-  },
   {
     "id": "cmjcqmgt50000ia7l5b2rglfo",
     "path": "/uploads/invoices/1766140783773-898559443.pdf",

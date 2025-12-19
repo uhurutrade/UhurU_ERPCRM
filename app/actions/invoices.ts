@@ -110,7 +110,7 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         });
 
         // 4. Try to find potential matches in General Ledger
-        const potentialMatches = await findPotentialMatches(analysis);
+        const potentialMatches = await findPotentialMatches(analysis, documentRole);
 
         revalidatePath('/dashboard/invoices');
 
@@ -127,7 +127,7 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
     }
 }
 
-async function findPotentialMatches(analysis: any) {
+async function findPotentialMatches(analysis: any, documentRole: string) {
     const { issuer, amount, date, currency } = analysis;
 
     let targetDate = new Date(date);
@@ -146,6 +146,13 @@ async function findPotentialMatches(analysis: any) {
     const whereConditions: any[] = [
         { date: { gte: dateStart, lte: dateEnd } }
     ];
+
+    // Filter by sign based on role
+    if (documentRole === 'RECEIVED') {
+        whereConditions.push({ amount: { lt: 0 } });
+    } else if (documentRole === 'EMITTED') {
+        whereConditions.push({ amount: { gt: 0 } });
+    }
 
     // Only add name matching if issuer is not "Unknown" or too generic
     if (issuer && issuer.toLowerCase() !== 'unknown' && issuer.length > 2) {
@@ -174,8 +181,8 @@ async function findPotentialMatches(analysis: any) {
     // Score and filter matches
     return matches.map(m => {
         let score = 0;
-        // Amount match
-        const diff = Math.abs(Number(m.amount) - amount);
+        // Amount match (using absolute values because expenses are negative in bank)
+        const diff = Math.abs(Math.abs(Number(m.amount)) - amount);
         const percentDiff = diff / amount;
         if (percentDiff < 0.01) score += 50;
         else if (percentDiff < 0.05) score += 30;

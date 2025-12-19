@@ -19,11 +19,12 @@ import {
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-blue-400" },
+    { href: "/dashboard/wall", label: "Uhuru Wall", icon: FileText, color: "text-pink-400" },
     { href: "/dashboard/crm", label: "CRM", icon: Users, color: "text-purple-400" },
     { href: "/dashboard/invoices", label: "Invoices", icon: Briefcase, color: "text-emerald-400" },
     { href: "/dashboard/banking", label: "General Ledger", icon: Landmark, color: "text-amber-400" },
-    { href: "/dashboard/statements", label: "Statements", icon: FileText, color: "text-pink-400" },
     { href: "/dashboard/compliance", label: "Compliance (UK)", icon: ShieldCheck, color: "text-rose-400" },
+    { href: "/dashboard/doc-basket", label: "Upload Doc Basket", icon: Briefcase, color: "text-indigo-400" }, // Using Briefcase or similar
     { href: "/dashboard/company-settings", label: "Company Settings", icon: Building2, color: "text-cyan-400" },
     { href: "/dashboard/bank-settings", label: "Bank Settings", icon: Settings, color: "text-indigo-400" },
 ];
