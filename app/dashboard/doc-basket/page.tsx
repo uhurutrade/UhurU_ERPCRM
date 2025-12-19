@@ -50,7 +50,7 @@ export default function DocBasketPage() {
                 fetchHistory();
             } else {
                 toast.error(res.error || 'Failed to upload documents');
-                if (res.skipped > 0) fetchHistory(); // Still refresh if some were duplicates
+                if (res.skipped && res.skipped > 0) fetchHistory(); // Still refresh if some were duplicates
             }
         } catch (err) {
             toast.error('Server error during upload');

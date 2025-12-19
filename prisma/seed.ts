@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:48:34.129Z');
+  console.log('Generated at: 2025-12-19T12:51:04.546Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5954,7 +5954,18 @@ async function main() {
   
   // --- 21. Compliance Events ---
   console.log('Seeding Compliance Events...');
-  for (const evt of [] as any[]) {
+  for (const evt of [
+  {
+    "id": "cmjcvaysz000113qlbrmmfqql",
+    "title": "VAT Return Submission",
+    "description": "Deadline for submitting VAT Return to HMRC for the VAT quarter ending September 2023.",
+    "date": "2023-11-07T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T12:50:48.371Z",
+    "updatedAt": "2025-12-19T12:50:48.371Z"
+  }
+] as any[]) {
       await prisma.complianceEvent.create({
           data: {
               ...evt,
@@ -6115,6 +6126,74 @@ async function main() {
     "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-19T12:23:28.844Z"
+  },
+  {
+    "id": "cmjcvaysu000013qlv2v7y89t",
+    "filename": "Vat-UK.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148638832-587117251.docx",
+    "size": 6713,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "fdfca330e44917cc19232b5de5bc6ae9387d20eefd789150773650636293b227",
+    "extractedData": {
+      "docTopic": "HMRC VAT Notice",
+      "deadlines": [
+        {
+          "date": "2023-11-07",
+          "title": "VAT Return Submission",
+          "description": "Deadline for submitting VAT Return to HMRC for the VAT quarter ending September 2023."
+        }
+      ],
+      "isRelevant": true,
+      "documentDate": "2023-10-25",
+      "vatLiability": {
+        "reason": "The company appears to be VAT registered as indicated by the HMRC VAT Notice.",
+        "mustCharge": true
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Ensure that the company adheres to VAT regulations by accurately tracking VAT on sales and purchases. Timely submission of the VAT return will prevent any potential penalties. Verify that all accounting systems are updated to reflect the latest VAT rates to avoid discrepancies. Consider consulting a VAT specialist for complex transactions to optimize tax efficiency.",
+      "irrelevanceReason": ""
+    },
+    "strategicInsights": "Ensure that the company adheres to VAT regulations by accurately tracking VAT on sales and purchases. Timely submission of the VAT return will prevent any potential penalties. Verify that all accounting systems are updated to reflect the latest VAT rates to avoid discrepancies. Consider consulting a VAT specialist for complex transactions to optimize tax efficiency.",
+    "documentDate": "2023-10-25T00:00:00.000Z",
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:50:48.367Z"
+  },
+  {
+    "id": "cmjcvb6tb000213qlbrvzqma2",
+    "filename": "UhuruTrade-IngresosGastos.xlsx",
+    "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148648377-826278040.xlsx",
+    "size": 5502,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "8e1244c22570f72325f593f482a135e870397d956a72d25bc7801a0f111fd8cd",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "Cannot determine VAT obligations from the given content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Since this document appears to be focused on internal financial data, the director should ensure that financial summaries align with statutory reporting requirements and consider leveraging this data for strategic financial planning.",
+      "irrelevanceReason": "The document appears to be a spreadsheet file related to financial data, likely containing revenue and expense figures, but it lacks any explicit information pertaining to UK company management, tax, legal, or strategy aspects relevant for analysis under UK Corporate Law & Tax guidelines. Therefore, no direct insights related to management, VAT obligations, or legal deadlines can be derived from the content provided."
+    },
+    "strategicInsights": "Since this document appears to be focused on internal financial data, the director should ensure that financial summaries align with statutory reporting requirements and consider leveraging this data for strategic financial planning.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:50:58.751Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({
