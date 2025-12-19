@@ -146,8 +146,8 @@ export function InvoiceUploadButton() {
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
-                    <div className="bg-uhuru-card border border-uhuru-border rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl my-auto animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+                    <div className="bg-uhuru-card border border-uhuru-border rounded-[32px] w-full max-w-5xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] my-auto animate-in fade-in zoom-in duration-300">
                         <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                             <div>
                                 <h3 className="text-xl font-bold text-white">Smart Invoice Upload</h3>
@@ -278,17 +278,18 @@ export function InvoiceUploadButton() {
                             {/* --- DEFINTIVE CONFIRMATION MODAL --- */}
                             {isConfirmingLink && selectedMatch && matchAnalysis && (
                                 <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300">
-                                    <div className="bg-uhuru-card border border-uhuru-border rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6">
+                                    <div className="bg-uhuru-card border border-uhuru-border rounded-[32px] p-10 max-w-2xl w-full shadow-[0_0_60px_rgba(0,0,0,0.8)] space-y-8 animate-in zoom-in duration-300">
                                         {/* Dynamic Header based on Risk */}
-                                        <div className="flex flex-col items-center text-center gap-4">
-                                            <div className={`w-16 h-16 rounded-full flex items-center justify-center ring-4 ring-white/5 ${matchAnalysis.riskLevel === 'HIGH' ? 'bg-rose-500/20 text-rose-500' : matchAnalysis.riskLevel === 'MEDIUM' ? 'bg-amber-500/20 text-amber-500' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                                        <div className="flex flex-col items-center text-center gap-6">
+                                            <div className={`w-20 h-20 rounded-full flex items-center justify-center ring-8 ring-white/5 ${matchAnalysis.riskLevel === 'HIGH' ? 'bg-rose-500/20 text-rose-500' : matchAnalysis.riskLevel === 'MEDIUM' ? 'bg-amber-500/20 text-amber-500' : 'bg-emerald-500/20 text-emerald-400'}`}>
                                                 {matchAnalysis.icon}
                                             </div>
                                             <div>
-                                                <h4 className="text-xl font-bold text-white uppercase tracking-tight">Confirm Linkage</h4>
-                                                <p className={`mt-3 p-3 rounded-xl border text-xs font-medium leading-relaxed ${matchAnalysis.colorClass}`}>
+                                                <h4 className="text-3xl font-extrabold text-white tracking-tight">Smart Association</h4>
+                                                <p className="text-slate-400 mt-2 text-sm italic">Are you sure you want to link this document to this transaction?</p>
+                                                <div className={`mt-5 p-4 rounded-2xl border text-sm font-semibold leading-relaxed ${matchAnalysis.colorClass}`}>
                                                     {matchAnalysis.message}
-                                                </p>
+                                                </div>
                                             </div>
                                         </div>
 

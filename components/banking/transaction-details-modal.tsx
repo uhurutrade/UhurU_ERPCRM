@@ -101,10 +101,10 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
 
             {/* Modal Card */}
             <div
-                className="relative w-full max-w-md transform transition-all duration-300 scale-100 translate-y-0"
+                className="relative w-full max-w-4xl transform transition-all duration-300 scale-100 translate-y-0"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="bg-gradient-card backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl p-6 mx-4 max-h-[80vh] overflow-y-auto">
+                <div className="bg-uhuru-card backdrop-blur-3xl border border-slate-700/50 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-10 mx-4 max-h-[90vh] overflow-y-auto">
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
