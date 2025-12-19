@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T13:00:10.969Z');
+  console.log('Generated at: 2025-12-19T13:36:00.981Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5964,6 +5964,76 @@ async function main() {
     "isCompleted": false,
     "createdAt": "2025-12-19T12:50:48.371Z",
     "updatedAt": "2025-12-19T12:50:48.371Z"
+  },
+  {
+    "id": "cmjcw7nfp0001dxeo78m92wg8",
+    "title": "Data Protection Fee Payment",
+    "description": "Deadline to register and pay the data protection fee to avoid a fine.",
+    "date": "2024-12-05T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:16:13.285Z",
+    "updatedAt": "2025-12-19T13:16:13.285Z"
+  },
+  {
+    "id": "cmjcw7tqt0003dxeodiv5q196",
+    "title": "Corporation Tax Information Submission",
+    "description": "Submit information within 3 months of starting or restarting business activity.",
+    "date": "2024-11-01T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:16:21.461Z",
+    "updatedAt": "2025-12-19T13:16:21.461Z"
+  },
+  {
+    "id": "cmjcwkc1g0005dxeokoot3pw9",
+    "title": "Company Registration Completion",
+    "description": "Expect an email with the company registration number and certificate within 2 working days from submission.",
+    "date": "2024-08-08T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:26:05.044Z",
+    "updatedAt": "2025-12-19T13:26:05.044Z"
+  },
+  {
+    "id": "cmjcwmhgz000bdxeo5ulxdrrm",
+    "title": "Outcome Email",
+    "description": "Receive an email notifying the outcome of your application within 2 working days.",
+    "date": "2024-06-10T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:27:45.395Z",
+    "updatedAt": "2025-12-19T13:27:45.395Z"
+  },
+  {
+    "id": "cmjcwmhh2000cdxeo4huolzgz",
+    "title": "Receive UTR",
+    "description": "Receive a letter with the company’s Unique Taxpayer Reference (UTR) within 15 working days.",
+    "date": "2024-06-29T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:27:45.399Z",
+    "updatedAt": "2025-12-19T13:27:45.399Z"
+  },
+  {
+    "id": "cmjcwna2p000fdxeok84h9cl3",
+    "title": "Corporation Tax Information Submission Deadline",
+    "description": "Submit required information to HMRC within 3 months of starting business activities.",
+    "date": "2024-11-01T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:28:22.465Z",
+    "updatedAt": "2025-12-19T13:28:22.465Z"
+  },
+  {
+    "id": "cmjcwnuhd000jdxeozhko05jd",
+    "title": "Activation Code Expiry",
+    "description": "Expiration of the provided activation code for Corporation Tax online services.",
+    "date": "2024-09-14T00:00:00.000Z",
+    "type": "DEADLINE",
+    "isCompleted": false,
+    "createdAt": "2025-12-19T13:28:48.913Z",
+    "updatedAt": "2025-12-19T13:28:48.913Z"
   }
 ] as any[]) {
       await prisma.complianceEvent.create({
@@ -6030,6 +6100,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6049,6 +6120,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6068,6 +6140,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6087,6 +6160,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6106,6 +6180,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6125,6 +6200,7 @@ async function main() {
     "fileHash": null,
     "isSuperseded": false,
     "strategicInsights": null,
+    "userNotes": null,
     "supersededById": null
   },
   {
@@ -6162,6 +6238,574 @@ async function main() {
     "fileHash": "fdfca330e44917cc19232b5de5bc6ae9387d20eefd789150773650636293b227",
     "isSuperseded": false,
     "strategicInsights": "Ensure that the company adheres to VAT regulations by accurately tracking VAT on sales and purchases. Timely submission of the VAT return will prevent any potential penalties. Verify that all accounting systems are updated to reflect the latest VAT rates to avoid discrepancies. Consider consulting a VAT specialist for complex transactions to optimize tax efficiency.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcw7nfk0000dxeop5v12so8",
+    "filename": "142390 181124-01.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150166960-205258627.pdf",
+    "size": 594911,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:16:13.280Z",
+    "documentDate": "2024-11-14T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "ICO_DATA_PROTECTION_FEE_NOTICE",
+      "deadlines": [
+        {
+          "date": "2024-12-05",
+          "title": "Data Protection Fee Payment",
+          "description": "Deadline to register and pay the data protection fee to avoid a fine."
+        }
+      ],
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-11-14",
+      "vatLiability": {
+        "reason": "This document pertains to data protection fees, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "company": "UHURU TRADE LTD",
+        "feeAmount": "£40 every year",
+        "fineForNonPayment": "up to £4,000"
+      },
+      "strategicInsight": "Ensure that your company pays the data protection fee by the due date to avoid penalties. Consider checking if your company qualifies for an exemption using the provided ICO resources.",
+      "irrelevanceReason": ""
+    },
+    "fileHash": "e1b047e64787c34d0e8806f4b18eceef1ba5f59638a4dfb87b2a80238b02326c",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that your company pays the data protection fee by the due date to avoid penalties. Consider checking if your company qualifies for an exemption using the provided ICO resources.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcw7tql0002dxeoipr4z1i9",
+    "filename": "142390 150824-01.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150173289-411750330.pdf",
+    "size": 204083,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:16:21.454Z",
+    "documentDate": "2024-08-01T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "HMRC_CORPORATION_TAX_UTR_NOTICE",
+      "deadlines": [
+        {
+          "date": "2024-11-01",
+          "title": "Corporation Tax Information Submission",
+          "description": "Submit information within 3 months of starting or restarting business activity."
+        }
+      ],
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-01",
+      "vatLiability": {
+        "reason": "Document relates to Corporation Tax, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "UTR": "89266 08239",
+        "companyName": "UHURU TRADE LTD",
+        "taxOfficeNumber": "623"
+      },
+      "strategicInsight": "Ensure that the HMRC online Corporation Tax services are set up promptly to avoid any penalties or issues with tax filings. Consider consulting with a tax advisor to ensure compliance and optimal tax planning for your new business activities.",
+      "irrelevanceReason": ""
+    },
+    "fileHash": "0cb3f9d643f4d84fdd13e42741181e231a122c5caf1a6e09064f4ca94a081f05",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that the HMRC online Corporation Tax services are set up promptly to avoid any penalties or issues with tax filings. Consider consulting with a tax advisor to ensure compliance and optimal tax planning for your new business activities.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwkc1c0004dxeodt146dc1",
+    "filename": "Uhurutrade_Registration_2.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150757419-855313344.pdf",
+    "size": 214100,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:26:05.041Z",
+    "documentDate": "2024-08-06T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "COMPANY_REGISTRATION_OVERVIEW",
+      "deadlines": [
+        {
+          "date": "2024-08-08",
+          "title": "Company Registration Completion",
+          "description": "Expect an email with the company registration number and certificate within 2 working days from submission."
+        }
+      ],
+      "summaryEN": "The document outlines the pending incorporation status for Uhuru Trade Ltd as of 6 August 2024, along with the pending status of corporation tax registration.",
+      "summaryES": "El documento detalla el estado de incorporación pendiente de Uhuru Trade Ltd al 6 de agosto de 2024, junto con el estado pendiente del registro de impuesto corporativo.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-06",
+      "vatLiability": {
+        "reason": "VAT specifics are not addressed in this document.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "companyName": "UHURU TRADE LTD",
+        "submissionDate": "6 August 2024",
+        "referenceNumber": "100-747748",
+        "paymentReference": "100-747748",
+        "incorporationStatus": "Pending",
+        "corporationTaxStatus": "Pending",
+        "corporationTaxReference": "BRCT00002782663"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure all necessary documents are prepared for company incorporation. Follow up on the registration process if confirmation is not received within the specified timeframe.",
+      "strategicInsightES": "Asegúrese de que todos los documentos necesarios estén preparados para la incorporación de la empresa. Realice un seguimiento del proceso de registro si no recibe confirmación dentro del plazo especificado."
+    },
+    "fileHash": "6ebb1a3fff27677f126a5d23e6e4801e257e10e6b78442094934fc4bbfce7a2b",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure all necessary documents are prepared for company incorporation. Follow up on the registration process if confirmation is not received within the specified timeframe.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwkgxk0006dxeo2inhwfe1",
+    "filename": "Exemptions _ ICO.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150765048-985262182.pdf",
+    "size": 70779,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:26:11.384Z",
+    "documentDate": "2024-06-12T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "ICO_DATA_PROTECTION_FEE_EXEMPTION",
+      "deadlines": [],
+      "summaryEN": "This document is an exemption form indicating that the company is not required to pay the data protection fee to the ICO under the Data Protection Regulations 2018.",
+      "summaryES": "Este documento es un formulario de exención que indica que la empresa no está obligada a pagar la tasa de protección de datos al ICO según las Regulaciones de Protección de Datos de 2018.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-06-12",
+      "vatLiability": {
+        "reason": "The document pertains to data protection fee exemption, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "businessNature": "e-commerce",
+        "selfAssessmentCompleted": "Yes"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure the exemption from the ICO data protection fee is duly justified and documented. Regularly review the criteria for exemption as the regulations might change.",
+      "strategicInsightES": "Asegúrese de que la exención de la tasa de protección de datos del ICO esté debidamente justificada y documentada. Revise regularmente los criterios para la exención, ya que las regulaciones pueden cambiar."
+    },
+    "fileHash": "51bddff7ca45ff2aa45ecbaee1e43f912a34326653fa2af4c43caaef886a68b7",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure the exemption from the ICO data protection fee is duly justified and documented. Regularly review the criteria for exemption as the regulations might change.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwkteq0007dxeor58ombi0",
+    "filename": "Uhurutrade_Registration_3.png",
+    "fileType": "image/png",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150782555-747821769.png",
+    "size": 52263,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:26:27.555Z",
+    "documentDate": "2023-10-11T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "AUTHENTICATOR_APP_SETUP",
+      "deadlines": [],
+      "summaryEN": "The document provides instructions on setting up an authenticator app using a QR code or manual secret key entry.",
+      "summaryES": "El documento ofrece instrucciones para configurar una aplicación de autenticación utilizando un código QR o la entrada manual de una clave secreta.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-10-11",
+      "vatLiability": {
+        "reason": "No VAT implications in setting up an authenticator app.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "secretKey": "MQ2T IMRS GY3D SLJY GRRT OLJU ME2D SLJY G43D CLLD MU3D QOBX HA2W MYZU MI"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure the secure storage of this secret key for future use and enable two-factor authentication for enhanced security.",
+      "strategicInsightES": "Asegúrese de almacenar de manera segura esta clave secreta para uso futuro y habilite la autenticación de dos factores para mejorar la seguridad."
+    },
+    "fileHash": "1b3a478e5b13e6d52dc55d4a004643c6370cce524c07ee3b999bf59eab1334f6",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure the secure storage of this secret key for future use and enable two-factor authentication for enhanced security.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwlamu0008dxeora025kpr",
+    "filename": "companies house_Uhuru123456789@.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150806783-843460969.docx",
+    "size": 6438,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:26:49.878Z",
+    "documentDate": "2023-10-17T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "UNKNOWN_CORRUPT_FILE",
+      "deadlines": [],
+      "summaryEN": "The provided document appears to be corrupted and does not contain standard readable information.",
+      "summaryES": "El documento proporcionado parece estar dañado y no contiene información legible estándar.",
+      "isRelevant": false,
+      "isDuplicate": false,
+      "documentDate": "2023-10-17",
+      "vatLiability": {
+        "reason": "Unable to assess VAT liability due to corrupted content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "irrelevanceReason": "Document content seems to be corrupted or not readable as standard text.",
+      "strategicInsightEN": "The document appears to be corrupted. It is advisable to check the source file for integrity and try extracting the information again.",
+      "strategicInsightES": "El documento parece estar dañado. Es recomendable revisar la integridad del archivo original e intentar extraer la información nuevamente."
+    },
+    "fileHash": "9494b233d08151144aebf47e217e7ba84399a79936151f0f5016410df642f238",
+    "isSuperseded": false,
+    "strategicInsights": "The document appears to be corrupted. It is advisable to check the source file for integrity and try extracting the information again.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwlijb0009dxeodfpi3tvp",
+    "filename": "Uhurutrade_Registration_4.png",
+    "fileType": "image/png",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150809920-213617344.png",
+    "size": 54158,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:27:00.119Z",
+    "documentDate": "2023-10-03T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "GOVERNMENT_GATEWAY_USER_ID",
+      "deadlines": [],
+      "summaryEN": "The document provides a Government Gateway user ID for accessing HMRC services, sent to the email provided.",
+      "summaryES": "El documento proporciona un ID de usuario del Gateway del Gobierno para acceder a los servicios de HMRC, enviado al correo electrónico proporcionado.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2023-10-03",
+      "vatLiability": {
+        "reason": "The document does not relate to VAT transactions.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "email": "uhurutradeuk@gmail.com",
+        "userID": "15 62 25 46 84 43"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure the security of your Government Gateway user ID as it is crucial for accessing HMRC services. Do not share it with anyone.",
+      "strategicInsightES": "Asegúrate de la seguridad de tu ID de usuario del Gateway del gobierno, ya que es crucial para acceder a los servicios de HMRC. No lo compartas con nadie."
+    },
+    "fileHash": "c329ee8aa122f121d69cd5afbe44bee0d13475975de8d2c34e80873be8809f09",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure the security of your Government Gateway user ID as it is crucial for accessing HMRC services. Do not share it with anyone.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwmhgk000adxeoa4gol26l",
+    "filename": "Uhurutrade_Registration_1.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150857910-795403788.pdf",
+    "size": 198888,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:27:45.380Z",
+    "documentDate": "2024-06-08T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "COMPANY_REGISTRATION_AND_CORPORATION_TAX",
+      "deadlines": [
+        {
+          "date": "2024-06-10",
+          "title": "Outcome Email",
+          "description": "Receive an email notifying the outcome of your application within 2 working days."
+        },
+        {
+          "date": "2024-06-29",
+          "title": "Receive UTR",
+          "description": "Receive a letter with the company’s Unique Taxpayer Reference (UTR) within 15 working days."
+        }
+      ],
+      "summaryEN": "The document confirms the submission of an application to set up a limited company and register for Corporation Tax, detailing subsequent steps including receiving application outcomes and a Unique Taxpayer Reference (UTR).",
+      "summaryES": "El documento confirma la presentación de una solicitud para establecer una sociedad limitada y registrarse para el impuesto de sociedades, detallando los pasos siguientes, incluyendo recibir el resultado de la solicitud y un Referencia Única de Contribuyente (UTR).",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-06-08",
+      "vatLiability": {
+        "reason": "This document pertains to company registration and corporation tax, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "applicationReference": "100-747748",
+        "corporationTaxReference": "BRCT00002782663"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure your contact email is monitored so you promptly receive updates about the application status and maintain a secure record of the UTR for future tax reporting.",
+      "strategicInsightES": "Asegúrese de que el correo electrónico de contacto se supervise para recibir prontamente actualizaciones sobre el estado de la aplicación y mantenga un registro seguro del UTR para futuros reportes de impuestos."
+    },
+    "fileHash": "ffd2b508c286675e129f44e436b69775063e44a32d99524b98c38196e1c7fc4a",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure your contact email is monitored so you promptly receive updates about the application status and maintain a secure record of the UTR for future tax reporting.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwn3ck000ddxeoxhg6ossw",
+    "filename": "142390 140824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150883825-569057152.pdf",
+    "size": 429382,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:28:13.748Z",
+    "documentDate": "2024-08-10T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "COMPANIES_HOUSE_AUTHENTICATION_CODE",
+      "deadlines": [],
+      "summaryEN": "The document provides an authentication code for UHURU TRADE LTD to file documents online with Companies House. It emphasizes maintaining confidentiality and security of the code.",
+      "summaryES": "El documento proporciona un código de autenticación para que UHURU TRADE LTD presente documentos en línea con Companies House. Se enfatiza mantener la confidencialidad y seguridad del código.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-10",
+      "vatLiability": {
+        "reason": "The document is related to authentication code for filing, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "address": "Unit 13 Freeland Park Wareham Road, Lytchett Matravers, Poole, England, BH16 6FA",
+        "companyName": "UHURU TRADE LTD",
+        "companyNumber": "15883242",
+        "authenticationCode": "RPJJ9Q"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure the security of your authentication code and only share it with trusted personnel who are authorized to file documents for your company. Consider setting reminders for regular updates or changes to the code through Companies House online services.",
+      "strategicInsightES": "Asegúrese de la seguridad de su código de autenticación y compártalo solo con personal de confianza autorizado para presentar documentos para su empresa. Considere establecer recordatorios para actualizaciones o cambios regulares al código a través de los servicios en línea de Companies House."
+    },
+    "fileHash": "21da09e388051d44ddf981bb545284eee636f9bc103c8ea1154e6e2ccd969de3",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure the security of your authentication code and only share it with trusted personnel who are authorized to file documents for your company. Consider setting reminders for regular updates or changes to the code through Companies House online services.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwna2e000edxeolnk18fl4",
+    "filename": "142390 150824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150893753-892032361.pdf",
+    "size": 112286,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:28:22.455Z",
+    "documentDate": "2024-08-01T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "HMRC_CORPORATION_TAX_UTR_ASSIGNMENT",
+      "deadlines": [
+        {
+          "date": "2024-11-01",
+          "title": "Corporation Tax Information Submission Deadline",
+          "description": "Submit required information to HMRC within 3 months of starting business activities."
+        }
+      ],
+      "summaryEN": "This document provides the UTR for a new company and outlines the necessary steps to activate online Corporation Tax services with HMRC. It includes a deadline for submitting information to HMRC within 3 months of starting business operations.",
+      "summaryES": "Este documento proporciona el UTR para una nueva empresa y detalla los pasos necesarios para activar los servicios de Impuesto sobre Sociedades en línea con HMRC. Incluye un plazo para enviar información a HMRC dentro de los 3 meses posteriores al inicio de las operaciones comerciales.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-01",
+      "vatLiability": {
+        "reason": "Document is focused on corporation tax registration, not VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "UTR": "89266 08239",
+        "Company Name": "UHURU TRADE LTD",
+        "Tax Office Number": "623"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure that the company promptly activates its online Corporation Tax services with HMRC. This is crucial for managing tax affairs effectively and avoiding potential penalties.",
+      "strategicInsightES": "Asegúrese de que la empresa active de inmediato sus servicios de Impuesto sobre Sociedades en línea con HMRC. Esto es crucial para gestionar los asuntos fiscales de manera efectiva y evitar posibles sanciones."
+    },
+    "fileHash": "ccaddace24ddb496999f490a6106ef5c101eebb7bee2b85c4550ff0110e23a5d",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that the company promptly activates its online Corporation Tax services with HMRC. This is crucial for managing tax affairs effectively and avoiding potential penalties.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwnfwp000gdxeovsqodphi",
+    "filename": "142390 120824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150902473-147326863.pdf",
+    "size": 438866,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:28:30.026Z",
+    "documentDate": "2024-08-08T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "COMPANIES_HOUSE_AUTHENTICATION_CODE",
+      "deadlines": [],
+      "summaryEN": "This document from Companies House provides an authentication code for UHURU TRADE LTD to file online. It emphasizes keeping the code confidential and secure.",
+      "summaryES": "Este documento de Companies House proporciona un código de autenticación para que UHURU TRADE LTD realice presentaciones en línea. Se enfatiza mantener el código confidencial y seguro.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-08",
+      "vatLiability": {
+        "reason": "The document does not pertain to VAT matters.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "address": "Unit 13 Freeland Park Wareham Road, Lytchett Matravers, Poole, BH16 6FA",
+        "companyName": "UHURU TRADE LTD",
+        "companyNumber": "15883242",
+        "authenticationCode": "RPJJ9Q"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Safeguard your authentication code carefully to ensure secure online filings with Companies House.",
+      "strategicInsightES": "Proteja su código de autenticación cuidadosamente para garantizar presentaciones en línea seguras con Companies House."
+    },
+    "fileHash": "5c166d8f6344b9c66b2814e8ab41adf841c03f7b5b6641c306746394dbef0aca",
+    "isSuperseded": true,
+    "strategicInsights": "Safeguard your authentication code carefully to ensure secure online filings with Companies House.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwnn0u000hdxeopj1ne40j",
+    "filename": "virtual-office-Alta_05082024.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150910039-891561219.pdf",
+    "size": 52945,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:28:39.247Z",
+    "documentDate": "2024-08-06T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "VIRTUAL_ADDRESS_AGREEMENT",
+      "deadlines": [],
+      "summaryEN": "This document is a Virtual Address Agreement between UK Postbox Ltd and Raul Ortega Irus. It details the terms for a virtual office service in Dorset, UK, with a monthly subscription fee of £10.00 plus VAT. The agreement starts on 04/08/2024 with a recurring one-month subscription.",
+      "summaryES": "Este documento es un Acuerdo de Dirección Virtual entre UK Postbox Ltd y Raul Ortega Irus. Detalla los términos para un servicio de oficina virtual en Dorset, Reino Unido, con una tarifa de suscripción mensual de £10.00 más IVA. El acuerdo comienza el 04/08/2024 con una suscripción mensual recurrente.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-06",
+      "vatLiability": {
+        "reason": "The payment is subject to VAT.",
+        "mustCharge": true
+      },
+      "extractedFacts": {
+        "agreementDate": "2024-08-06",
+        "clientDetails": {
+          "name": "Raul Ortega Irus",
+          "address": "5, 4C, Pintor Rosales, Valdemoro, Madrid, Spain, 28342"
+        },
+        "paymentDetails": {
+          "totalPayment": "£10.00 + VAT",
+          "firstMonthFee": "£10.00"
+        },
+        "businessDetails": {
+          "address": "Lytchett House, 13 Freeland Park, Wareham Road, Poole, Dorset, BH16 6FA"
+        },
+        "referenceNumber": "142390",
+        "serviceProvision": {
+          "startDate": "2024-08-04",
+          "termLength": "1 month (Subscription)"
+        }
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure that you are fully aware of the terms and conditions associated with the virtual office service, and plan for the monthly payments. This can help in maintaining continuous access to the service.",
+      "strategicInsightES": "Asegúrate de conocer completamente los términos y condiciones asociados con el servicio de oficina virtual y planifica los pagos mensuales. Esto puede ayudar a mantener un acceso continuo al servicio."
+    },
+    "fileHash": "a9c2dcb3aa6f4a4483eb5b505fe2c07b4f652d78d713ac5ac75be9def02fec4a",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure that you are fully aware of the terms and conditions associated with the virtual office service, and plan for the monthly payments. This can help in maintaining continuous access to the service.",
+    "userNotes": null,
+    "supersededById": null
+  },
+  {
+    "id": "cmjcwnug4000idxeol3uw35qi",
+    "filename": "142390 210824-01.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766150919266-719229493.pdf",
+    "size": 59006,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T13:28:48.868Z",
+    "documentDate": "2024-08-15T00:00:00.000Z",
+    "extractedData": {
+      "docTopic": "HMRC_ACTIVATION_CODE_CORPORATION_TAX",
+      "deadlines": [
+        {
+          "date": "2024-09-14",
+          "title": "Activation Code Expiry",
+          "description": "Expiration of the provided activation code for Corporation Tax online services."
+        }
+      ],
+      "summaryEN": "The document provides an activation code for UHURU TRADE LTD to access Corporation Tax online services, expiring on 14/09/2024.",
+      "summaryES": "El documento proporciona un código de activación para que UHURU TRADE LTD acceda a los servicios en línea del Impuesto a las Sociedades, que vence el 14/09/2024.",
+      "isRelevant": true,
+      "isDuplicate": false,
+      "documentDate": "2024-08-15",
+      "vatLiability": {
+        "reason": "The document is related to Corporation Tax, which is separate from VAT responsibilities.",
+        "mustCharge": false
+      },
+      "extractedFacts": {
+        "expiryDate": "2024-09-14",
+        "companyName": "UHURU TRADE LTD",
+        "activationCode": "975060669175",
+        "contactInformation": "0300 200 3600"
+      },
+      "irrelevanceReason": "",
+      "strategicInsightEN": "Ensure the activation code is used before the expiry date to avoid delays in accessing online Corporation Tax services.",
+      "strategicInsightES": "Asegúrese de usar el código de activación antes de la fecha de vencimiento para evitar retrasos en el acceso a los servicios en línea del Impuesto a las Sociedades."
+    },
+    "fileHash": "0a79facf40b0097e46f708cd5090829d819751c9599bb84b927ec1f6da40ded9",
+    "isSuperseded": false,
+    "strategicInsights": "Ensure the activation code is used before the expiry date to avoid delays in accessing online Corporation Tax services.",
+    "userNotes": null,
     "supersededById": null
   }
 ] as any[]) {

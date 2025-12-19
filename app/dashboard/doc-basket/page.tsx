@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, FileText, Check, AlertCircle, Loader2, Info, History, ShieldAlert, ShieldCheck, Clock, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
-import { uploadToBasket, getBasketHistory, removeFromBasket } from '@/app/actions/basket';
+import { uploadToBasket, getBasketHistory, removeFromBasket, updateDocumentNotes, reprocessDocument } from '@/app/actions/basket';
 import { format } from 'date-fns';
 
 export default function DocBasketPage() {
@@ -13,6 +13,11 @@ export default function DocBasketPage() {
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [selectedDoc, setSelectedDoc] = useState<any>(null);
+    const [modalLang, setModalLang] = useState<'en' | 'es'>('en');
+    const [docNotes, setDocNotes] = useState('');
+    const [isSavingNotes, setIsSavingNotes] = useState(false);
+    const [isReprocessing, setIsReprocessing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchHistory = async () => {
@@ -50,7 +55,7 @@ export default function DocBasketPage() {
                 fetchHistory();
             } else {
                 toast.error(res.error || 'Failed to upload documents');
-                if (res.skipped && res.skipped > 0) fetchHistory(); // Still refresh if some were duplicates
+                if (res.skipped && res.skipped > 0) fetchHistory();
             }
         } catch (err) {
             toast.error('Server error during upload');
@@ -74,7 +79,8 @@ export default function DocBasketPage() {
         }
     };
 
-    const toggleSelection = (id: string) => {
+    const toggleSelection = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
@@ -93,24 +99,168 @@ export default function DocBasketPage() {
         fetchHistory();
     };
 
+    const handleSaveNotes = async () => {
+        if (!selectedDoc) return;
+        setIsSavingNotes(true);
+        const res = await updateDocumentNotes(selectedDoc.id, docNotes);
+        if (res.success) {
+            toast.success('Intelligence context updated');
+            fetchHistory();
+            setSelectedDoc({ ...selectedDoc, userNotes: docNotes });
+        } else {
+            toast.error(res.error || 'Failed to update notes');
+        }
+        setIsSavingNotes(false);
+    };
+
+    const handleReprocess = async () => {
+        if (!selectedDoc) return;
+        setIsReprocessing(true);
+        const res = await reprocessDocument(selectedDoc.id);
+        if (res.success) {
+            toast.success('Intelligence re-generated with new context');
+            const updatedRes = await getBasketHistory();
+            if (updatedRes.success && updatedRes.data) {
+                setHistory(updatedRes.data);
+                const updated = updatedRes.data.find((d: any) => d.id === selectedDoc.id);
+                if (updated) setSelectedDoc(updated);
+            }
+        } else {
+            toast.error(res.error || 'Failed to reprocess');
+        }
+        setIsReprocessing(false);
+    };
+
+    const openDocDetail = (doc: any) => {
+        setSelectedDoc(doc);
+        setDocNotes(doc.userNotes || '');
+        setModalLang('en');
+    };
+
     return (
         <div className="max-w-5xl mx-auto space-y-10 py-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Modal de Detalle */}
+            {selectedDoc && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300 pointer-events-auto"
+                    onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
+                >
+                    <div
+                        className="bg-uhuru-card border border-uhuru-border w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-8 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-4 bg-indigo-500/10 rounded-2xl text-indigo-400">
+                                        <FileText size={28} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white tracking-tight">{selectedDoc.filename}</h3>
+                                        <p className="text-xs text-uhuru-text-dim uppercase tracking-widest font-black mt-1">
+                                            {selectedDoc.extractedData?.docTopic || "General Intelligence"}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
+                                    className="p-3 hover:bg-white/5 rounded-2xl text-uhuru-text-dim hover:text-white transition-all"
+                                >
+                                    <AlertCircle size={20} className="rotate-45" />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div
+                                    onClick={() => setModalLang('en')}
+                                    className={`space-y-3 p-6 rounded-3xl border transition-all cursor-pointer relative group ${modalLang === 'en' ? 'bg-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/20' : 'bg-slate-900/40 border-white/5 opacity-60 hover:opacity-100'}`}
+                                >
+                                    <div className="absolute top-4 right-4 text-[10px] font-black text-indigo-400/50 uppercase tracking-widest">English</div>
+                                    <h4 className="text-xs font-black text-white uppercase tracking-widest">Executive Summary</h4>
+                                    <p className="text-sm text-slate-300 leading-relaxed italic">
+                                        {selectedDoc.extractedData?.summaryEN || "No English summary generated for this document."}
+                                    </p>
+                                </div>
+                                <div
+                                    onClick={() => setModalLang('es')}
+                                    className={`space-y-3 p-6 rounded-3xl border transition-all cursor-pointer relative group ${modalLang === 'es' ? 'bg-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/20' : 'bg-slate-900/40 border-white/5 opacity-60 hover:opacity-100'}`}
+                                >
+                                    <div className="absolute top-4 right-4 text-[10px] font-black text-indigo-400/50 uppercase tracking-widest">Español</div>
+                                    <h4 className="text-xs font-black text-white uppercase tracking-widest">Resumen Ejecutivo</h4>
+                                    <p className="text-sm text-slate-300 leading-relaxed italic">
+                                        {selectedDoc.extractedData?.summaryES || "No se ha generado un resumen en español para este documento."}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="p-6 bg-slate-900/60 rounded-3xl border border-uhuru-border/50 animate-in fade-in duration-500" key={modalLang}>
+                                <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-4">
+                                    {modalLang === 'en' ? 'Strategic Insight' : 'Visión Estratégica'}
+                                </h4>
+                                <p className="text-sm text-white font-medium leading-relaxed">
+                                    {modalLang === 'en'
+                                        ? (selectedDoc.extractedData?.strategicInsightEN || selectedDoc.strategicInsights || "Strategic assessment pending deeper analysis.")
+                                        : (selectedDoc.extractedData?.strategicInsightES || "Análisis estratégico en español pendiente.")
+                                    }
+                                </p>
+                            </div>
+
+                            <div className="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10 space-y-4">
+                                <h4 className="text-xs font-black text-white uppercase tracking-widest">Additional Context / Notes</h4>
+                                <textarea
+                                    value={docNotes}
+                                    onChange={(e) => setDocNotes(e.target.value)}
+                                    placeholder="Add notes to help the AI understand this document's purpose..."
+                                    className="w-full bg-slate-900/60 border border-uhuru-border rounded-2xl p-4 text-sm text-white placeholder:text-uhuru-text-dim focus:outline-none focus:border-indigo-500/50 min-h-[100px] transition-all"
+                                />
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        onClick={handleReprocess}
+                                        disabled={isReprocessing || isSavingNotes}
+                                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-[10px] font-black text-indigo-400 uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            {isReprocessing ? <Loader2 size={12} className="animate-spin" /> : <ShieldCheck size={12} />}
+                                            {isReprocessing ? 'Analyzing...' : 'Re-Run Intelligence'}
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={handleSaveNotes}
+                                        disabled={isSavingNotes || docNotes === (selectedDoc?.userNotes || '')}
+                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 text-[10px] font-black text-white uppercase tracking-widest rounded-xl transition-all"
+                                    >
+                                        {isSavingNotes ? 'Saving...' : 'Update Context'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end pt-4">
+                                <button
+                                    onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
+                                    className="px-8 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-bold text-white uppercase tracking-widest transition-all"
+                                >
+                                    {modalLang === 'en' ? 'Close Intelligence' : 'Cerrar Inteligencia'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <header className="space-y-2">
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
                         <Upload size={24} className="text-indigo-400" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Doc Basket</h1>
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Feed UhurU AI Engine</h1>
                         <p className="text-uhuru-text-dim mt-1">AI-Powered Strategic Document Repository for UK Ltd Compliance.</p>
                     </div>
                 </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Section: Upload & History */}
                 <div className="lg:col-span-2 space-y-10">
-                    {/* Upload Zone */}
                     <div className="space-y-6">
                         <div
                             onClick={() => fileInputRef.current?.click()}
@@ -119,8 +269,6 @@ export default function DocBasketPage() {
                                 ${files.length > 0 ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-uhuru-border hover:border-indigo-500/40 hover:bg-slate-900/40 hover:shadow-2xl'}
                             `}
                         >
-                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors" />
-
                             <input
                                 type="file"
                                 multiple
@@ -129,18 +277,16 @@ export default function DocBasketPage() {
                                 onChange={handleFileSelect}
                                 className="hidden"
                             />
-
                             <div className="relative z-10 flex flex-col items-center gap-6">
                                 <div className={`p-6 rounded-full transition-transform duration-500 group-hover:scale-110 ${files.length > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/10 text-indigo-400 ring-4 ring-indigo-500/5'}`}>
                                     <Upload size={32} strokeWidth={1.5} />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-bold text-white">Nourish the Engine</h3>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">Feed UhuRu AI Engine</h3>
                                     <p className="text-uhuru-text-dim text-sm max-w-xs mx-auto">
                                         Drop contracts, HMRC letters, or valuation reports.
                                     </p>
                                 </div>
-
                                 {files.length > 0 && (
                                     <div className="mt-4 flex flex-wrap gap-2 justify-center">
                                         {files.map((f, i) => (
@@ -187,14 +333,12 @@ export default function DocBasketPage() {
                         </div>
                     </div>
 
-                    {/* History Section */}
                     <div className="space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex items-center gap-2 text-uhuru-text-dim">
                                 <History size={16} />
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em]">Strategic Basket History</h2>
+                                <h2 className="text-xs font-black uppercase tracking-[0.2em]">Intelligence Repository</h2>
                             </div>
-
                             <div className="flex items-center gap-3">
                                 {selectedIds.length > 0 && (
                                     <button
@@ -215,9 +359,6 @@ export default function DocBasketPage() {
                                         className="bg-slate-900/40 border border-uhuru-border rounded-xl py-2 pl-9 pr-4 text-xs text-white placeholder:text-uhuru-text-dim focus:outline-none focus:border-indigo-500/50 w-full sm:w-64 transition-all"
                                     />
                                 </div>
-                                <span className="text-[10px] text-uhuru-text-dim px-2 py-1 bg-white/5 rounded-full border border-white/5 font-bold whitespace-nowrap">
-                                    {history.length} Docs
-                                </span>
                             </div>
                         </div>
 
@@ -239,19 +380,22 @@ export default function DocBasketPage() {
                                     .map((doc) => {
                                         const analysis = doc.extractedData as any;
                                         const isRelevant = analysis?.isRelevant !== false;
-                                        const isSuperseded = (doc as any).isSuperseded === true;
+                                        const isSuperseded = doc.isSuperseded === true;
 
                                         return (
                                             <div
                                                 key={doc.id}
-                                                onClick={() => toggleSelection(doc.id)}
+                                                onClick={() => openDocDetail(doc)}
                                                 className={`
                                                 group bg-uhuru-card border rounded-3xl p-5 hover:bg-slate-900/40 transition-all relative overflow-hidden cursor-pointer
                                                 ${selectedIds.includes(doc.id) ? 'border-indigo-500 bg-indigo-500/5 ring-1 ring-indigo-500/50' : !isRelevant ? 'border-rose-500/20 opacity-70' : isSuperseded ? 'border-amber-500/20 opacity-50' : 'border-uhuru-border hover:border-indigo-500/30'}
                                             `}>
                                                 <div className="flex items-start gap-4">
                                                     <div className="pt-3">
-                                                        <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${selectedIds.includes(doc.id) ? 'bg-indigo-500 border-indigo-500' : 'border-uhuru-border group-hover:border-indigo-500/50'}`}>
+                                                        <div
+                                                            onClick={(e) => toggleSelection(e, doc.id)}
+                                                            className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${selectedIds.includes(doc.id) ? 'bg-indigo-500 border-indigo-500' : 'border-uhuru-border hover:border-indigo-500'}`}
+                                                        >
                                                             {selectedIds.includes(doc.id) && <Check size={12} className="text-white" />}
                                                         </div>
                                                     </div>
@@ -269,44 +413,25 @@ export default function DocBasketPage() {
                                                                 <button
                                                                     onClick={(e) => { e.stopPropagation(); handleDelete(doc.id); }}
                                                                     className="p-1.5 text-uhuru-text-dim hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-500/10 opacity-0 group-hover:opacity-100"
-                                                                    title="Remove document"
                                                                 >
                                                                     <Trash2 size={14} />
                                                                 </button>
                                                             </div>
                                                         </div>
-
                                                         <div className="flex flex-wrap items-center gap-2">
                                                             {!isRelevant ? (
-                                                                <span className="px-2 py-0.5 bg-rose-500/10 text-[9px] font-black text-rose-400 rounded uppercase tracking-tighter flex items-center gap-1">
-                                                                    Irrelevant to Uhuru
-                                                                </span>
+                                                                <span className="px-2 py-0.5 bg-rose-500/10 text-[9px] font-black text-rose-400 rounded uppercase tracking-tighter">Irrelevant</span>
                                                             ) : isSuperseded ? (
-                                                                <span className="px-2 py-0.5 bg-amber-500/10 text-[9px] font-black text-amber-400 rounded uppercase tracking-tighter flex items-center gap-1">
-                                                                    Superseded by Newer Doc
-                                                                </span>
+                                                                <span className="px-2 py-0.5 bg-amber-500/10 text-[9px] font-black text-amber-400 rounded uppercase tracking-tighter">Superseded</span>
                                                             ) : (
                                                                 <span className="px-2 py-0.5 bg-indigo-500/10 text-[9px] font-black text-indigo-400 rounded uppercase tracking-tighter flex items-center gap-1">
-                                                                    <ShieldCheck size={10} />
-                                                                    Strategic Context Vetted
-                                                                </span>
-                                                            )}
-                                                            {analysis?.vatLiability?.mustCharge && !isSuperseded && (
-                                                                <span className="px-2 py-0.5 bg-amber-500/10 text-[9px] font-black text-amber-400 rounded uppercase tracking-tighter">
-                                                                    VAT Impact
+                                                                    <ShieldCheck size={10} /> Strategic
                                                                 </span>
                                                             )}
                                                         </div>
-
                                                         {doc.strategicInsights && (
-                                                            <p className="text-xs text-uhuru-text-dim leading-relaxed line-clamp-2 italic">
+                                                            <p className="text-xs text-uhuru-text-dim leading-relaxed line-clamp-1 italic">
                                                                 "{doc.strategicInsights}"
-                                                            </p>
-                                                        )}
-
-                                                        {!isRelevant && analysis?.irrelevanceReason && (
-                                                            <p className="text-[10px] text-rose-400/70 font-medium">
-                                                                Reason: {analysis.irrelevanceReason}
                                                             </p>
                                                         )}
                                                     </div>
@@ -315,51 +440,40 @@ export default function DocBasketPage() {
                                         );
                                     })
                             ) : (
-                                <div className="border-2 border-dashed border-uhuru-border rounded-[2rem] p-12 text-center">
-                                    <p className="text-sm text-uhuru-text-dim italic">
-                                        {searchQuery ? "No intelligence found matching your query." : "The basket is empty. Feed the intelligence engine."}
-                                    </p>
+                                <div className="border border-dashed border-uhuru-border rounded-[2rem] p-12 text-center text-uhuru-text-dim text-sm italic">
+                                    {searchQuery ? "No results found." : "Repository is empty."}
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar Info */}
                 <div className="space-y-6">
                     <div className="bg-uhuru-card border border-uhuru-border rounded-[2rem] p-8 space-y-6 shadow-card sticky top-24">
                         <div className="flex items-center gap-3">
                             <Info size={18} className="text-indigo-400" />
                             <h4 className="text-sm font-bold text-white uppercase tracking-widest">Safety & Integrity</h4>
                         </div>
-
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
-                                    <div className="w-1 h-1 bg-indigo-400 rounded-full" />
-                                    Global Deduplication
+                                    <div className="w-1 h-1 bg-indigo-400 rounded-full" /> Deduplication
                                 </div>
-                                <p className="text-xs text-uhuru-text-dim leading-relaxed">
-                                    Files are hashed (SHA-256). Bit-identical duplicates are caught before they touch your DB.
-                                </p>
+                                <p className="text-xs text-uhuru-text-dim leading-relaxed">Bit-identical and semantic duplicates are caught automatically.</p>
                             </div>
                             <div className="space-y-1">
                                 <div className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
-                                    <div className="w-1 h-1 bg-indigo-400 rounded-full" />
-                                    Relevance Filter
+                                    <div className="w-1 h-1 bg-indigo-400 rounded-full" /> Relevance
                                 </div>
-                                <p className="text-xs text-uhuru-text-dim leading-relaxed">
-                                    AI rejects documents unrelated to UK business management to maintain a clean Strategic Wall.
-                                </p>
+                                <p className="text-xs text-uhuru-text-dim leading-relaxed">AI filters out non-business intelligence projects.</p>
                             </div>
                         </div>
-
                         <div className="pt-4 border-t border-uhuru-border">
                             <div className="p-4 bg-slate-900/60 rounded-2xl border border-white/5 space-y-2">
                                 <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">AI Status</p>
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                    <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Strategic Engine Online</p>
+                                    <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Engine Online</p>
                                 </div>
                             </div>
                         </div>

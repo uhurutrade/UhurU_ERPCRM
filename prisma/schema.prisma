@@ -437,6 +437,7 @@ model ComplianceDocument {
   fileHash          String?
   isSuperseded      Boolean         @default(false)
   strategicInsights String?
+  userNotes         String?
   supersededById    String?
   chunks            DocumentChunk[]
 }

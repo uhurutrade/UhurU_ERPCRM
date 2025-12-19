@@ -64,26 +64,60 @@ export async function uploadToBasket(formData: FormData) {
             const docDate = analysis.documentDate ? new Date(analysis.documentDate) : null;
             const docTopic = analysis.docTopic;
 
-            // 4. Intelligence: Versioning & Invalidation
+            // 4. Intelligence: Semantic Deduplication & Versioning
+            let isAutoSuperseded = false;
             if (docTopic && docDate) {
-                const others = await prisma.complianceDocument.findMany({
+                // Check for Semantic Duplicate (Same Topic + Same Date)
+                const semanticDuplicate = await prisma.complianceDocument.findFirst({
+                    where: {
+                        documentType: 'BASKET',
+                        documentDate: docDate,
+                        extractedData: {
+                            path: ['docTopic'],
+                            equals: docTopic
+                        } as any
+                    }
+                });
+
+                if (semanticDuplicate || analysis.isDuplicate === true) {
+                    skippedCount++;
+                    continue;
+                }
+
+                // Handle Invalidation (Same Topic + Incoming is Newer)
+                const olderVersions = await prisma.complianceDocument.findMany({
                     where: {
                         documentType: 'BASKET',
                         extractedData: {
                             path: ['docTopic'],
                             equals: docTopic
                         } as any,
+                        documentDate: { lt: docDate },
                         isSuperseded: false
                     }
                 });
 
-                for (const other of others) {
-                    if (other.documentDate && docDate > other.documentDate) {
-                        await prisma.complianceDocument.update({
-                            where: { id: other.id },
-                            data: { isSuperseded: true }
-                        });
+                for (const oldDoc of olderVersions) {
+                    await prisma.complianceDocument.update({
+                        where: { id: oldDoc.id },
+                        data: { isSuperseded: true }
+                    });
+                }
+
+                // If we upload an OLD document, it should be marked as superseded immediately
+                const newerVersionsCount = await prisma.complianceDocument.count({
+                    where: {
+                        documentType: 'BASKET',
+                        extractedData: {
+                            path: ['docTopic'],
+                            equals: docTopic
+                        } as any,
+                        documentDate: { gt: docDate }
                     }
+                });
+
+                if (newerVersionsCount > 0) {
+                    isAutoSuperseded = true;
                 }
             }
 
@@ -97,10 +131,10 @@ export async function uploadToBasket(formData: FormData) {
                     size: file.size,
                     fileHash: hash,
                     extractedData: analysis as any,
-                    strategicInsights: analysis.strategicInsight || null,
+                    strategicInsights: analysis.strategicInsightEN || analysis.strategicInsight || null,
                     documentDate: docDate,
                     isProcessed: true,
-                    isSuperseded: false
+                    isSuperseded: isAutoSuperseded
                 }
             });
 
@@ -185,3 +219,70 @@ export async function removeFromBasket(id: string) {
         return { success: false, error: error.message || 'Failed to remove document' };
     }
 }
+
+export async function updateDocumentNotes(id: string, notes: string) {
+    try {
+        await prisma.complianceDocument.update({
+            where: { id },
+            data: { userNotes: notes }
+        });
+
+        revalidatePath('/dashboard/doc-basket');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message || 'Failed to update notes' };
+    }
+}
+
+export async function reprocessDocument(id: string) {
+    try {
+        const doc = await prisma.complianceDocument.findUnique({
+            where: { id }
+        });
+
+        if (!doc) return { success: false, error: 'Document not found' };
+
+        const ai = await getAIClient();
+        const fs = require('fs/promises');
+        const path = require('path');
+        const fullPath = path.join(process.cwd(), 'public', doc.path);
+
+        let buffer: Buffer;
+        try {
+            buffer = await fs.readFile(fullPath);
+        } catch (err) {
+            return { success: false, error: 'File not found on disk' };
+        }
+
+        let fileText = "";
+        if (doc.filename.toLowerCase().endsWith('.pdf')) {
+            try {
+                const pdf = require('pdf-parse');
+                const pdfData = await pdf(buffer);
+                fileText = pdfData.text;
+            } catch (err) {
+                fileText = `[PDF extraction failed]`;
+            }
+        } else {
+            fileText = buffer.toString('utf-8');
+        }
+
+        const analysis = await ai.analyzeStrategicDoc(doc.filename, fileText, buffer, doc.fileType || undefined, doc.userNotes || undefined);
+
+        await prisma.complianceDocument.update({
+            where: { id },
+            data: {
+                extractedData: analysis as any,
+                strategicInsights: analysis.strategicInsightEN || analysis.strategicInsight || doc.strategicInsights,
+                documentDate: analysis.documentDate ? new Date(analysis.documentDate) : doc.documentDate
+            }
+        });
+
+        revalidatePath('/dashboard/doc-basket');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Reprocess error:', error);
+        return { success: false, error: error.message || 'Failed to reprocess document' };
+    }
+}
+

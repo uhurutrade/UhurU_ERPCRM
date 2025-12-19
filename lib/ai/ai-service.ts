@@ -1,6 +1,34 @@
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { prisma } from '@/lib/prisma';
+import { execSync } from 'child_process';
+import { writeFileSync, readFileSync, unlinkSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+
+async function pdfToImage(buffer: Buffer): Promise<Buffer | null> {
+    const tempIn = join(tmpdir(), `temp_${Date.now()}.pdf`);
+    const tempOutBase = join(tmpdir(), `temp_out_${Date.now()}`);
+    const tempOut = `${tempOutBase}.png`;
+
+    try {
+        writeFileSync(tempIn, buffer);
+        // Convert only the first page to PNG (multimodal vision)
+        execSync(`pdftocairo -png -singlefile -f 1 -l 1 "${tempIn}" "${tempOutBase}"`);
+        const imageBuffer = readFileSync(tempOut);
+
+        // Clean up
+        unlinkSync(tempIn);
+        unlinkSync(tempOut);
+
+        return imageBuffer;
+    } catch (err) {
+        // Silently fail if tool missing or conversion fails, fallback to text
+        try { unlinkSync(tempIn); } catch { }
+        try { unlinkSync(tempOut); } catch { }
+        return null;
+    }
+}
 
 export interface AIExtractionResult {
     isInvoice: boolean;
@@ -30,11 +58,11 @@ export async function getAIClient() {
             return analyzeWithOpenAI(filename, text, buffer, mimeType);
         },
 
-        async analyzeStrategicDoc(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<any> {
+        async analyzeStrategicDoc(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
             if (provider === 'gemini') {
-                return analyzeStrategicWithGemini(filename, text, buffer, mimeType);
+                return analyzeStrategicWithGemini(filename, text, buffer, mimeType, userNotes);
             }
-            return analyzeStrategicWithOpenAI(filename, text, buffer, mimeType);
+            return analyzeStrategicWithOpenAI(filename, text, buffer, mimeType, userNotes);
         },
 
         async chat(message: string, systemPrompt: string): Promise<string> {
@@ -74,13 +102,25 @@ async function analyzeWithOpenAI(filename: string, text: string, buffer?: Buffer
         { type: "text", text: `Filename: ${filename}\n\nExtracted Text: ${text.substring(0, 10000)}` }
     ];
 
-    if (buffer && mimeType?.startsWith('image/')) {
-        userContent.push({
-            type: "image_url",
-            image_url: {
-                url: `data:${mimeType};base64,${buffer.toString('base64')}`
+    if (buffer) {
+        if (mimeType?.startsWith('image/')) {
+            userContent.push({
+                type: "image_url",
+                image_url: {
+                    url: `data:${mimeType};base64,${buffer.toString('base64')}`
+                }
+            });
+        } else if (mimeType === 'application/pdf') {
+            const imageBuffer = await pdfToImage(buffer);
+            if (imageBuffer) {
+                userContent.push({
+                    type: "image_url",
+                    image_url: {
+                        url: `data:image/png;base64,${imageBuffer.toString('base64')}`
+                    }
+                });
             }
-        });
+        }
     }
 
     messages.push({ role: "user", content: userContent });
@@ -94,7 +134,7 @@ async function analyzeWithOpenAI(filename: string, text: string, buffer?: Buffer
     return JSON.parse(response.choices[0].message.content || '{}');
 }
 
-async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<any> {
+async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
@@ -104,19 +144,33 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
         {
             role: "system",
             content: `You are a UK Corporate Law & Tax expert. Analyze the provided document for a UK LTD company.
+            ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
             Extract details for: relevance, documentDate (YYYY-MM-DD), docTopic, deadlines, vatLiability, and a strategicInsight.
+            
+            Define:
+            1. relevance: Is this relevant to UK business?
+            2. documentDate: Effective date (YYYY-MM-DD).
+            3. docTopic: A STABLE, UNIFIED topic name (e.g. "OFFICE_LEASE_CONTRACT", "HMRC_VAT_QUARTERLY_NOTICE"). This is used to link versions.
+            4. isDuplicate: true if this looks like a generic boilerplate or identical to common known templates without new data.
+            5. strategicInsight: Advice for the Director.
             
             Return JSON:
             {
                 "isRelevant": boolean,
                 "documentDate": "YYYY-MM-DD",
                 "docTopic": string,
+                "isDuplicate": boolean, 
                 "irrelevanceReason": string,
                 "deadlines": [{ "date": "YYYY-MM-DD", "title": string, "description": string }],
                 "vatLiability": { "mustCharge": boolean, "reason": string },
-                "strategicInsight": string,
+                "strategicInsightEN": string,
+                "strategicInsightES": string, (Faithful Spanish translation of the English insight)
+                "summaryEN": string,
+                "summaryES": string, (Faithful Spanish translation of the English summary)
                 "extractedFacts": object
-            }`
+            }
+            
+            Note: The docTopic must be consistent. If it's a renewal, the topic must match the previous one.`
         }
     ];
 
@@ -124,13 +178,25 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
         { type: "text", text: `Filename: ${filename}\n\nExtracted Text: ${text.substring(0, 15000)}` }
     ];
 
-    if (buffer && mimeType?.startsWith('image/')) {
-        userContent.push({
-            type: "image_url",
-            image_url: {
-                url: `data:${mimeType};base64,${buffer.toString('base64')}`
+    if (buffer) {
+        if (mimeType?.startsWith('image/')) {
+            userContent.push({
+                type: "image_url",
+                image_url: {
+                    url: `data:${mimeType};base64,${buffer.toString('base64')}`
+                }
+            });
+        } else if (mimeType === 'application/pdf') {
+            const imageBuffer = await pdfToImage(buffer);
+            if (imageBuffer) {
+                userContent.push({
+                    type: "image_url",
+                    image_url: {
+                        url: `data:image/png;base64,${imageBuffer.toString('base64')}`
+                    }
+                });
             }
-        });
+        }
     }
 
     messages.push({ role: "user", content: userContent });
@@ -213,7 +279,7 @@ async function chatWithGemini(message: string, systemPrompt: string): Promise<st
     return response.text();
 }
 
-async function analyzeStrategicWithGemini(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<any> {
+async function analyzeStrategicWithGemini(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key is not configured.");
 
@@ -224,6 +290,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
     });
 
     const prompt = `Analyze this document as a UK LTD corporate expert. Filename: ${filename}.
+    ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
     Determine if it is relevant to business/tax/legal management (isRelevant).
     Extract the effective date (documentDate) and a specific topic name (docTopic) used for versioning.
     
@@ -232,13 +299,20 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
         "isRelevant": boolean,
         "documentDate": "YYYY-MM-DD",
         "docTopic": string,
+        "isDuplicate": boolean,
         "irrelevanceReason": string,
         "deadlines": [{ "date": "YYYY-MM-DD", "title": string, "description": string }],
         "vatLiability": { "mustCharge": boolean, "reason": string },
-        "strategicInsight": string,
+        "strategicInsightEN": string,
+        "strategicInsightES": string,
+        "summaryEN": string,
+        "summaryES": string,
         "extractedFacts": object
     }
     
+    If it's a business document, identify the STABLE 'docTopic'. If it's a newer version of an existing theme, use the same 'docTopic'.
+    Provide a concise summary and strategic insight in both English (EN) and Spanish (ES).
+    The Spanish versions (summaryES and strategicInsightES) must be professional, faithful translations of the English ones to ensure consistency.
     If no text is provided or if text extraction failed, analyze the visual content of the file if provided.`;
 
     const contents: any[] = [];
