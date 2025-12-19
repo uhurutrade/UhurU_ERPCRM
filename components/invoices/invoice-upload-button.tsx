@@ -227,6 +227,31 @@ export function InvoiceUploadButton() {
                                         </div>
                                     </div>
 
+                                    {/* --- STATUS HEADER --- */}
+                                    <div className="mb-8">
+                                        {analysisResult.potentialMatches?.length > 0 ? (
+                                            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 flex items-center gap-6 animate-in slide-in-from-left duration-500">
+                                                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                                                    <Check size={32} />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-2xl font-black text-white tracking-tight">Matches Found!</h3>
+                                                    <p className="text-slate-400 mt-1">We identified <strong>{analysisResult.potentialMatches.length}</strong> possible movements in your bank records. Would you like to associate one of them now?</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 flex items-center gap-6 animate-in slide-in-from-left duration-500">
+                                                <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                                                    <AlertCircle size={32} />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-2xl font-black text-white tracking-tight">No Exact Matches</h3>
+                                                    <p className="text-slate-400 mt-1">We couldn't find a perfect candidate in your ledger. You can link it later or review the transactions manually.</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     {/* Matches List */}
                                     <div>
                                         <h4 className="text-[10px] font-bold text-uhuru-text-dim mb-3 uppercase tracking-[0.2em] flex items-center gap-2">

@@ -101,7 +101,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
 
             {/* Modal Card */}
             <div
-                className="relative w-full max-w-4xl transform transition-all duration-300 scale-100 translate-y-0"
+                className="relative w-full max-w-6xl transform transition-all duration-300 scale-100 translate-y-0"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="bg-uhuru-card backdrop-blur-3xl border border-slate-700/50 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-10 mx-4 max-h-[90vh] overflow-y-auto">
@@ -120,63 +120,74 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
                     {/* Content */}
                     <div className="space-y-4">
 
-                        {/* Main Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Amount</label>
-                                    <div className={`text-2xl font-bold ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
-                                        {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Description</label>
-                                    <div className="text-lg text-white font-medium">{transaction.description}</div>
-                                </div>
-
-                                {transaction.counterparty && (
-                                    <div>
-                                        <label className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Counterparty</label>
-                                        <div className="text-slate-300">{transaction.counterparty}</div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="space-y-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                                <div className="flex items-center gap-3">
-                                    <Calendar className="text-purple-400" size={18} />
-                                    <div>
-                                        <label className="text-xs text-slate-500 block">Date</label>
-                                        <span className="text-slate-200">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <CreditCard className="text-blue-400" size={18} />
-                                    <div>
-                                        <label className="text-xs text-slate-500 block">Account</label>
-                                        <span className="text-slate-200">{transaction.bankAccount.bank.bankName} - {transaction.bankAccount.currency}</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <Tag className="text-orange-400" size={18} />
-                                    <div>
-                                        <label className="text-xs text-slate-500 block">Category</label>
-                                        <span className="text-slate-200">{transaction.category || 'Uncategorized'}</span>
-                                    </div>
-                                </div>
-
-                                {transaction.reference && (
-                                    <div className="flex items-center gap-3">
-                                        <FileText className="text-slate-400" size={18} />
+                        {/* Main Info Expansion */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Left Column: Transaction Core */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-slate-900/40 p-8 rounded-[24px] border border-white/5">
+                                    <div className="flex justify-between items-start mb-6">
                                         <div>
-                                            <label className="text-xs text-slate-500 block">Reference</label>
-                                            <span className="text-slate-200">{transaction.reference}</span>
+                                            <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Amount & Currency</label>
+                                            <div className={`text-5xl font-black tracking-tight ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                                {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Status</label>
+                                            <span className="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase">
+                                                Verified
+                                            </span>
                                         </div>
                                     </div>
-                                )}
+
+                                    <div className="space-y-4 pt-6 border-t border-white/5">
+                                        <div>
+                                            <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Description</label>
+                                            <div className="text-xl text-white font-semibold leading-relaxed">{transaction.description}</div>
+                                        </div>
+
+                                        {transaction.merchant && (
+                                            <div className="pt-2">
+                                                <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Identified Merchant</label>
+                                                <div className="text-lg text-uhuru-blue font-bold">{transaction.merchant}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Column: Metadata Cards */}
+                            <div className="space-y-4">
+                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                                        <Calendar size={24} />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Transaction Date</label>
+                                        <span className="text-white font-bold">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                        <CreditCard size={24} />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Bank Connection</label>
+                                        <span className="text-white font-bold">{transaction.bankAccount.bank.bankName}</span>
+                                        <span className="text-[10px] text-uhuru-text-dim block">{transaction.bankAccount.accountName}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400">
+                                        <Tag size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Internal Category</label>
+                                        <span className="text-white font-bold">{transaction.category || 'Uncategorized'}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
