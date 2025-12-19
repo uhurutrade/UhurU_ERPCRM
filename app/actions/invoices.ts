@@ -56,7 +56,7 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
             fileText = await file.text();
         }
 
-        const analysis = await ai.analyzeInvoice(file.name, fileText);
+        const analysis = await ai.analyzeInvoice(file.name, fileText, buffer, file.type);
 
         if (!analysis.isInvoice) {
             return {

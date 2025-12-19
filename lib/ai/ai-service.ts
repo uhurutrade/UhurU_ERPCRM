@@ -318,7 +318,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
     const contents: any[] = [];
 
     // Add file data if available (Multimodal)
-    if (buffer && mimeType === 'application/pdf') {
+    if (buffer && (mimeType === 'application/pdf' || mimeType?.startsWith('image/'))) {
         contents.push({
             inlineData: {
                 data: buffer.toString('base64'),
