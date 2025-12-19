@@ -59,6 +59,7 @@ export function InvoiceUploadButton() {
             toast.error('Server error');
         } finally {
             setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
@@ -300,6 +301,42 @@ export function InvoiceUploadButton() {
                                 </div>
                             )}
 
+                            {/* --- DUPLICATE CONFIRMATION MODAL --- */}
+                            {isConfirmingDuplicate && (
+                                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300">
+                                    <div className="bg-uhuru-card border border-amber-500/50 rounded-[32px] p-10 max-w-xl w-full shadow-[0_0_60px_rgba(245,158,11,0.2)] space-y-8 animate-in zoom-in duration-300">
+                                        <div className="flex flex-col items-center text-center gap-6">
+                                            <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 ring-8 ring-amber-500/5">
+                                                <AlertCircle size={40} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-3xl font-extrabold text-white tracking-tight">Duplicate Detected</h4>
+                                                <p className="text-slate-400 mt-2 text-sm">A document with the same content or metadata (Amount: {analysisResult.analysis.currency} {analysisResult.analysis.amount}, Date: {analysisResult.analysis.date}) already exists in your vault.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-3 pt-2">
+                                            <button
+                                                onClick={() => {
+                                                    setIsConfirmingDuplicate(false);
+                                                    setAnalysisResult(null);
+                                                    setPendingFile(null);
+                                                }}
+                                                className="flex-1 py-4 bg-slate-800 hover:bg-slate-750 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => handleUpload(undefined, true)}
+                                                className="flex-1 py-4 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-amber-900/40"
+                                            >
+                                                Upload Anyway
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* --- DEFINTIVE CONFIRMATION MODAL --- */}
                             {isConfirmingLink && selectedMatch && matchAnalysis && (
                                 <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300">
@@ -326,7 +363,7 @@ export function InvoiceUploadButton() {
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-bold text-white uppercase tracking-wider">Amount Match</span>
                                                     <span className="text-xs text-slate-400 truncate">
-                                                        Doc: {analysisResult.analysis.currency} {Number(analysisResult.analysis.amount).toFixed(2)} | Ledger: {selectedMatch.currency} {Math.abs(Number(selectedMatch.amount)).toFixed(2)}
+                                                        Doc: {analysisResult.analysis.currency} {Number(analysisResult.analysis.amount || 0).toFixed(2)} | Ledger: {selectedMatch.currency} {Math.abs(Number(selectedMatch.amount)).toFixed(2)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -338,7 +375,7 @@ export function InvoiceUploadButton() {
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-bold text-white uppercase tracking-wider">Date Window</span>
                                                     <span className="text-xs text-slate-400">
-                                                        Doc: {new Date(analysisResult.analysis.date).toLocaleDateString()} | Ledger: {new Date(selectedMatch.date).toLocaleDateString()}
+                                                        Doc: {analysisResult.analysis.date} | Ledger: {new Date(selectedMatch.date).toLocaleDateString()}
                                                     </span>
                                                 </div>
                                             </div>
