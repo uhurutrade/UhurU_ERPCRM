@@ -335,19 +335,19 @@ export default function DocBasketPage() {
 
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <p className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                                <div className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
                                     <div className="w-1 h-1 bg-indigo-400 rounded-full" />
                                     Global Deduplication
-                                </p>
+                                </div>
                                 <p className="text-xs text-uhuru-text-dim leading-relaxed">
                                     Files are hashed (SHA-256). Bit-identical duplicates are caught before they touch your DB.
                                 </p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                                <div className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
                                     <div className="w-1 h-1 bg-indigo-400 rounded-full" />
                                     Relevance Filter
-                                </p>
+                                </div>
                                 <p className="text-xs text-uhuru-text-dim leading-relaxed">
                                     AI rejects documents unrelated to UK business management to maintain a clean Strategic Wall.
                                 </p>
