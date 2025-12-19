@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { format } from 'date-fns';
 import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip, Search } from 'lucide-react';
 import { useConfirm } from '@/components/providers/modal-provider';
+import { toast } from 'sonner';
 import { TransactionDetailsModal } from './transaction-details-modal';
 import { CategoryBadge } from './category-badge';
 
@@ -31,12 +32,14 @@ type Transaction = {
 
 export function TransactionTable({
     transactions,
+    sequences = {},
     totalPages = 1,
     currentPage = 1,
     totalItems = 0,
     categories = []
 }: {
     transactions: any[],
+    sequences?: Record<string, number>,
     totalPages?: number,
     currentPage?: number,
     totalItems?: number,
@@ -112,6 +115,30 @@ export function TransactionTable({
     };
 
     // --- Deletion Logic ---
+    // --- Linking Logic ---
+    const linkAttachmentId = searchParams.get('attachmentId');
+    const isLinkingMode = searchParams.get('action') === 'link' && linkAttachmentId;
+
+    const handleLinkDirect = async (transactionId: string) => {
+        if (!linkAttachmentId) return;
+
+        setIsDeleting(true); // Loading state
+        try {
+            const { linkAttachmentToTransaction } = await import('@/app/actions/invoices');
+            const res = await linkAttachmentToTransaction(linkAttachmentId, transactionId);
+            if (res.success) {
+                toast.success('Attached successfully');
+                router.push('/dashboard/invoices');
+            } else {
+                toast.error('Failed: ' + res.error);
+            }
+        } catch (err) {
+            toast.error('Error linking');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     const handleDelete = async () => {
         if (!deleteReason.trim()) return;
 
@@ -233,6 +260,8 @@ export function TransactionTable({
                                     }
                                 </button>
                             </th>
+                            {isLinkingMode && <th className="py-3 px-4 w-32 text-emerald-400 font-bold uppercase text-[10px]">Action</th>}
+                            <th className="py-3 px-4 w-12 text-slate-500 font-bold">#</th>
                             <th className="py-3 px-4 font-medium">Date</th>
                             <th className="py-3 px-4 font-medium">Description</th>
                             <th className="py-3 px-4 font-medium hidden md:table-cell">Account</th>
@@ -252,7 +281,7 @@ export function TransactionTable({
                                 </td>
                             </tr>
                         ) : (
-                            transactions.map((tx) => {
+                            transactions.map((tx, index) => {
                                 const isSelected = selectedIds.has(tx.id);
                                 const hasAttachments = tx.attachments && tx.attachments.length > 0;
                                 return (
@@ -265,12 +294,29 @@ export function TransactionTable({
                                         onClick={() => setViewTransaction(tx)}
                                     >
                                         <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
-                                            <button onClick={() => handleSelectOne(tx.id)}>
-                                                {isSelected ?
-                                                    <CheckSquare size={20} className="text-emerald-500" /> :
-                                                    <Square size={20} className="text-slate-600" />
-                                                }
-                                            </button>
+                                            {isLinkingMode ? (
+                                                <div className="w-5 h-5 rounded border border-emerald-500/50 bg-emerald-500/10" />
+                                            ) : (
+                                                <button onClick={() => handleSelectOne(tx.id)}>
+                                                    {isSelected ?
+                                                        <CheckSquare size={20} className="text-emerald-500" /> :
+                                                        <Square size={20} className="text-slate-600" />
+                                                    }
+                                                </button>
+                                            )}
+                                        </td>
+                                        {isLinkingMode && (
+                                            <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                                <button
+                                                    onClick={() => handleLinkDirect(tx.id)}
+                                                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold uppercase transition-all"
+                                                >
+                                                    Link Here
+                                                </button>
+                                            </td>
+                                        )}
+                                        <td className="py-3 px-4 text-slate-500 font-mono text-[10px]">
+                                            {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
                                         </td>
                                         <td className="py-3 px-4 text-slate-300">
                                             {format(new Date(tx.date), 'MMM d, yyyy')}

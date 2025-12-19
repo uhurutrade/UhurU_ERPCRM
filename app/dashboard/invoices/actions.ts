@@ -50,7 +50,7 @@ export async function uploadAttachment(formData: FormData) {
         }
     });
 
-    revalidatePath('/dashboard/erp');
+    revalidatePath('/dashboard/invoices');
 }
 
 export async function updateCategory(txId: string, category: string) {

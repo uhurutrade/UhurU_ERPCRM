@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { Upload, FileText, Check, AlertCircle, Loader2, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Upload, FileText, Check, AlertCircle, Loader2, Link as LinkIcon, ExternalLink, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { uploadAndAnalyzeInvoice, linkAttachmentToTransaction } from '@/app/actions/invoices';
 import { toast } from 'sonner';
 
@@ -12,9 +12,17 @@ export function InvoiceUploadButton() {
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+    const [isConfirmingDuplicate, setIsConfirmingDuplicate] = useState(false);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [documentRole, setDocumentRole] = useState<'EMITTED' | 'RECEIVED' | null>(null);
+
+    const handleUpload = async (e?: React.ChangeEvent<HTMLInputElement>, confirmed = false) => {
+        const file = e?.target.files?.[0] || pendingFile;
         if (!file) return;
+        if (!documentRole) {
+            toast.error('Select if invoice is Emitted or Received');
+            return;
+        }
 
         setIsUploading(true);
         setError(null);
@@ -22,12 +30,24 @@ export function InvoiceUploadButton() {
 
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('documentRole', documentRole);
+        if (confirmed) {
+            formData.append('confirmDuplicate', 'true');
+        }
 
         try {
             const result = await uploadAndAnalyzeInvoice(formData);
             if (result.success) {
-                setAnalysisResult(result);
-                toast.success('Invoices processed successfully');
+                if (result.isDuplicate && !confirmed) {
+                    setIsConfirmingDuplicate(true);
+                    setPendingFile(file);
+                    setAnalysisResult(result); // Show the analysis anyway so they know why it's a duplicate
+                } else {
+                    setAnalysisResult(result);
+                    setIsConfirmingDuplicate(false);
+                    setPendingFile(null);
+                    toast.success('Invoice processed successfully');
+                }
             } else {
                 setError(result.error || 'Failed to analyze invoice');
                 toast.error(result.error || 'Check document format');
@@ -82,22 +102,75 @@ export function InvoiceUploadButton() {
 
                         <div className="p-8 space-y-6">
                             {!analysisResult && !isUploading && (
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="border-2 border-dashed border-uhuru-border rounded-2xl p-12 text-center cursor-pointer hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all group"
-                                >
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleUpload}
-                                        className="hidden"
-                                        accept=".pdf,image/*"
-                                    />
-                                    <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                        <Upload className="text-indigo-400" size={32} />
+                                <div className="space-y-6">
+                                    {/* Role Selector */}
+                                    <div className="flex flex-col gap-3">
+                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] text-center">
+                                            Step 1: Select Document Nature
+                                        </label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button
+                                                onClick={() => setDocumentRole('EMITTED')}
+                                                className={`
+                                                    p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2
+                                                    ${documentRole === 'EMITTED'
+                                                        ? 'bg-uhuru-blue/20 border-uhuru-blue text-white'
+                                                        : 'bg-slate-900/40 border-uhuru-border text-uhuru-text-dim hover:border-uhuru-blue/30'}
+                                                `}
+                                            >
+                                                <ArrowUpRight size={24} className={documentRole === 'EMITTED' ? 'text-uhuru-blue' : ''} />
+                                                <div className="text-center">
+                                                    <div className="font-bold text-sm">EMITTED</div>
+                                                    <div className="text-[10px] opacity-70 italic font-medium">Sales / Income</div>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => setDocumentRole('RECEIVED')}
+                                                className={`
+                                                    p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2
+                                                    ${documentRole === 'RECEIVED'
+                                                        ? 'bg-rose-500/20 border-rose-500 text-white'
+                                                        : 'bg-slate-900/40 border-uhuru-border text-uhuru-text-dim hover:border-rose-500/30'}
+                                                `}
+                                            >
+                                                <ArrowDownLeft size={24} className={documentRole === 'RECEIVED' ? 'text-rose-500' : ''} />
+                                                <div className="text-center">
+                                                    <div className="font-bold text-sm">RECEIVED</div>
+                                                    <div className="text-[10px] opacity-70 italic font-medium">Expenses / Purchases</div>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p className="text-white font-medium">Click or drag invoice file</p>
-                                    <p className="text-uhuru-text-dim text-sm mt-1">PDF, JPG, PNG or WEBP (Direct match with Ledger)</p>
+
+                                    {/* Upload Area */}
+                                    <div
+                                        onClick={() => {
+                                            if (!documentRole) {
+                                                toast.error('Select document nature first');
+                                                return;
+                                            }
+                                            fileInputRef.current?.click();
+                                        }}
+                                        className={`
+                                            border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all group
+                                            ${!documentRole ? 'border-uhuru-border/20 grayscale opacity-50' : 'border-uhuru-border hover:border-indigo-500/50 hover:bg-indigo-500/5'}
+                                        `}
+                                    >
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleUpload}
+                                            className="hidden"
+                                            accept=".pdf,image/*"
+                                        />
+                                        <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                            <Upload className="text-indigo-400" size={32} />
+                                        </div>
+                                        <p className="text-white font-medium">
+                                            {!documentRole ? 'Select type to start upload' : 'Click or drag invoice file'}
+                                        </p>
+                                        <p className="text-uhuru-text-dim text-sm mt-1">PDF, JPG, PNG or WEBP</p>
+                                    </div>
                                 </div>
                             )}
 
@@ -118,8 +191,37 @@ export function InvoiceUploadButton() {
 
                             {analysisResult && (
                                 <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                                    {isConfirmingDuplicate && (
+                                        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 flex flex-col items-center text-center gap-4">
+                                            <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-500">
+                                                <AlertCircle size={24} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-white font-bold">Possible Duplicate Detected</h4>
+                                                <p className="text-uhuru-text-dim text-sm mt-1">
+                                                    An invoice with the same issuer, date, and amount already exists.
+                                                    Do you want to upload it anyway or discard this copy?
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-3 w-full">
+                                                <button
+                                                    onClick={() => { setAnalysisResult(null); setIsConfirmingDuplicate(false); setPendingFile(null); }}
+                                                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+                                                >
+                                                    Discard
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpload(undefined, true)}
+                                                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+                                                >
+                                                    Upload Anyway
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Extracted Info */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className={`grid grid-cols-2 gap-4 ${isConfirmingDuplicate ? 'opacity-50 pointer-events-none' : ''}`}>
                                         <div className="bg-slate-900/40 p-4 rounded-xl border border-white/5">
                                             <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest mb-1">Issuer</p>
                                             <p className="text-white font-bold">{analysisResult.analysis.issuer}</p>
@@ -127,7 +229,7 @@ export function InvoiceUploadButton() {
                                         <div className="bg-slate-900/40 p-4 rounded-xl border border-white/5">
                                             <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest mb-1">Amount</p>
                                             <p className="text-emerald-400 font-bold text-lg">
-                                                {analysisResult.analysis.currency} {analysisResult.analysis.amount.toLocaleString()}
+                                                {analysisResult.analysis.currency} {typeof analysisResult.analysis.amount === 'number' ? analysisResult.analysis.amount.toLocaleString() : (analysisResult.analysis.amount || '0.00')}
                                             </p>
                                         </div>
                                         <div className="bg-slate-900/40 p-4 rounded-xl border border-white/5">

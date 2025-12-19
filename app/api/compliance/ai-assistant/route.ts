@@ -16,12 +16,19 @@ export async function POST(req: Request) {
 
         const { message, contextFiles } = await req.json();
 
+        // 2. FETCH LEDGER & TAX CONTEXT
+        const { getFinancialContext } = require('@/lib/ai/financial-context');
+        const financialContext = await getFinancialContext();
+
         let systemPrompt = `You are an expert UK Tax Consultant for HMRC and Companies House compliance. 
         You help the user prepare their tax obligations based on their ERP data and uploaded documents.
         
-        Keep responses professional, concise, and focused on UK tax law (VAT, Corporation Tax).`;
+        Keep responses professional, concise, and focused on UK tax law (VAT, Corporation Tax).
+        
+        CURRENT BUSINESS FINANCIAL DATA:
+        ${financialContext}`;
 
-        // 2. RAG RETRIEVAL
+        // 3. RAG RETRIEVAL (from uploaded docs)
         let ragContext = "";
         try {
             ragContext = await retrieveContext(message);
@@ -30,12 +37,12 @@ export async function POST(req: Request) {
         }
 
         if (ragContext) {
-            systemPrompt += `\n\nRELEVANT INFORMATION FROM YOUR DOCUMENTS:\n${ragContext}`;
+            systemPrompt += `\n\nRELEVANT INFORMATION FROM UPLOADED COMPLIANCE DOCUMENTS:\n${ragContext}`;
         } else if (contextFiles && contextFiles.length > 0) {
-            systemPrompt += `\n\nCONTEXT FROM UPLOADED FILES:\nThe user has uploaded ${contextFiles.length} documents.`;
+            systemPrompt += `\n\nCONTEXT FROM UPLOADED FILES:\nThe user has uploaded ${contextFiles.length} documents for analysis.`;
         }
 
-        // 3. Call AI
+        // 4. Call AI
         const reply = await ai.chat(message, systemPrompt);
 
         return NextResponse.json({ reply });

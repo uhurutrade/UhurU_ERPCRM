@@ -9,8 +9,13 @@ import { getAIClient } from '@/lib/ai/ai-service';
 export async function uploadAndAnalyzeInvoice(formData: FormData) {
     try {
         const file = formData.get('file') as File;
+        const documentRole = formData.get('documentRole') as string; // 'EMITTED' or 'RECEIVED'
+
         if (!file) {
             return { success: false, error: 'No file provided' };
+        }
+        if (!documentRole) {
+            return { success: false, error: 'Document type is mandatory' };
         }
 
         // 1. Get AI Client (Provider selected in Settings)
@@ -57,13 +62,50 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
             };
         }
 
-        // 3. Save Attachment with Extracted Metadata
+        // 3. Duplicate Detection
+        // Check if an attachment with very similar metadata already exists
+        const existingDuplicate = await (prisma.attachment.findFirst as any)({
+            where: {
+                extractedData: {
+                    path: ['issuer'],
+                    equals: analysis.issuer
+                },
+                AND: [
+                    {
+                        extractedData: {
+                            path: ['amount'],
+                            equals: analysis.amount
+                        }
+                    },
+                    {
+                        extractedData: {
+                            path: ['date'],
+                            equals: analysis.date
+                        }
+                    }
+                ]
+            }
+        });
+
+        if (existingDuplicate && !formData.get('confirmDuplicate')) {
+            return {
+                success: true,
+                isDuplicate: true,
+                existingId: existingDuplicate.id,
+                analysis
+            };
+        }
+
+        // 4. Save Attachment with Extracted Metadata
         const attachment = await (prisma.attachment.create as any)({
             data: {
                 path: publicPath,
                 originalName: file.name,
                 fileType: file.type,
-                extractedData: analysis as any
+                extractedData: {
+                    ...analysis,
+                    documentRole // Save whether it's emitted or received
+                } as any
             }
         });
 
@@ -87,29 +129,38 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
 
 async function findPotentialMatches(analysis: any) {
     const { issuer, amount, date, currency } = analysis;
-    const targetDate = new Date(date);
 
-    // Search window: Entire calendar year of the invoice
+    let targetDate = new Date(date);
+
+    // Fallback if AI produced an invalid date
+    if (isNaN(targetDate.getTime())) {
+        console.warn(`[Invoice Matching] AI provided invalid date: "${date}". Falling back to current date.`);
+        targetDate = new Date();
+    }
+
+    // Search window: Entire calendar year of the document (or current year as fallback)
     const dateStart = new Date(targetDate.getFullYear(), 0, 1);
     const dateEnd = new Date(targetDate.getFullYear(), 11, 31, 23, 59, 59);
 
-    // Matching criteria:
-    // 1. Amount should be close (within 5% for FX or fees)
-    // 2. Date within window
-    // 3. Description/Counterparty contains issuer name
+    // Build the query
+    const whereConditions: any[] = [
+        { date: { gte: dateStart, lte: dateEnd } }
+    ];
+
+    // Only add name matching if issuer is not "Unknown" or too generic
+    if (issuer && issuer.toLowerCase() !== 'unknown' && issuer.length > 2) {
+        whereConditions.push({
+            OR: [
+                { description: { contains: issuer, mode: 'insensitive' } },
+                { counterparty: { contains: issuer, mode: 'insensitive' } },
+                { merchant: { contains: issuer, mode: 'insensitive' } }
+            ]
+        });
+    }
 
     const matches = await prisma.bankTransaction.findMany({
         where: {
-            AND: [
-                { date: { gte: dateStart, lte: dateEnd } },
-                {
-                    OR: [
-                        { description: { contains: issuer, mode: 'insensitive' } },
-                        { counterparty: { contains: issuer, mode: 'insensitive' } },
-                        { merchant: { contains: issuer, mode: 'insensitive' } }
-                    ]
-                }
-            ]
+            AND: whereConditions
         },
         include: {
             bankAccount: {
@@ -153,6 +204,24 @@ export async function linkAttachmentToTransaction(attachmentId: string, transact
         });
         revalidatePath('/dashboard/invoices');
         revalidatePath('/dashboard/banking');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function deleteAttachment(id: string) {
+    try {
+        const att = await prisma.attachment.findUnique({ where: { id } });
+        if (!att) return { success: false, error: 'Not found' };
+
+        // delete from db
+        await prisma.attachment.delete({ where: { id } });
+
+        // revalidate
+        revalidatePath('/dashboard/invoices');
+        revalidatePath('/dashboard/banking');
+
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };

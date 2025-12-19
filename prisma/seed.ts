@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T09:59:08.392Z');
+  console.log('Generated at: 2025-12-19T10:42:52.714Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5854,6 +5854,75 @@ async function main() {
     "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:27:26.986Z"
+  },
+  {
+    "id": "cmjcp77lz0000q5k3iy8r01n8",
+    "path": "/uploads/invoices/1766138393022-374233281.pdf",
+    "fileType": "application/pdf",
+    "originalName": "invoice_INV25-8 (2).pdf",
+    "extractedData": {
+      "date": null,
+      "amount": null,
+      "issuer": "Invoice Company",
+      "reason": "The filename suggests it is an invoice (INV25-8). However, no specific invoice details such as date, amount, or currency could be extracted due to unreadable content.",
+      "currency": null,
+      "isInvoice": true,
+      "confidence": 0.8
+    },
+    "transactionId": null,
+    "uploadedAt": "2025-12-19T09:59:55.464Z"
+  },
+  {
+    "id": "cmjcp9c8d0001q5k3mdsfpcz2",
+    "path": "/uploads/invoices/1766138492319-836395785.pdf",
+    "fileType": "application/pdf",
+    "originalName": "INV25-7.pdf",
+    "extractedData": {
+      "date": "2023-10-01",
+      "amount": 0,
+      "issuer": "Unknown",
+      "reason": "The filename indicates it is an invoice (INV25-7). However, no text content was successfully extracted to corroborate specific details.",
+      "currency": "USD",
+      "isInvoice": true,
+      "confidence": 0.5
+    },
+    "transactionId": null,
+    "uploadedAt": "2025-12-19T10:01:34.765Z"
+  },
+  {
+    "id": "cmjcpt2x600002e35avfo35r3",
+    "path": "/uploads/invoices/1766139413305-977694897.pdf",
+    "fileType": "application/pdf",
+    "originalName": "invoice_INV25-8 (2).pdf",
+    "extractedData": {
+      "date": "Unknown",
+      "amount": 0,
+      "issuer": "Unknown",
+      "reason": "The filename contains 'invoice' suggesting it is an invoice, but the actual content could not be extracted. Therefore, while it appears to be an invoice, specific details like issuer, date, and amount cannot be confirmed.",
+      "currency": "USD",
+      "isInvoice": true,
+      "confidence": 0.8
+    },
+    "transactionId": null,
+    "uploadedAt": "2025-12-19T10:16:55.819Z"
+  },
+  {
+    "id": "cmjcqmgt50000ia7l5b2rglfo",
+    "path": "/uploads/invoices/1766140783773-898559443.pdf",
+    "fileType": "application/pdf",
+    "originalName": "invoice_INV25-8.pdf",
+    "extractedData": {
+      "date": "",
+      "amount": 0,
+      "issuer": "",
+      "reason": "The filename suggests this is an invoice (INV25-8), but the content could not be extracted to provide detailed information.",
+      "currency": "",
+      "isInvoice": true,
+      "confidence": 0.9,
+      "documentRole": "EMITTED"
+    },
+    "transactionId": null,
+    "uploadedAt": "2025-12-19T10:39:46.842Z"
   }
 ] as any[]) {
       await prisma.attachment.create({

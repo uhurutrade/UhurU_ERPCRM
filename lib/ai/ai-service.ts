@@ -57,7 +57,7 @@ async function analyzeWithOpenAI(filename: string, text: string): Promise<AIExtr
                 {
                     "isInvoice": boolean,
                     "issuer": string (Company name if found),
-                    "date": string (ISO date if found),
+                    "date": string (YYYY-MM-DD format if found),
                     "amount": number (Total amount),
                     "currency": string (ISO code, e.g., 'USD', 'EUR', 'GBP'),
                     "confidence": number (0 to 1),
@@ -110,7 +110,7 @@ async function analyzeWithGemini(filename: string, text: string): Promise<AIExtr
     {
         "isInvoice": boolean,
         "issuer": string,
-        "date": string (ISO),
+        "date": string (YYYY-MM-DD),
         "amount": number,
         "currency": string (ISO code),
         "confidence": number,

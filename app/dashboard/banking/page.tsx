@@ -5,6 +5,7 @@ import { Upload, History } from 'lucide-react';
 import { ExchangeRatesWidget } from '@/components/banking/exchange-rates-widget';
 import { serializeData } from '@/lib/serialization';
 import { getTransactionCategories } from '@/app/actions/categories';
+import { getTransactionSequences } from '@/lib/banking/sequences';
 
 export default async function BankingPage({
     searchParams
@@ -57,6 +58,7 @@ export default async function BankingPage({
         getTransactionCategories()
     ]);
 
+    const sequences = await getTransactionSequences(transactions);
     const categories = categoriesRes.success ? categoriesRes.categories : [];
 
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -100,6 +102,7 @@ export default async function BankingPage({
                     </div>
                     <TransactionTable
                         transactions={serializeData(transactions)}
+                        sequences={sequences}
                         totalPages={totalPages}
                         currentPage={currentPage}
                         totalItems={totalItems}
