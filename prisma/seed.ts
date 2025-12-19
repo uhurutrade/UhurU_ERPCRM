@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:51:46.279Z');
+  console.log('Generated at: 2025-12-19T12:52:23.594Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -6571,6 +6571,161 @@ async function main() {
     "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-19T12:51:44.623Z"
+  },
+  {
+    "id": "cmjcvcakz000f13qlsahrpvs4",
+    "filename": "Uhurutrade_Registration_4.png",
+    "fileType": "image/png",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148704630-350730881.png",
+    "size": 54158,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "c329ee8aa122f121d69cd5afbe44bee0d13475975de8d2c34e80873be8809f09",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "Cannot determine from the provided content as it appears to be non-textual data from an image file.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "The document does not contain usable information for company directors regarding UK corporate law, management, or strategy.",
+      "irrelevanceReason": "The content appears to be non-textual and not related to any specific UK company management, tax, legal, or strategy topic. It seems to be a part of a PNG image file that is corrupted or encoded in a way that is not readable as a document pertaining to UK corporate matters."
+    },
+    "strategicInsights": "The document does not contain usable information for company directors regarding UK corporate law, management, or strategy.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:50.291Z"
+  },
+  {
+    "id": "cmjcvccbp000g13qlc8pm6vzy",
+    "filename": "UhuruTrade_Registration.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148710298-670725687.pdf",
+    "size": 298662,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "7a5ba560ed1887ad6fa0b1857e953ea12fd17a4aaf7db1fd7b427c28304e432b",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Cannot determine VAT obligations due to lack of document content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Ensure document format is accessible for extraction to facilitate compliance and strategic review.",
+      "irrelevanceReason": "Document content failed to extract; unable to determine relevance to UK company management, tax, legal or strategy."
+    },
+    "strategicInsights": "Ensure document format is accessible for extraction to facilitate compliance and strategic review.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:52.549Z"
+  },
+  {
+    "id": "cmjcvcf85000h13qlqbf6uh0k",
+    "filename": "UKpostbox_comunication_.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148712556-1222337.pdf",
+    "size": 594911,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "e1b047e64787c34d0e8806f4b18eceef1ba5f59638a4dfb87b2a80238b02326c",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "No document content available to assess VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Without access to document content, strategic insights cannot be provided. If this communication is from or to a service like UK Postbox, it might relate to logistics, mail handling, or similar services, which typically do not directly influence company strategy or legal/tax obligations.",
+      "irrelevanceReason": "The document content could not be extracted, but based on the filename it does not clearly indicate relevance to UK company management, tax, legal, or strategy."
+    },
+    "strategicInsights": "Without access to document content, strategic insights cannot be provided. If this communication is from or to a service like UK Postbox, it might relate to logistics, mail handling, or similar services, which typically do not directly influence company strategy or legal/tax obligations.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:56.309Z"
+  },
+  {
+    "id": "cmjcvcija000i13qlevbtl8zx",
+    "filename": "Uhurutrade_Registration_1.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148716314-689898971.pdf",
+    "size": 198888,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "ffd2b508c286675e129f44e436b69775063e44a32d99524b98c38196e1c7fc4a",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Cannot determine VAT obligations without document content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Unable to provide strategic insight without document details.",
+      "irrelevanceReason": "The content of the PDF could not be extracted, making it impossible to determine its relevance or content."
+    },
+    "strategicInsights": "Unable to provide strategic insight without document details.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:52:00.598Z"
+  },
+  {
+    "id": "cmjcvclb2000j13qle3s8rewy",
+    "filename": "142390 150824-01.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148720610-569855052.pdf",
+    "size": 204083,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "0cb3f9d643f4d84fdd13e42741181e231a122c5caf1a6e09064f4ca94a081f05",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "No information available due to extraction failure.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "No strategic insights can be provided due to the inability to access the document content.",
+      "irrelevanceReason": "The content of the document could not be extracted, thus its relevance could not be determined."
+    },
+    "strategicInsights": "No strategic insights can be provided due to the inability to access the document content.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:52:04.191Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({
