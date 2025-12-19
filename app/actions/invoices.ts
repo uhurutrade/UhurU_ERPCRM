@@ -152,17 +152,20 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
 
     // Initial search: Wide enough to find both exact and converted amounts
     // We'll search for transactions in the date range with a pre-filter to ensure likely matches are fetched
-    const issuerKeywords = (issuer || '').split(/\s+/).filter((w: string) => w.length > 3).slice(0, 3);
+    const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 3).slice(0, 4);
     const amountStrDot = amount.toFixed(2);
     const amountStrComma = amountStrDot.replace('.', ',');
+
+    console.log(`[InvoiceMatch] Searching for: issuer=${issuer}, amount=${amount}, date=${targetDate.toISOString()}`);
+    console.log(`[InvoiceMatch] Keywords: ${issuerKeywords.join(', ')}`);
 
     const candidates = await prisma.bankTransaction.findMany({
         where: {
             date: { gte: dateStart, lte: dateEnd },
             OR: [
                 // 1. Amount matches roughly (FX/Conversion - up to 80% variation)
-                { amount: { gte: amount * 0.2, lte: amount * 2.5 } },
-                { amount: { gte: -amount * 2.5, lte: -amount * 0.2 } },
+                { amount: { gte: amount * 0.1, lte: amount * 3.0 } },
+                { amount: { gte: -amount * 3.0, lte: -amount * 0.1 } },
                 // 2. Exact amount digits found in description (dot or comma)
                 { description: { contains: amountStrDot, mode: 'insensitive' } },
                 { description: { contains: amountStrComma, mode: 'insensitive' } },
@@ -179,8 +182,10 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
             attachments: true
         },
         orderBy: { date: 'desc' },
-        take: 100
+        take: 200
     });
+
+    console.log(`[InvoiceMatch] Found ${candidates.length} potential candidates in DB.`);
 
     // Score and filter candidates
     return candidates.map(m => {
@@ -197,14 +202,23 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
         const amountStrDot = amount.toFixed(2);
         const amountStrComma = amountStrDot.replace('.', ',');
         const amountInDesc = cleanDesc.includes(amountStrDot) || cleanDesc.includes(amountStrComma);
+
+        // Also check if the integer part is present (e.g. "538" in description)
         const integerPart = amountStrDot.split('.')[0];
         const integerInDesc = integerPart.length > 2 && cleanDesc.includes(integerPart);
 
-        if (percentDiff < 0.001) score += 60; // Perfect match
-        else if (amountInDesc) score += 55;    // Exact amount mention in text (e.g. "transaction of 538.82 GBP")
-        else if (percentDiff < 0.02) score += 40; // Very close
-        else if (percentDiff < 0.4) score += 15;  // Broad range (+/- 40%) to account for exchange rates/fees
-        else if (integerInDesc) score += 10;   // At least the integer part matched (e.g. "538" in description)
+        if (percentDiff < 0.001) score += 75;      // Perfect match
+        else if (amountInDesc) score += 70;         // Exact amount mention in text (Highest Priority for cards)
+        else if (percentDiff < 0.1) score += 65;    // Within 10% (User requested priority)
+        else if (percentDiff < 0.25) score += 30;   // Reasonable conversion range
+        else if (percentDiff < 0.5) score += 15;    // Broad conversion range
+        else if (integerInDesc) score += 15;        // Integer match in description (Bonus)
+
+        // --- 1b. Date Proximity Scoring ---
+        const timeDiff = Math.abs(m.date.getTime() - targetDate.getTime());
+        const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+        if (daysDiff <= 4) score += 20;             // High bonus for being within +/- 4 days (User requested)
+        else if (daysDiff <= 15) score += 5;        // Small bonus for being close-ish
 
         // --- 2. Currency & Exchange Rate Scoring ---
         if (m.currency === currency) {
