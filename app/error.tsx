@@ -49,10 +49,10 @@ export default function Error({
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                         onClick={() => reset()}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-950 hover:bg-slate-200 rounded-xl font-semibold transition-all shadow-lg hover:-translate-y-0.5"
+                        className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-indigo-600/20 transition-all active:scale-95 hover:-translate-y-0.5"
                     >
                         <RefreshCw size={18} />
-                        Try Again
+                        Retry Operation
                     </button>
                     <Link
                         href="/"

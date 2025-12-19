@@ -69,81 +69,92 @@ export default async function CompliancePage() {
     ];
 
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">Fiscal Compliance (UK)</h1>
-                <p className="text-slate-400 mt-1">Track your HMRC and Companies House obligations securely.</p>
-            </div>
+        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+            <header className="flex justify-between items-end shrink-0">
+                <div>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Fiscal Compliance Engine</h1>
+                    <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Institutional Legal & Tax Surveillance (UK)</p>
+                </div>
+                <div className="flex gap-3">
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 uppercase tracking-widest">
+                        HMRC Link Active
+                    </span>
+                </div>
+            </header>
 
             {/* AI Tax Assistant Promo */}
-            <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500/10 blur-[80px] rounded-full" />
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-uhuru-card border border-uhuru-border p-10 shadow-card">
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-emerald-500/5 blur-[100px] rounded-full" />
 
-                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
                     <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20">Alpha</span>
-                            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                                UhurU AI Assistant
+                        <div className="flex items-center gap-4 mb-6">
+                            <span className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] border border-emerald-500/20">Autonomous Node</span>
+                            <h2 className="text-3xl font-black text-white tracking-tighter">
+                                UhurU Intelligence
                             </h2>
                         </div>
-                        <p className="text-slate-400 text-lg leading-relaxed max-w-2xl">
-                            Our RAG-powered engine analyzes your historical tax filings and ERP data to automate your upcoming returns with 99% accuracy.
+                        <p className="text-uhuru-text-muted text-xl leading-relaxed max-w-2xl font-medium">
+                            RAG-powered analysis engine processing historical filings and cross-referencing ledger data for 99.9% automated return accuracy.
                         </p>
                     </div>
 
                     <Link
                         href="/dashboard/compliance/tax-assistant"
-                        className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold shadow-xl shadow-emerald-500/20 transition-all active:scale-95 whitespace-nowrap"
+                        className="group flex items-center gap-4 px-10 py-5 rounded-[2rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-indigo-600/30 transition-all active:scale-95 whitespace-nowrap"
                     >
-                        Open Assistant
-                        <div className="p-1 bg-white/20 rounded-lg group-hover:translate-x-1 transition-transform">
-                            <Bot size={18} />
+                        Initialize Assistant
+                        <div className="p-1.5 bg-white/10 rounded-xl group-hover:rotate-12 transition-transform">
+                            <Bot size={20} />
                         </div>
                     </Link>
                 </div>
             </div>
 
-            {/* OBLIGATION CARDS - DARK THEME AS REQUESTED */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* OBLIGATION CARDS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {displayData.map((ob) => (
-                    <div key={ob.id} className="bg-uhuru-card border border-uhuru-border rounded-2xl p-6 relative overflow-hidden group hover:bg-uhuru-hover transition-all duration-300 shadow-card">
-                        <button className="absolute top-5 right-5 text-slate-500 hover:text-white transition-colors">
+                    <div key={ob.id} className="bg-uhuru-card border border-uhuru-border rounded-[2.5rem] p-8 relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300 shadow-card">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px] rounded-full -mr-10 -mt-10 group-hover:bg-indigo-500/10 transition-colors" />
+
+                        <button className="absolute top-8 right-8 text-uhuru-text-dim hover:text-white transition-colors z-20">
                             <MoreVertical size={20} />
                         </button>
 
-                        <div className="flex flex-col h-full space-y-5">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border border-slate-700/50 
-                                ${ob.type.includes('TAX') ? 'bg-emerald-500/10 text-emerald-400' :
-                                    ob.type.includes('ACC') ? 'bg-indigo-500/10 text-indigo-400' :
-                                        'bg-amber-500/10 text-amber-400'}`}
+                        <div className="flex flex-col h-full space-y-8 relative z-10">
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border border-white/5 shadow-2xl transition-transform group-hover:scale-110 
+                                ${ob.type.includes('TAX') ? 'bg-emerald-500/10 text-emerald-400 shadow-emerald-500/10' :
+                                    ob.type.includes('ACC') ? 'bg-blue-500/10 text-blue-400 shadow-blue-500/10' :
+                                        'bg-amber-500/10 text-amber-400 shadow-amber-500/10'}`}
                             >
-                                {ob.type.includes('TAX') ? <Landmark size={28} /> :
-                                    ob.type.includes('ACC') ? <FileCheck size={28} /> :
-                                        <Briefcase size={28} />}
+                                {ob.type.includes('TAX') ? <Landmark size={32} /> :
+                                    ob.type.includes('ACC') ? <FileCheck size={32} /> :
+                                        <Briefcase size={32} />}
                             </div>
 
                             <div>
-                                <h3 className="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-widest opacity-80">
+                                <h3 className="text-uhuru-text-dim text-[10px] font-black mb-3 uppercase tracking-[0.3em]">
                                     {ob.type.replace('_', ' ')}
                                 </h3>
-                                <p className="text-3xl font-bold text-white tracking-tight">
+                                <p className="text-4xl font-black text-white tracking-tighter">
                                     {ob.dueDate}
                                 </p>
                             </div>
 
-                            <div className="flex pt-2">
-                                <span className={`
-                                    px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2
+                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                <div className={`
+                                    px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2
                                     ${ob.daysLeft < 30
                                         ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-                                        : ob.type.includes('TAX')
-                                            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                                            : 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20'}
+                                        : 'bg-slate-900/60 text-slate-400 border border-white/5'}
                                 `}>
                                     <Clock size={14} className={ob.daysLeft < 30 ? 'animate-pulse' : ''} />
-                                    {ob.daysLeft} days left
-                                </span>
+                                    {ob.daysLeft < 0 ? 'Overdue' : `${ob.daysLeft} Operational Days`}
+                                </div>
+
+                                {ob.status === 'PENDING' && (
+                                    <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                                )}
                             </div>
                         </div>
                     </div>
@@ -151,13 +162,13 @@ export default async function CompliancePage() {
             </div>
 
             {calculatedObligations.length === 0 && (
-                <div className="mt-8 p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-start gap-4">
-                    <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400">
-                        <Calendar size={20} />
+                <div className="mt-8 p-6 bg-slate-900/40 border border-uhuru-border rounded-[2rem] flex items-center gap-5">
+                    <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400 shadow-xl shadow-indigo-500/10">
+                        <Calendar size={24} />
                     </div>
                     <div>
-                        <p className="text-indigo-300 font-bold mb-1 uppercase text-xs tracking-widest">Configuration required</p>
-                        <p className="text-indigo-300/60 text-sm">Showing demo deadlines. Go to settings to sync your real Companies House and HMRC dates.</p>
+                        <p className="text-white font-black mb-1 uppercase text-[10px] tracking-[0.2em]">Sandbox Mode Active</p>
+                        <p className="text-uhuru-text-muted text-sm">Showing simulated regulatory milestones. Integrate your HMRC Gateway credentials to unlock real-time perimeter surveillance.</p>
                     </div>
                 </div>
             )}

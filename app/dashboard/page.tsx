@@ -56,20 +56,22 @@ export default async function DashboardPage() {
     const totalBalance = allAccounts.reduce((sum, acc) => sum + Number(acc.currentBalance), 0);
 
     return (
-        <div className="space-y-8">
-            <header className="flex justify-between items-center">
+        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+            <header className="flex justify-between items-end shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-                    <p className="text-uhuru-text-muted mt-1">Overview of your business performance</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Executive Dashboard</h1>
+                    <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Strategic Management & Resource Planning</p>
                 </div>
                 <div className="flex gap-3">
-                    {/* Header Actions */}
+                    <span className="text-[10px] font-bold text-slate-500 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-white/5 uppercase tracking-widest">
+                        System Online
+                    </span>
                 </div>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Global Balance Card */}
-                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-emerald-500/30 hover:shadow-glow transition-all duration-300">
+                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-emerald-500/30 transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400">
                             <Wallet size={24} />
@@ -78,18 +80,18 @@ export default async function DashboardPage() {
                             <MoreVertical size={20} />
                         </button>
                     </div>
-                    <h3 className="text-uhuru-text-muted text-sm font-medium">Global Balance</h3>
-                    <p className="text-3xl font-bold text-white mt-1 tracking-tight">
-                        £{totalBalance.toLocaleString()}
+                    <label className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1 block">Global Liquidity</label>
+                    <p className="text-3xl font-bold text-white tracking-tight">
+                        £{totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </p>
-                    <div className="mt-4 flex items-center text-xs text-emerald-400 bg-emerald-500/10 w-fit px-2 py-1 rounded-full">
+                    <div className="mt-4 flex items-center text-[10px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
                         <TrendingUp size={12} className="mr-1" />
-                        <span>+12.5% this month</span>
+                        <span>+12.5% vs last month</span>
                     </div>
                 </div>
 
                 {/* Leads Card */}
-                <Link href="/dashboard/crm?view=leads" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+                <Link href="/dashboard/crm?view=leads" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400">
                             <Users size={24} />
@@ -98,15 +100,15 @@ export default async function DashboardPage() {
                             <MoreVertical size={20} />
                         </button>
                     </div>
-                    <h3 className="text-uhuru-text-muted text-sm font-medium">New Leads</h3>
-                    <p className="text-3xl font-bold text-white mt-1 tracking-tight">{leads}</p>
-                    <div className="mt-4 flex items-center text-xs text-blue-400 bg-blue-500/10 w-fit px-2 py-1 rounded-full">
-                        <span>Capture rate active</span>
+                    <label className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1 block">Active Inbound</label>
+                    <p className="text-3xl font-bold text-white tracking-tight">{leads}</p>
+                    <div className="mt-4 flex items-center text-[10px] text-blue-400 font-bold bg-blue-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
+                        <span>Lead Capture Active</span>
                     </div>
                 </Link>
 
                 {/* Tasks Card */}
-                <Link href="/dashboard/crm?view=tasks" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-amber-500/30 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] transition-all duration-300">
+                <Link href="/dashboard/crm?view=tasks" className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-amber-500/30 transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
                             <ClipboardList size={24} />
@@ -115,97 +117,93 @@ export default async function DashboardPage() {
                             <MoreVertical size={20} />
                         </button>
                     </div>
-                    <h3 className="text-uhuru-text-muted text-sm font-medium">Pending Tasks</h3>
-                    <p className="text-3xl font-bold text-white mt-1 tracking-tight">{tasks}</p>
-                    <div className="mt-4 flex items-center text-xs text-amber-400 bg-amber-500/10 w-fit px-2 py-1 rounded-full">
-                        <span>Requires attention</span>
+                    <label className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1 block">Operational Tasks</label>
+                    <p className="text-3xl font-bold text-white tracking-tight">{tasks}</p>
+                    <div className="mt-4 flex items-center text-[10px] text-amber-400 font-bold bg-amber-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
+                        <span>Intervention required</span>
                     </div>
                 </Link>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* Recent Activity */}
-                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm h-full">
+                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card h-full">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="font-semibold text-lg text-white flex items-center gap-2">
-                            <div className="p-1.5 bg-purple-500/10 rounded-lg text-purple-400">
-                                <Activity size={18} />
+                        <h3 className="font-bold text-lg text-white flex items-center gap-3">
+                            <div className="p-2 bg-purple-500/10 rounded-xl text-purple-400">
+                                <Activity size={20} />
                             </div>
-                            Recent Transactions
+                            Live Transactions Feed
                         </h3>
+                        <Link href="/dashboard/banking" className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">Full Ledger</Link>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         {transactions.map((tx: any) => (
-                            <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-uhuru-hover/50 transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+                            <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl border border-transparent hover:border-white/5 hover:bg-slate-900/40 transition-all group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-700 transition-all font-bold">
                                         £
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-white">{tx.description}</p>
-                                        <p className="text-xs text-uhuru-text-dim">{new Date(tx.date).toLocaleDateString()}</p>
+                                        <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform">{tx.description}</p>
+                                        <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tighter mt-0.5">{new Date(tx.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                     </div>
                                 </div>
-                                <span className={`font-mono font-medium ${Number(tx.amount) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                    {Number(tx.amount) >= 0 ? '+' : ''}{Number(tx.amount).toFixed(2)} {tx.currency}
+                                <span className={`font-mono font-bold text-sm ${Number(tx.amount) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {Number(tx.amount) >= 0 ? '+' : ''}{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {tx.currency}
                                 </span>
                             </div>
                         ))}
                         {transactions.length === 0 && (
-                            <p className="text-sm text-uhuru-text-muted text-center py-4">No recent transactions</p>
+                            <div className="py-12 text-center text-uhuru-text-dim italic text-sm">No recent interactions detected.</div>
                         )}
-                        <Link href="/dashboard/banking" className="block text-center text-sm text-uhuru-blue hover:text-uhuru-blue-light mt-4">
-                            View all transactions
-                        </Link>
                     </div>
                 </div>
 
-                {/* Account Cards Grid (Replaces Placeholder) */}
-                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm h-full">
+                {/* Account Cards Grid */}
+                <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card h-full">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="font-semibold text-lg text-white flex items-center gap-2">
-                            <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-400">
-                                <Building2 size={18} />
+                        <h3 className="font-bold text-lg text-white flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400">
+                                <Building2 size={20} />
                             </div>
-                            Active Accounts
+                            Institutional Accounts
                         </h3>
-                        <Link href="/dashboard/bank-settings" className="text-xs text-slate-400 hover:text-white transition-colors">
-                            Manage
-                        </Link>
+                        <Link href="/dashboard/bank-settings" className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Configure</Link>
                     </div>
 
                     {accounts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-40 text-center">
-                            <CreditCard className="text-slate-600 mb-2" size={32} />
-                            <p className="text-uhuru-text-muted">No accounts active</p>
+                        <div className="flex flex-col items-center justify-center h-48 py-8 text-center bg-slate-900/40 rounded-2xl border border-dashed border-uhuru-border">
+                            <CreditCard className="text-slate-700 mb-3" size={32} />
+                            <p className="text-uhuru-text-dim text-xs italic">No active accounts registered.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {accounts.map((acc: any) => (
                                 <Link href={`/dashboard/banking?accountId=${acc.id}`} key={acc.id} className="block group">
-                                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 group-hover:border-emerald-500/50 transition-colors">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="p-2 bg-slate-800 rounded-lg text-white transition-colors">
+                                    <div className="bg-slate-900/40 p-5 rounded-2xl border border-white/5 group-hover:border-emerald-500/30 group-hover:bg-slate-900/60 transition-all h-full">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="p-2.5 bg-slate-800 rounded-xl text-slate-400 group-hover:text-white transition-colors border border-white/5">
                                                 {(() => {
                                                     switch (acc.currency) {
-                                                        case 'USD': return <DollarSign size={16} />;
-                                                        case 'EUR': return <Euro size={16} />;
-                                                        case 'GBP': return <PoundSterling size={16} />;
-                                                        case 'JPY': return <JapaneseYen size={16} />;
-                                                        default: return <Banknote size={16} />;
+                                                        case 'USD': return <DollarSign size={18} />;
+                                                        case 'EUR': return <Euro size={18} />;
+                                                        case 'GBP': return <PoundSterling size={18} />;
+                                                        case 'JPY': return <JapaneseYen size={18} />;
+                                                        default: return <Banknote size={18} />;
                                                     }
                                                 })()}
                                             </div>
-                                            <span className="text-xs font-mono text-slate-500 bg-slate-900 px-2 py-0.5 rounded">
+                                            <span className="text-[9px] font-black text-slate-500 bg-slate-950 px-2 py-0.5 rounded border border-white/5 group-hover:text-white transition-colors">
                                                 {acc.currency}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-slate-400 truncate mb-1">{acc.bank.bankName}</p>
-                                        <p className={`font-bold truncate text-lg ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
+                                        <p className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-[0.1em] truncate mb-1">{acc.bank.bankName}</p>
+                                        <p className={`font-black tracking-tighter text-2xl group-hover:scale-[1.02] transition-transform origin-left ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
                                             {acc.currency === 'GBP' ? '£' : acc.currency === 'EUR' ? '€' : acc.currency === 'USD' ? '$' : ''}
                                             {Number(acc.currentBalance).toLocaleString()}
                                         </p>
-                                        <p className="text-xs text-slate-500 truncate mt-1">{acc.accountName}</p>
+                                        <p className="text-[10px] text-uhuru-text-dim font-bold mt-2 truncate bg-white/5 w-fit px-2 py-0.5 rounded uppercase tracking-widest">{acc.accountName}</p>
                                     </div>
                                 </Link>
                             ))}

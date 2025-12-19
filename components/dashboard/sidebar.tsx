@@ -72,14 +72,16 @@ export function Sidebar({ userEmail }: { userEmail?: string | null }) {
                 ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
             `}>
                 <div className="p-8 pb-4 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                    <Link href="/dashboard" className="flex flex-col items-center gap-1 transition-transform hover:scale-[1.02] active:scale-95 group w-full">
+                        <img
+                            src="/images/uhuru-logo.png"
+                            alt="UhurU Logo"
+                            className="h-16 w-auto object-contain drop-shadow-glow"
+                        />
+                        <h1 className="text-[13px] font-normal text-white/90 tracking-[0.25em] uppercase transition-colors group-hover:text-indigo-400">
                             Management Outlook
                         </h1>
-                        <p className="text-xs text-uhuru-text-dim mt-1 uppercase tracking-widest">
-                            UhurU Trade Ltd
-                        </p>
-                    </div>
+                    </Link>
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2 overflow-y-auto py-4 no-scrollbar">
