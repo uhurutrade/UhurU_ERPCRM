@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:22:14.538Z');
+  console.log('Generated at: 2025-12-19T12:24:28.787Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -6044,6 +6044,19 @@ async function main() {
     "fiscalYear": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T18:22:36.800Z"
+  },
+  {
+    "id": "cmjcubtqk0003ia7lgt47c2ox",
+    "filename": "HMRC_Tax_23092025.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766147008841-555999853.pdf",
+    "size": 109806,
+    "isProcessed": false,
+    "vectorId": null,
+    "fiscalYear": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:23:28.844Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({
