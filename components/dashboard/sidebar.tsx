@@ -20,7 +20,7 @@ import {
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-blue-400" },
     { href: "/dashboard/crm", label: "CRM", icon: Users, color: "text-purple-400" },
-    { href: "/dashboard/erp", label: "ERP", icon: Briefcase, color: "text-emerald-400" },
+    { href: "/dashboard/invoices", label: "Invoices", icon: Briefcase, color: "text-emerald-400" },
     { href: "/dashboard/banking", label: "General Ledger", icon: Landmark, color: "text-amber-400" },
     { href: "/dashboard/statements", label: "Statements", icon: FileText, color: "text-pink-400" },
     { href: "/dashboard/compliance", label: "Compliance (UK)", icon: ShieldCheck, color: "text-rose-400" },

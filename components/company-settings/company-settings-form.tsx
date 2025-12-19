@@ -76,6 +76,9 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
         contactPhone: initialData?.contactPhone || "",
         website: initialData?.website || "",
 
+        // AI Preferences
+        aiProvider: initialData?.aiProvider || "openai",
+
         // Additional Notes
         notes: initialData?.notes || "",
     });
@@ -649,7 +652,62 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                 </div>
             </section>
 
+            {/* AI Configuration */}
+            <section className="bg-slate-900/40 p-6 rounded-xl border border-indigo-500/20 shadow-lg">
+                <h2 className="text-xl font-semibold mb-4 text-indigo-400 flex items-center gap-2">
+                    <span className="p-1.5 bg-indigo-500/10 rounded-lg">🤖</span>
+                    AI Configuration & Assistant
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Select AI Infrastructure Provider
+                        </label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, aiProvider: 'openai' }))}
+                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${formData.aiProvider === 'openai'
+                                    ? 'bg-indigo-600/20 border-indigo-500 text-white font-bold'
+                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                    }`}
+                            >
+                                <span className="text-lg">✨</span>
+                                OpenAI (ChatGPT)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, aiProvider: 'gemini' }))}
+                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${formData.aiProvider === 'gemini'
+                                    ? 'bg-teal-600/20 border-teal-500 text-white font-bold'
+                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                    }`}
+                            >
+                                <span className="text-lg">💎</span>
+                                Google Gemini
+                            </button>
+                        </div>
+                        <p className="mt-2 text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                            {formData.aiProvider === 'openai'
+                                ? "Infrastructure: GPT-4o Mini (Cost Optimized)"
+                                : "Infrastructure: Gemini 1.5 Flash (Optimized Cost)"}
+                        </p>
+                    </div>
+
+                    <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5 flex flex-col justify-center">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className={`w-2 h-2 rounded-full ${process.env.NEXT_PUBLIC_AI_STATUS === 'ready' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">System Status</span>
+                        </div>
+                        <p className="text-xs text-slate-400 italic">
+                            All API keys are securely managed via environment variables. Ensure OPENAI_API_KEY or GEMINI_API_KEY are configured in your .env file on the VPS.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             {/* Additional Notes */}
+
             <section>
                 <h2 className="text-xl font-semibold mb-4 text-emerald-400">Additional Notes</h2>
                 <div>

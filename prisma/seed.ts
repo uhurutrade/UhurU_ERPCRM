@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T08:51:39.673Z');
+  console.log('Generated at: 2025-12-19T09:30:31.249Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -110,6 +110,7 @@ async function main() {
     "companySecretary": ".",
     "shareCapital": "1",
     "numberOfShares": 1,
+    "aiProvider": "openai",
     "accountingSoftware": null,
     "accountingMethod": null,
     "contactEmail": "hello@uhurutrade.com",
@@ -5814,6 +5815,7 @@ async function main() {
     "path": "/uploads/attachments/1765714768157-76204959.pdf",
     "fileType": "application/pdf",
     "originalName": "invoice_INV25-8 (1).pdf",
+    "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:19:28.165Z"
   },
@@ -5822,6 +5824,7 @@ async function main() {
     "path": "/uploads/attachments/1765714885617-125972166.pdf",
     "fileType": "application/pdf",
     "originalName": "INV25-7.pdf",
+    "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:21:25.621Z"
   },
@@ -5830,6 +5833,7 @@ async function main() {
     "path": "/uploads/attachments/1765715189200-210844698.png",
     "fileType": "image/png",
     "originalName": "descarga.png",
+    "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:26:29.207Z"
   },
@@ -5838,6 +5842,7 @@ async function main() {
     "path": "/uploads/attachments/1765715219850-93510644.png",
     "fileType": "image/png",
     "originalName": "descarga.png",
+    "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:26:59.853Z"
   },
@@ -5846,6 +5851,7 @@ async function main() {
     "path": "/uploads/attachments/1765715246982-223742510.png",
     "fileType": "image/png",
     "originalName": "linkedin4.png",
+    "extractedData": null,
     "transactionId": null,
     "uploadedAt": "2025-12-14T12:27:26.986Z"
   }

@@ -44,7 +44,7 @@ export default function CreateInvoiceForm({ organizations }: { organizations: an
         const res = await createInvoice(formData);
 
         if (res?.success) {
-            router.push('/dashboard/erp');
+            router.push('/dashboard/invoices');
         } else {
             alert('Error creating invoice');
             setLoading(false);

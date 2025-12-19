@@ -73,7 +73,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
 # Crear carpeta de uploads
-RUN mkdir -p /app/uploads && chown nextjs:nodejs /app/uploads
+RUN mkdir -p /app/public/uploads && chown nextjs:nodejs /app/public/uploads
 
 USER nextjs
 CMD ["node", "server.js"]

@@ -5,29 +5,59 @@ services:
       dockerfile: Dockerfile
     container_name: uhuru-erp-web
     restart: always
-    ports:
-      - "3000:3000"
+
+    # 🔒 NO exponemos al host (seguridad VPS)
+    expose:
+      - "3000"
+
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://uhuru_user:uhuru_password@db:5432/uhuru_db?schema=public
+      DATABASE_URL: postgresql://uhuru_user:uhuru_password@erp-db:5432/uhuru_db?schema=public
+
     volumes:
-      - ./uploads:/app/uploads
+      # Sincronizado con la carpeta public de Next.js para persistencia de adjuntos
+      - ./uploads:/app/public/uploads
+
     depends_on:
       - db
+
+    networks:
+      uhuru-network:
+        aliases:
+          - erp-web
+
+    mem_limit: 1g
+    cpus: 1.0
 
   db:
     image: postgres:15-alpine
     container_name: uhuru-erp-db
     restart: always
+
     environment:
       POSTGRES_USER: uhuru_user
       POSTGRES_PASSWORD: uhuru_password
       POSTGRES_DB: uhuru_db
-    ports:
-      - "5432:5432"
+
+    # 🔒 PostgreSQL SOLO interno
+    expose:
+      - "5432"
+
     volumes:
       - db_data:/var/lib/postgresql/data
 
+    networks:
+      uhuru-network:
+        aliases:
+          - erp-db
+
+    mem_limit: 512m
+    cpus: 1.0
+
 volumes:
   db_data:
+
+networks:
+  uhuru-network:
+    external: true

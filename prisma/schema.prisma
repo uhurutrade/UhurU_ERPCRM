@@ -390,6 +390,7 @@ model Attachment {
   path          String
   fileType      String?
   originalName  String?
+  extractedData Json?           // AI-extracted data (issuer, amount, date, etc.)
 
   transactionId String?
   transaction   BankTransaction? @relation(fields: [transactionId], references: [id])
@@ -535,6 +536,9 @@ model CompanySettings {
   shareCapital              Decimal?  @db.Decimal(15, 2)
   numberOfShares            Int?
   
+  // AI Preferences
+  aiProvider                String    @default("openai") // "openai" or "gemini"
+
   // Accounting Software & Methods
   accountingSoftware        String?   // Xero, QuickBooks, etc.
   accountingMethod          String?   // Cash basis, Accrual basis

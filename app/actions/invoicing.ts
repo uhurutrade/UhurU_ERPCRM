@@ -49,7 +49,7 @@ export async function createInvoice(formData: FormData) {
             }
         });
 
-        revalidatePath('/dashboard/erp');
+        revalidatePath('/dashboard/invoices');
         return { success: true };
 
     } catch (error) {

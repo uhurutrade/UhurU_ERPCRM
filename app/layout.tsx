@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import { ModalProvider } from "@/components/providers/modal-provider";
+import { Toaster } from 'sonner';
 
 export default function RootLayout({
     children,
@@ -19,6 +20,7 @@ export default function RootLayout({
                 <ModalProvider>
                     {children}
                 </ModalProvider>
+                <Toaster richColors position="top-right" theme="dark" />
             </body>
         </html>
     );

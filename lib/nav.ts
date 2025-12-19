@@ -3,7 +3,7 @@
 export const navItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/dashboard/crm", label: "CRM" },
-    { href: "/dashboard/erp", label: "ERP" },
+    { href: "/dashboard/invoices", label: "Invoices" },
     { href: "/dashboard/banking", label: "Banca" },
     { href: "/dashboard/compliance", label: "Cumplimiento (UK)", className: "text-slate-400" },
 ];
