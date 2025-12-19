@@ -145,7 +145,6 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
 
     // Fallback if AI produced an invalid date
     if (isNaN(targetDate.getTime())) {
-        console.warn(`[Invoice Matching] AI provided invalid date: "${date}". Falling back to current date.`);
         targetDate = new Date();
     }
 
@@ -153,26 +152,29 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
     const dateStart = new Date(targetDate.getFullYear(), 0, 1);
     const dateEnd = new Date(targetDate.getFullYear(), 11, 31, 23, 59, 59);
 
+    // Amount range: +/- 10% to account for fees, small discrepancies or approximate extractions
+    const minAmount = amount * 0.9;
+    const maxAmount = amount * 1.1;
+
     // Build the query
     const whereConditions: any[] = [
         { date: { gte: dateStart, lte: dateEnd } }
     ];
 
-    // Filter by sign based on role
+    // Filter by sign and amount range
     if (documentRole === 'RECEIVED') {
-        whereConditions.push({ amount: { lt: 0 } });
-    } else if (documentRole === 'EMITTED') {
-        whereConditions.push({ amount: { gt: 0 } });
-    }
-
-    // Only add name matching if issuer is not "Unknown" or too generic
-    if (issuer && issuer.toLowerCase() !== 'unknown' && issuer.length > 2) {
         whereConditions.push({
-            OR: [
-                { description: { contains: issuer, mode: 'insensitive' } },
-                { counterparty: { contains: issuer, mode: 'insensitive' } },
-                { merchant: { contains: issuer, mode: 'insensitive' } }
-            ]
+            amount: {
+                lte: -minAmount,
+                gte: -maxAmount
+            }
+        });
+    } else if (documentRole === 'EMITTED') {
+        whereConditions.push({
+            amount: {
+                gte: minAmount,
+                lte: maxAmount
+            }
         });
     }
 
@@ -186,25 +188,42 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
             },
             attachments: true
         },
-        take: 5
+        take: 10 // Increase candidates
     });
 
     // Score and filter matches
     return matches.map(m => {
         let score = 0;
-        // Amount match (using absolute values because expenses are negative in bank)
-        const diff = Math.abs(Math.abs(Number(m.amount)) - amount);
+        const transAmount = Math.abs(Number(m.amount));
+
+        // --- Amount Scoring (Max 50) ---
+        const diff = Math.abs(transAmount - amount);
         const percentDiff = diff / amount;
-        if (percentDiff < 0.01) score += 50;
-        else if (percentDiff < 0.05) score += 30;
 
-        // Currency match
-        if (m.currency === currency) score += 20;
+        if (percentDiff < 0.001) score += 50; // Exact
+        else if (percentDiff < 0.01) score += 40; // Very close
+        else if (percentDiff < 0.05) score += 25; // Close
+        else score += 10; // Within 10% range
 
-        // Exact name match
-        if (m.description.toLowerCase().includes(issuer.toLowerCase()) ||
-            (m.counterparty && m.counterparty.toLowerCase().includes(issuer.toLowerCase()))) {
-            score += 30;
+        // --- Currency match (Max 15) ---
+        if (m.currency === currency) score += 15;
+
+        // --- Provider/Issuer match (Max 35) ---
+        // We look for the provider in any field, even if it's a partial tag like "ALIBABA.COM" in a card transaction
+        if (issuer && issuer.toLowerCase() !== 'unknown' && issuer.length > 2) {
+            const cleanIssuer = issuer.toLowerCase().trim();
+            const desc = m.description.toLowerCase();
+            const cp = (m.counterparty || '').toLowerCase();
+            const merch = (m.merchant || '').toLowerCase();
+
+            if (desc.includes(cleanIssuer) || cp.includes(cleanIssuer) || merch.includes(cleanIssuer)) {
+                score += 35;
+            } else {
+                // Check for individual words to be even less restrictive (e.g. "Google Cloud" matching "GOOGLE")
+                const words = cleanIssuer.split(/\s+/).filter(w => w.length > 3);
+                const hasWordMatch = words.some(w => desc.includes(w) || cp.includes(w) || merch.includes(w));
+                if (hasWordMatch) score += 20;
+            }
         }
 
         return {
