@@ -141,86 +141,77 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
 async function findPotentialMatches(analysis: any, documentRole: string) {
     const { issuer, amount, date, currency } = analysis;
 
-    let targetDate = new Date(date);
-    if (isNaN(targetDate.getTime())) {
-        targetDate = new Date();
-    }
+    // Defensive check: If AI failed to extract amount or date
+    const safeAmount = Number(amount) || 0;
+    const targetDate = new Date(date);
+    const dateVal = isNaN(targetDate.getTime()) ? new Date() : targetDate;
 
-    // Search window: +/- 730 days (2 years) from the invoice date
-    const dateStart = new Date(targetDate.getTime() - (730 * 24 * 60 * 60 * 1000));
-    const dateEnd = new Date(targetDate.getTime() + (730 * 24 * 60 * 60 * 1000));
+    // Search window: +/- 730 days (2 years)
+    const dateStart = new Date(dateVal.getTime() - (730 * 24 * 60 * 60 * 1000));
+    const dateEnd = new Date(dateVal.getTime() + (730 * 24 * 60 * 60 * 1000));
 
-    // Initial search: Wide enough to find both exact and converted amounts
-    // We'll search for transactions in the date range with a pre-filter to ensure likely matches are fetched
     const issuerKeywords = (issuer || '').split(/[\s,.-]+/).filter((w: string) => w.length > 3).slice(0, 6);
-    const amountStrDot = amount.toFixed(2);
+    const amountStrDot = safeAmount.toFixed(2);
     const amountStrComma = amountStrDot.replace('.', ',');
     const integerPart = amountStrDot.split('.')[0];
 
-    // Calculate a 10% margin for DB filtering
-    const minAmount = amount * 0.9;
-    const maxAmount = amount * 1.1;
-
-    console.log(`[InvoiceMatch] Searching for: issuer=${issuer}, amount=${amount}, integerPart=${integerPart}`);
+    console.log(`[InvoiceMatch] START: issuer=${issuer}, amount=${safeAmount}, integer=${integerPart}, date=${dateVal.toISOString()}`);
 
     const candidates = await prisma.bankTransaction.findMany({
         where: {
             date: { gte: dateStart, lte: dateEnd },
             OR: [
-                // 1. Amount matches within 10% (direct or negative for receipts)
-                { amount: { gte: minAmount, lte: maxAmount } },
-                { amount: { gte: -maxAmount, lte: -minAmount } },
-                // 2. Exact amount digits found in description (dot, comma or just the integer part)
+                // 1. Amount matches within 10%
+                { amount: { gte: safeAmount * 0.9, lte: safeAmount * 1.1 } },
+                { amount: { gte: -safeAmount * 1.1, lte: -safeAmount * 0.9 } },
+                // 2. String matches (dot, comma, or integer)
                 { description: { contains: amountStrDot, mode: 'insensitive' } },
                 { description: { contains: amountStrComma, mode: 'insensitive' } },
-                ...(integerPart.length >= 3 ? [{ description: { contains: integerPart, mode: 'insensitive' } }] : []),
-                // 3. Any issuer keywords in description/counterparty/merchant
+                ...(integerPart.length >= 3 ? [
+                    { description: { contains: integerPart, mode: 'insensitive' } },
+                    { counterparty: { contains: integerPart, mode: 'insensitive' } }
+                ] : []),
+                // 3. Issuer match
                 ...issuerKeywords.map((kw: string) => ({ description: { contains: kw, mode: 'insensitive' } })),
                 ...issuerKeywords.map((kw: string) => ({ counterparty: { contains: kw, mode: 'insensitive' } })),
                 ...issuerKeywords.map((kw: string) => ({ merchant: { contains: kw, mode: 'insensitive' } }))
             ]
         },
         include: {
-            bankAccount: {
-                include: { bank: true }
-            },
+            bankAccount: { include: { bank: true } },
             attachments: true
         },
         orderBy: { date: 'desc' },
         take: 300
     });
 
-    console.log(`[InvoiceMatch] Found ${candidates.length} potential candidates in DB.`);
+    console.log(`[InvoiceMatch] DB Found ${candidates.length} candidates.`);
 
-    // Score and filter candidates
     return candidates.map(m => {
         let score = 0;
         const transAmount = Math.abs(Number(m.amount));
         const cleanDesc = m.description.toLowerCase();
 
         // --- 1. Amount Scoring ---
-        const diff = Math.abs(transAmount - amount);
-        const percentDiff = diff / amount;
+        const diff = Math.abs(transAmount - safeAmount);
+        const percentDiff = safeAmount > 0 ? diff / safeAmount : 0;
 
-        // Logical check: Is the amount mentioned in the description? 
-        // (Crucial for card payments in foreign currencies)
-        const amountStrDot = amount.toFixed(2);
+        const amountStrDot = safeAmount.toFixed(2);
         const amountStrComma = amountStrDot.replace('.', ',');
         const amountInDesc = cleanDesc.includes(amountStrDot) || cleanDesc.includes(amountStrComma);
 
-        // Also check if the integer part is present (e.g. "538" in description)
         const integerPart = amountStrDot.split('.')[0];
-        const integerInDesc = integerPart.length > 2 && cleanDesc.includes(integerPart);
+        const integerInDesc = integerPart.length >= 3 && cleanDesc.includes(integerPart);
 
-        if (percentDiff < 0.001) score += 75;      // Perfect match
-        else if (amountInDesc) score += 70;         // Exact amount mention in text (Highest Priority for cards)
-        else if (percentDiff < 0.1) score += 65;    // Within 10% (User requested priority)
-        else if (percentDiff < 0.25) score += 30;   // Reasonable conversion range
-        else if (percentDiff < 0.5) score += 15;    // Broad conversion range
-        else if (integerInDesc) score += 15;        // Integer match in description (Bonus)
+        if (percentDiff < 0.001 && safeAmount > 0) score += 80;  // Perfect match
+        else if (amountInDesc) score += 75;                       // Full string in desc
+        else if (integerInDesc) score += 65;                      // Integer match (USER PRIORITY)
+        else if (percentDiff < 0.1) score += 60;                  // Within 10%
+        else if (percentDiff < 0.3) score += 30;                  // Broad FX range
+        else if (percentDiff < 0.6) score += 15;                  // Extreme FX range
 
         // --- 1b. Date Proximity Scoring ---
-        const timeDiff = Math.abs(m.date.getTime() - targetDate.getTime());
+        const timeDiff = Math.abs(m.date.getTime() - dateVal.getTime());
         const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
         if (daysDiff <= 4) score += 20;             // High bonus for being within +/- 4 days (User requested)
         else if (daysDiff <= 15) score += 5;        // Small bonus for being close-ish
