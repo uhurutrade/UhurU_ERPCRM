@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:51:04.546Z');
+  console.log('Generated at: 2025-12-19T12:51:19.824Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -6194,6 +6194,135 @@ async function main() {
     "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-19T12:50:58.751Z"
+  },
+  {
+    "id": "cmjcvbbre000313qlyp051fbm",
+    "filename": "Entradas.xlsx",
+    "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148658760-976466552.xlsx",
+    "size": 4798,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "7f92670a9a747070e8f88dc4de16b645ad8af25e68be65797e679e0a2fc7ffb9",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "The content does not provide any information on VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "The content appears to contain metadata or technical details of an Excel file rather than actionable insights or data related to company strategy. Please review the intended worksheet content for specific strategic insights.",
+      "irrelevanceReason": "The content appears to be a binary representation of an Excel file, likely related to data or metadata storage for an Excel workbook rather than specific UK company management, tax, legal, or strategy guidance."
+    },
+    "strategicInsights": "The content appears to contain metadata or technical details of an Excel file rather than actionable insights or data related to company strategy. Please review the intended worksheet content for specific strategic insights.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:05.163Z"
+  },
+  {
+    "id": "cmjcvbevv000413qlpmxkpfv0",
+    "filename": "factura pedido 96 unidades set tupper.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148665170-971990558.pdf",
+    "size": 78137,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "52c87f7a79b496fd222cce86205685333cbb06f49c1322137070ce29009e1b0c",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Without specific document content, it cannot be determined if the company should charge VAT.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "No strategic insights can be determined from this document.",
+      "irrelevanceReason": "The document appears to be an invoice for an order of tupperware units, likely not related to UK company management, tax, legal, or strategic considerations."
+    },
+    "strategicInsights": "No strategic insights can be determined from this document.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:09.211Z"
+  },
+  {
+    "id": "cmjcvbigv000513qluf2elilo",
+    "filename": "Iva_UK",
+    "fileType": "application/octet-stream",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148669219-237676044.Iva_UK",
+    "size": 269,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "e567b8c525135e0a6da1e33dbb6f2c5f7cc760d7b839275db34656d05fa0a4c8",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Document does not provide sufficient information regarding business activities or VAT registration status.",
+        "mustCharge": null
+      },
+      "extractedFacts": {
+        "address": "Lytchett House, 13 Freeland Park, Wareham Road, Poole, Dorset, BH16 6FA",
+        "utrNumber": "8926608239",
+        "companyNumber": "15883242",
+        "taxOfficerNumber": "623"
+      },
+      "strategicInsight": "Ensure the security of sensitive information such as authentication codes and passwords to prevent unauthorized access. Regularly update passwords and follow best practices for data protection.",
+      "irrelevanceReason": "The document contains sensitive account information but lacks context or content pertaining specifically to UK company management, tax obligations, legal agreements, or strategic business decisions."
+    },
+    "strategicInsights": "Ensure the security of sensitive information such as authentication codes and passwords to prevent unauthorized access. Regularly update passwords and follow best practices for data protection.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:13.854Z"
+  },
+  {
+    "id": "cmjcvbkia000613ql530m6wv9",
+    "filename": "142390 140824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148673875-634813442.pdf",
+    "size": 429382,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "21da09e388051d44ddf981bb545284eee636f9bc103c8ea1154e6e2ccd969de3",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Content could not be extracted, so VAT obligations cannot be determined.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Ensure document digitization to facilitate retrieval and analysis, which is crucial for meeting compliance and operational effectiveness.",
+      "irrelevanceReason": "Unable to assess due to extraction failure; no content available for review."
+    },
+    "strategicInsights": "Ensure document digitization to facilitate retrieval and analysis, which is crucial for meeting compliance and operational effectiveness.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:16.498Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({
