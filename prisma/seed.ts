@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T16:43:02.138Z');
+  console.log('Generated at: 2025-12-19T16:46:05.634Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5843,17 +5843,17 @@ async function main() {
   console.log('Seeding Attachments...');
   for (const att of [
   {
-    "id": "cmjd3gfd10005pmu6r66ysry1",
-    "path": "/uploads/invoices/1766162334154-378657430.pdf",
+    "id": "cmjd3mslt0006pmu6lr06k0mr",
+    "path": "/uploads/invoices/1766162630729-908193238.pdf",
     "fileType": "application/pdf",
     "originalName": "factura pedido 96 unidades set tupper.pdf",
     "transactionId": "cmj8xvoqc004we43opodemtdt",
-    "uploadedAt": "2025-12-19T16:39:00.038Z",
+    "uploadedAt": "2025-12-19T16:43:57.137Z",
     "extractedData": {
       "date": "2022-11-18",
       "amount": 538.82,
       "issuer": "Alibaba.com Singapore E-Commerce Private Ltd.",
-      "reason": "The document is labeled as an invoice and contains typical invoice information, including issuer details, invoice number, and payment amount.",
+      "reason": "Clearly labeled as an invoice with identifiable issuer and date, and itemized amounts are provided.",
       "currency": "GBP",
       "isInvoice": true,
       "confidence": 0.95,
