@@ -30,9 +30,9 @@ export async function getAIClient() {
             return analyzeWithOpenAI(filename, text);
         },
 
-        async analyzeStrategicDoc(filename: string, text: string): Promise<any> {
+        async analyzeStrategicDoc(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<any> {
             if (provider === 'gemini') {
-                return analyzeStrategicWithGemini(filename, text);
+                return analyzeStrategicWithGemini(filename, text, buffer, mimeType);
             }
             return analyzeStrategicWithOpenAI(filename, text);
         },
@@ -187,7 +187,7 @@ async function chatWithGemini(message: string, systemPrompt: string): Promise<st
     return response.text();
 }
 
-async function analyzeStrategicWithGemini(filename: string, text: string): Promise<any> {
+async function analyzeStrategicWithGemini(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<any> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key is not configured.");
 
@@ -197,9 +197,10 @@ async function analyzeStrategicWithGemini(filename: string, text: string): Promi
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Analyze this document as a UK LTD corporate expert. Filename: ${filename}. Content: ${text.substring(0, 20000)}
+    const prompt = `Analyze this document as a UK LTD corporate expert. Filename: ${filename}.
     Determine if it is relevant to business/tax/legal management (isRelevant).
     Extract the effective date (documentDate) and a specific topic name (docTopic) used for versioning.
+    
     Return JSON:
     {
         "isRelevant": boolean,
@@ -210,9 +211,28 @@ async function analyzeStrategicWithGemini(filename: string, text: string): Promi
         "vatLiability": { "mustCharge": boolean, "reason": string },
         "strategicInsight": string,
         "extractedFacts": object
-    }`;
+    }
+    
+    If no text is provided or if text extraction failed, analyze the visual content of the file if provided.`;
 
-    const result = await model.generateContent(prompt);
+    const contents: any[] = [];
+
+    // Add file data if available (Multimodal)
+    if (buffer && mimeType === 'application/pdf') {
+        contents.push({
+            inlineData: {
+                data: buffer.toString('base64'),
+                mimeType: mimeType
+            }
+        });
+    }
+
+    // Add text extracted (as fallback or additional context)
+    contents.push({
+        text: `${prompt}\n\nExtracted Text (can be empty): ${text.substring(0, 20000)}`
+    });
+
+    const result = await model.generateContent(contents);
     const response = await result.response;
     return JSON.parse(response.text());
 }

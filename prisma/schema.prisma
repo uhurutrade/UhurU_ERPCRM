@@ -7,37 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User & Auth
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("USER") // ADMIN for the owner
+  role          String    @default("USER")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
   tasks         Task[]    @relation("AssignedTo")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Account {
-  id                  String  @id @default(cuid())
-  userId              String
-  type                String
-  provider            String
-  providerAccountId   String
-  refresh_token       String? @db.Text
-  access_token        String? @db.Text
-  expires_at          Int?
-  token_type          String?
-  scope               String?
-  id_token            String? @db.Text
-  session_state       String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -50,29 +47,23 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// CRM
 model Organization {
-  id          String    @id @default(cuid())
-  name        String
-  sector      String?
-  website     String?
-  address     String?
-  contacts    Contact[]
-  deals       Deal[]
-  
-  // CORRECCIÓN: Se añade la relación inversa para Invoice (factura)
-  invoices    Invoice[] 
-  
-  // Billing Info
-  isBillable  Boolean   @default(false)
-  taxId       String?   // VAT/NIF
-  legalName   String?
-  bankName    String?
-  bankIban    String?
-  bankSwift   String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  sector     String?
+  website    String?
+  address    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  bankIban   String?
+  bankName   String?
+  bankSwift  String?
+  isBillable Boolean   @default(false)
+  legalName  String?
+  taxId      String?
+  contacts   Contact[]
+  deals      Deal[]
+  invoices   Invoice[]
 }
 
 model Contact {
@@ -82,559 +73,382 @@ model Contact {
   phone          String?
   role           String?
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  activities     Activity[]
-
   isClient       Boolean       @default(false)
-  
-  // Billing Info (for individuals)
-  isBillable     Boolean       @default(false)
-  taxId          String?
-  legalName      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   bankIban       String?
+  isBillable     Boolean       @default(false)
+  legalName      String?
+  taxId          String?
   linkedin       String?
   website        String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  activities     Activity[]
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Lead {
-  id          String   @id @default(cuid())
-  name        String
-  email       String?
-  source      String?  // LinkedIn, X, etc
-  status      String   @default("NEW") // NEW, CONTACTED, QUALIFIED, LOST
-  notes       String? @db.Text
-
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  source    String?
+  status    String   @default("NEW")
+  notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Deal {
-  id             String         @id @default(cuid())
+  id             String       @id @default(cuid())
   title          String
-  amount         Decimal?       @db.Decimal(10, 2)
-  currency       String         @default("GBP")
-  stage          String         // PROSPECTING, PROPOSAL, NEGOTIATION, WON, LOST
+  amount         Decimal?     @db.Decimal(10, 2)
+  currency       String       @default("GBP")
+  stage          String
   closeDate      DateTime?
   organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Task {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  dueDate       DateTime?
-  completed     Boolean   @default(false)
-
-  assignedToId  String?
-  assignedTo    User?     @relation("AssignedTo", fields: [assignedToId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  dueDate      DateTime?
+  completed    Boolean   @default(false)
+  assignedToId String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  assignedTo   User?     @relation("AssignedTo", fields: [assignedToId], references: [id])
 }
 
 model Activity {
   id        String   @id @default(cuid())
-  type      String   // CALL, EMAIL, MEETING
-  notes     String?  @db.Text
+  type      String
+  notes     String?
   date      DateTime @default(now())
-
   contactId String?
   contact   Contact? @relation(fields: [contactId], references: [id])
 }
 
-// ERP & Banking
-// Bank Settings - Traditional Banks
 model Bank {
-  id                  String         @id @default(cuid())
-  
-  // Basic Bank Information
-  bankName            String         // Revolut, Wise, Worldfirst, HSBC, etc.
-  bankType            String         // TRADITIONAL, NEOBANK, PAYMENT_PROVIDER
-  
-  // Bank Details
-  swiftBic            String?        // SWIFT/BIC code
-  bankCode            String?        // Bank code (varies by country)
-  
-  // Contact Information
-  website             String?
-  supportEmail        String?
-  supportPhone        String?
-  
-  // Address
-  bankAddress         String?
-  bankCity            String?
-  bankPostcode        String?
-  bankCountry         String?
-  
-  // Status
-  isActive            Boolean        @default(true)
-  
-  // Notes
-  notes               String?        @db.Text
-  
-  // Relations
-  accounts            BankAccount[]
-  
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id           String        @id @default(cuid())
+  bankName     String
+  bankType     String
+  swiftBic     String?
+  bankCode     String?
+  website      String?
+  supportEmail String?
+  supportPhone String?
+  bankAddress  String?
+  bankCity     String?
+  bankPostcode String?
+  bankCountry  String?
+  isActive     Boolean       @default(true)
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  accounts     BankAccount[]
 }
 
-// Bank Accounts - Specific accounts per currency
 model BankAccount {
-  id                  String            @id @default(cuid())
-  
-  // Bank Reference
-  bankId              String
-  bank                Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
-  
-  // Account Information
-  accountName         String            // e.g., "Main EUR Account", "USD Business Account"
-  accountType         String            // CHECKING, SAVINGS, BUSINESS, MULTI_CURRENCY
-  currency            String            // EUR, USD, GBP, CHF
-  
-  // Account Numbers (varies by currency/country)
-  // EUR (SEPA)
-  iban                String?           // International Bank Account Number
-  
-  // USD (USA)
-  accountNumber       String?           // Account number
-  routingNumber       String?           // ABA routing number (USA) - mostly for ACH
-  wireRoutingNumber   String?           // Wire transfer routing number (if different)
-  
-  // GBP (UK)
-  sortCode            String?           // UK sort code (6 digits)
-  accountNumberUK     String?           // UK account number (8 digits)
-  
-  // CHF (Switzerland)
-  ibanCH              String?           // Swiss IBAN
-  bcNumber            String?           // BC number (Switzerland)
-  
-  // Additional identifiers
-  swiftBic            String?           // SWIFT/BIC for this specific account
-  
-  // Balance tracking (optional)
-  currentBalance      Decimal?          @db.Decimal(15, 2)
-  availableBalance    Decimal?          @db.Decimal(15, 2)
-  lastBalanceUpdate   DateTime?
-  
-  // Status
-  isActive            Boolean           @default(true)
-  isPrimary           Boolean           @default(false) // Primary account for this currency
-  order               Int               @default(0)     // Order for display
-  
-  // Notes
-  notes               String?           @db.Text
-  
-  // Relations
-  transactions        BankTransaction[]
-  
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  
+  id                String            @id @default(cuid())
+  accountName       String
+  currency          String
+  accountNumber     String?
+  iban              String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  accountNumberUK   String?
+  accountType       String
+  availableBalance  Decimal?          @db.Decimal(15, 2)
+  bankId            String
+  bcNumber          String?
+  currentBalance    Decimal?          @db.Decimal(15, 2)
+  ibanCH            String?
+  isActive          Boolean           @default(true)
+  isPrimary         Boolean           @default(false)
+  lastBalanceUpdate DateTime?
+  notes             String?
+  routingNumber     String?
+  sortCode          String?
+  swiftBic          String?
+  order             Int               @default(0)
+  wireRoutingNumber String?
+  bank              Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  transactions      BankTransaction[]
+
   @@index([bankId])
   @@index([currency])
 }
 
-// Crypto Wallets - Corporate crypto wallets
 model CryptoWallet {
-  id                  String         @id @default(cuid())
-  
-  // Wallet Information
-  walletName          String         // e.g., "Corporate USDC Wallet", "BTC Treasury"
-  walletType          String         // HOT_WALLET, COLD_WALLET, HARDWARE, EXCHANGE
-  
-  // Blockchain & Network
-  blockchain          String         // BITCOIN, ETHEREUM, POLYGON, BINANCE_SMART_CHAIN, etc.
-  network             String         // MAINNET, TESTNET
-  
-  // Token/Asset
-  asset               String         // BTC, ETH, USDC, USDT, etc.
-  assetType           String         // NATIVE, ERC20, BEP20, etc.
-  contractAddress     String?        // For tokens (e.g., USDC contract address)
-  
-  // Wallet Address
-  walletAddress       String         @unique // Public address for receiving funds
-  
-  // Additional Information
-  provider            String?        // MetaMask, Ledger, Coinbase, Binance, etc.
-  
-  // Balance tracking (optional)
-  currentBalance      Decimal?       @db.Decimal(25, 8) // Higher precision for crypto
-  balanceUSD          Decimal?       @db.Decimal(15, 2) // USD equivalent
-  lastBalanceUpdate   DateTime?
-  
-  // Security
-  isMultiSig          Boolean        @default(false)
-  requiredSignatures  Int?           // For multi-sig wallets
-  
-  // Status
-  isActive            Boolean        @default(true)
-  
-  // Notes
-  notes               String?        @db.Text
-  
-  // Relations
-  transactions        CryptoTransaction[]
-  
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  
+  id                 String              @id @default(cuid())
+  walletName         String
+  walletType         String
+  blockchain         String
+  network            String
+  asset              String
+  assetType          String
+  contractAddress    String?
+  walletAddress      String              @unique
+  provider           String?
+  currentBalance     Decimal?            @db.Decimal(25, 8)
+  balanceUSD         Decimal?            @db.Decimal(15, 2)
+  lastBalanceUpdate  DateTime?
+  isMultiSig         Boolean             @default(false)
+  requiredSignatures Int?
+  isActive           Boolean             @default(true)
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  transactions       CryptoTransaction[]
+
   @@index([blockchain])
   @@index([asset])
 }
 
-// Crypto Transactions
 model CryptoTransaction {
-  id                  String         @id @default(cuid())
-  
-  // Wallet Reference
-  walletId            String
-  wallet              CryptoWallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  
-  // Transaction Details
-  txHash              String         @unique // Transaction hash on blockchain
-  type                String         // DEPOSIT, WITHDRAWAL, INTERNAL_TRANSFER
-  
-  // Amounts
-  amount              Decimal        @db.Decimal(25, 8)
-  asset               String         // BTC, ETH, USDC, etc.
-  
-  // USD Value (at time of transaction)
-  amountUSD           Decimal?       @db.Decimal(15, 2)
-  exchangeRate        Decimal?       @db.Decimal(15, 8)
-  
-  // Addresses
-  fromAddress         String?
-  toAddress           String?
-  
-  // Fees
-  networkFee          Decimal?       @db.Decimal(25, 8)
-  networkFeeUSD       Decimal?       @db.Decimal(15, 2)
-  
-  // Status
-  status              String         // PENDING, CONFIRMED, FAILED
-  confirmations       Int?
-  
-  // Blockchain info
-  blockNumber         String?
-  timestamp           DateTime
-  
-  // Categorization
-  category            String?        // PAYMENT, INVESTMENT, EXCHANGE, etc.
-  description         String?
-  reference           String?
-  
-  // Metadata
-  metadata            String?        @db.Text // JSON for additional data
-  
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  
+  id            String       @id @default(cuid())
+  walletId      String
+  txHash        String       @unique
+  type          String
+  amount        Decimal      @db.Decimal(25, 8)
+  asset         String
+  amountUSD     Decimal?     @db.Decimal(15, 2)
+  exchangeRate  Decimal?     @db.Decimal(15, 8)
+  fromAddress   String?
+  toAddress     String?
+  networkFee    Decimal?     @db.Decimal(25, 8)
+  networkFeeUSD Decimal?     @db.Decimal(15, 2)
+  status        String
+  confirmations Int?
+  blockNumber   String?
+  timestamp     DateTime
+  category      String?
+  description   String?
+  reference     String?
+  metadata      String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  wallet        CryptoWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
   @@index([walletId])
   @@index([timestamp])
 }
 
 model BankTransaction {
-  id              String          @id @default(cuid())
-  externalId      String?         // ID from CSV
+  id              String         @id @default(cuid())
+  externalId      String?
   date            DateTime
   description     String
-  amount          Decimal         @db.Decimal(15, 2)
+  amount          Decimal        @db.Decimal(15, 2)
   currency        String
-  fee             Decimal?        @db.Decimal(10, 2)
-  status          String?         // PENDING, COMPLETED
-
-  // Categorization
+  fee             Decimal?       @db.Decimal(10, 2)
+  status          String?
   category        String?
-  reference       String? // Payment Reference
-
-  // Extended Banking Data
-  counterparty    String?         // Payer Name / Payee Name / Beneficiary
-  merchant        String?         // Merchant Name (for card spend)
-  balanceAfter    Decimal?        @db.Decimal(15, 2) // Running Balance provided by bank
-  exchangeRate    Decimal?        @db.Decimal(15, 8) // FX Rate used
-  type            String?         // TRANSFER, CARD_PAYMENT, EXCHANGE, FEE, etc.
-
-  // Deduplication hash
-  hash            String          @unique
-
+  reference       String?
+  hash            String         @unique
   bankAccountId   String
-  bankAccount     BankAccount     @relation(fields: [bankAccountId], references: [id])
-
   bankStatementId String?
-  bankStatement   BankStatement?  @relation(fields: [bankStatementId], references: [id])
-
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  counterparty    String?
+  merchant        String?
+  balanceAfter    Decimal?       @db.Decimal(15, 2)
+  exchangeRate    Decimal?       @db.Decimal(15, 8)
+  type            String?
   attachments     Attachment[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  bankAccount     BankAccount    @relation(fields: [bankAccountId], references: [id])
+  bankStatement   BankStatement? @relation(fields: [bankStatementId], references: [id])
 }
 
 model BankStatement {
   id           String            @id @default(cuid())
   filename     String
-  fileHash     String?           // SHA-256 for CSV deduplication
   uploadedAt   DateTime          @default(now())
-
+  fileHash     String?
   transactions BankTransaction[]
 }
 
 model Attachment {
-  id            String          @id @default(cuid())
+  id            String           @id @default(cuid())
   path          String
   fileType      String?
   originalName  String?
-  extractedData Json?           // AI-extracted data (issuer, amount, date, etc.)
-
   transactionId String?
+  uploadedAt    DateTime         @default(now())
+  extractedData Json?
+  fileHash      String?
   transaction   BankTransaction? @relation(fields: [transactionId], references: [id])
-
-  fileHash      String?         // SHA-256 for file deduplication
-  uploadedAt    DateTime @default(now())
 }
 
 model Asset {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
   purchaseDate DateTime
   cost         Decimal
   currency     String
-  type         String    // HARDWARE, SOFTWARE, ETC
-
+  type         String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
-// Compliance
 model FiscalYear {
   id          String          @id @default(cuid())
   year        Int             @unique
   startDate   DateTime
   endDate     DateTime
   isClosed    Boolean         @default(false)
-
   obligations TaxObligation[]
 }
 
-
 model TaxObligation {
-  id              String    @id @default(cuid())
-  type            String    // VAT, CORPORATION_TAX, CONFIRMATION_STATEMENT, ACCOUNTS
-  status          String    @default("PENDING") // PENDING, SUBMITTED, PAID, OVERDUE
-
+  id              String      @id @default(cuid())
+  type            String
+  status          String      @default("PENDING")
   periodStart     DateTime?
   periodEnd       DateTime?
   dueDate         DateTime
-
-  amountEstimated Decimal?  @db.Decimal(15, 2)
-  amountActual    Decimal?  @db.Decimal(15, 2)
-
+  amountEstimated Decimal?    @db.Decimal(15, 2)
+  amountActual    Decimal?    @db.Decimal(15, 2)
   fiscalYearId    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   fiscalYear      FiscalYear? @relation(fields: [fiscalYearId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model ComplianceEvent {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  date          DateTime
-  type          String    // DEADLINE, SUBMISSION, REMINDER
-  isCompleted   Boolean   @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  type        String
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-// Invoicing
 model Invoice {
   id             String        @id @default(cuid())
-  number         String        @unique // e.g. INV-001
+  number         String        @unique
   date           DateTime      @default(now())
   dueDate        DateTime
-  status         String        @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
-
+  status         String        @default("DRAFT")
   subtotal       Decimal       @db.Decimal(15, 2)
   taxRate        Decimal       @default(0) @db.Decimal(5, 2)
   taxAmount      Decimal       @db.Decimal(15, 2)
   total          Decimal       @db.Decimal(15, 2)
   currency       String        @default("GBP")
-
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id]) 
-
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organization   Organization  @relation(fields: [organizationId], references: [id])
   items          InvoiceItem[]
-
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
 }
 
 model InvoiceItem {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   description String
-  quantity    Decimal  @db.Decimal(10, 2)
-  unitPrice   Decimal  @db.Decimal(15, 2)
-  total       Decimal  @db.Decimal(15, 2)
-
+  quantity    Decimal @db.Decimal(10, 2)
+  unitPrice   Decimal @db.Decimal(15, 2)
+  total       Decimal @db.Decimal(15, 2)
   invoiceId   String
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
-// Company Settings - UK Legal Compliance
 model CompanySettings {
-  id                        String    @id @default(cuid())
-  
-  // Basic Company Information
-  companyName               String
-  companyNumber             String    @unique // Companies House registration number
-  incorporationDate         DateTime  // Date of incorporation
-  
-  // Registered Office Address
-  registeredAddress         String
-  registeredCity            String
-  registeredPostcode        String
-  registeredCountry         String    @default("United Kingdom")
-  
-  // Trading Address (if different)
-  tradingAddress            String?
-  tradingCity               String?
-  tradingPostcode           String?
-  
-  // Company Type & SIC Codes
-  companyType               String    // Ltd, PLC, LLP, etc.
-  sicCodes                  String?   // Standard Industrial Classification codes (comma separated)
-  
-  // Financial Year
-  financialYearEnd          String    // Format: "DD-MM" e.g., "31-03"
-  accountsNextDueDate       DateTime? // Next accounts filing deadline
-  confirmationNextDueDate   DateTime? // Next confirmation statement deadline
-  
-  // Tax Information
-  vatRegistered             Boolean   @default(false)
-  vatNumber                 String?
-  vatRegistrationDate       DateTime?
-  vatScheme                 String?   // Standard, Flat Rate, Cash Accounting, etc.
-  vatReturnFrequency        String?   // Quarterly, Monthly, Annual
-  
-  // HMRC Information
-  payeReference             String?   // If employer
-  corporationTaxReference   String?
-  utr                       String?   // Unique Taxpayer Reference
-  
-  // Directors & Officers
-  directors                 String?   @db.Text // JSON array of directors
-  companySecretary          String?
-  
-  // Share Capital
-  shareCapital              Decimal?  @db.Decimal(15, 2)
-  numberOfShares            Int?
-  
-  // AI Preferences
-  aiProvider                String    @default("openai") // "openai" or "gemini"
-
-  // Accounting Software & Methods
-  accountingSoftware        String?   // Xero, QuickBooks, etc.
-  accountingMethod          String?   // Cash basis, Accrual basis
-  
-  // Contact Information
-  contactEmail              String?
-  contactPhone              String?
-  website                   String?
-  
-  // Additional Notes
-  notes                     String?   @db.Text
-  
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
+  id                      String    @id @default(cuid())
+  companyName             String
+  companyNumber           String    @unique
+  incorporationDate       DateTime
+  registeredAddress       String
+  registeredCity          String
+  registeredPostcode      String
+  registeredCountry       String    @default("United Kingdom")
+  tradingAddress          String?
+  tradingCity             String?
+  tradingPostcode         String?
+  companyType             String
+  sicCodes                String?
+  financialYearEnd        String
+  accountsNextDueDate     DateTime?
+  confirmationNextDueDate DateTime?
+  vatRegistered           Boolean   @default(false)
+  vatNumber               String?
+  vatRegistrationDate     DateTime?
+  vatScheme               String?
+  vatReturnFrequency      String?
+  payeReference           String?
+  corporationTaxReference String?
+  utr                     String?
+  directors               String?
+  companySecretary        String?
+  shareCapital            Decimal?  @db.Decimal(15, 2)
+  numberOfShares          Int?
+  accountingSoftware      String?
+  accountingMethod        String?
+  contactEmail            String?
+  contactPhone            String?
+  website                 String?
+  notes                   String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  aiProvider              String    @default("openai")
 }
 
-
-// Audit Log for Deleted Transactions
 model DeletedTransaction {
   id              String   @id @default(cuid())
-  
-  // Original Data Snapshot
-  originalId      String?  // The ID it had in BankTransaction
+  originalId      String?
   amount          Decimal  @db.Decimal(15, 2)
   currency        String
   description     String
   date            DateTime
-  
-  // Context
   bankAccountName String?
   bankName        String?
-  
-  // Audit Info
   deletedAt       DateTime @default(now())
-  deletedBy       String?  // User ID or Email
+  deletedBy       String?
   reason          String?
-  
-  // Raw Data (Backup)
-  fullSnapshot    String?  @db.Text // JSON string of the complete original object
+  fullSnapshot    String?
 }
 
-// Categories
 model TransactionCategory {
   id        String   @id @default(cuid())
   name      String   @unique
-  color     String   
+  color     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ComplianceDocument {
-  id            String   @id @default(cuid())
-  filename      String
-  fileType      String?  // PDF, CSV, etc
-  documentType  String?  // TAX_RETURN, HMRC_LETTER, etc.
-  
-  // Storage
-  path          String
-  size          Int?
-  
-  // RAG Status
-  isProcessed   Boolean  @default(false)
-  vectorId      String?  
-  
-  chunks        DocumentChunk[]
-
-  // Context
-  fiscalYear    String?  // e.g. "2024"
-  
-  fileHash      String?  
-  extractedData Json?    // AI-extracted key dates and facts
-  strategicInsights String? @db.Text // AI analysis related to UK LTD compliance
-  
-  // Versioning & Invalidation
-  documentDate  DateTime? // The effective date of the document (not upload date)
-  isSuperseded  Boolean  @default(false)
-  supersededById String?
-  
-  uploadedBy    String?
-  uploadedAt    DateTime @default(now())
+  id                String          @id @default(cuid())
+  filename          String
+  fileType          String?
+  documentType      String?
+  path              String
+  size              Int?
+  isProcessed       Boolean         @default(false)
+  vectorId          String?
+  fiscalYear        String?
+  uploadedBy        String?
+  uploadedAt        DateTime        @default(now())
+  documentDate      DateTime?
+  extractedData     Json?
+  fileHash          String?
+  isSuperseded      Boolean         @default(false)
+  strategicInsights String?
+  supersededById    String?
+  chunks            DocumentChunk[]
 }
 
 model DocumentChunk {
-  id          String   @id @default(cuid())
-  documentId  String
-  document    ComplianceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
-  content     String   @db.Text
-  tokenCount  Int?
-  
-  // Storage for embedding (serialized vector)
-  embedding   String?  @db.Text // Store as JSON string [0.1, 0.2, ...]
-  
-  createdAt   DateTime @default(now())
+  id         String             @id @default(cuid())
+  documentId String
+  content    String
+  tokenCount Int?
+  embedding  String?
+  createdAt  DateTime           @default(now())
+  document   ComplianceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId])
 }

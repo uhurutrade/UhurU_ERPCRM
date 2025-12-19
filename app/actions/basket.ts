@@ -60,7 +60,7 @@ export async function uploadToBasket(formData: FormData) {
                 fileText = await file.text();
             }
 
-            const analysis = await ai.analyzeStrategicDoc(file.name, fileText);
+            const analysis = await ai.analyzeStrategicDoc(file.name, fileText, buffer, file.type);
             const docDate = analysis.documentDate ? new Date(analysis.documentDate) : null;
             const docTopic = analysis.docTopic;
 
