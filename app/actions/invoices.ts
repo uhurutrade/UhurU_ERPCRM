@@ -76,11 +76,9 @@ async function findPotentialMatches(analysis: any) {
     const { issuer, amount, date, currency } = analysis;
     const targetDate = new Date(date);
 
-    // Search window: 7 days before/after
-    const dateStart = new Date(targetDate);
-    dateStart.setDate(dateStart.getDate() - 7);
-    const dateEnd = new Date(targetDate);
-    dateEnd.setDate(dateEnd.getDate() + 7);
+    // Search window: Entire calendar year of the invoice
+    const dateStart = new Date(targetDate.getFullYear(), 0, 1);
+    const dateEnd = new Date(targetDate.getFullYear(), 11, 31, 23, 59, 59);
 
     // Matching criteria:
     // 1. Amount should be close (within 5% for FX or fees)
