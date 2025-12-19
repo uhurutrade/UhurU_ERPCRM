@@ -142,14 +142,14 @@ export default function DocBasketPage() {
             {/* Modal de Detalle */}
             {selectedDoc && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300 pointer-events-auto"
+                    className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300 pointer-events-auto"
                     onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
                 >
                     <div
-                        className="bg-uhuru-card border border-uhuru-border w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300"
+                        className="bg-uhuru-card border border-uhuru-border w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="p-8 space-y-6">
+                        <div className="p-8 space-y-6 overflow-y-auto">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-indigo-500/10 rounded-2xl text-indigo-400">
@@ -362,7 +362,7 @@ export default function DocBasketPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-3 min-h-[800px]">
                             {isLoadingHistory ? (
                                 <div className="p-12 flex flex-col items-center gap-4 text-uhuru-text-dim">
                                     <Loader2 className="animate-spin" size={24} />
