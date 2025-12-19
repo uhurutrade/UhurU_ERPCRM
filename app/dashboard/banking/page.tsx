@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { TransactionTable } from '@/components/banking/transaction-table';
-import { Upload, History } from 'lucide-react';
+import { Upload, History as HistoryIcon } from 'lucide-react';
 import { ExchangeRatesWidget } from '@/components/banking/exchange-rates-widget';
 import { serializeData } from '@/lib/serialization';
 import { getTransactionCategories } from '@/app/actions/categories';
 import { getTransactionSequences } from '@/lib/banking/sequences';
+import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
 
 export default async function BankingPage({
     searchParams
@@ -80,12 +81,13 @@ export default async function BankingPage({
                             className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all border border-slate-700"
                             title="View Deleted Transactions Audit Log"
                         >
-                            <History size={20} />
+                            <HistoryIcon size={20} />
                             Audit Log
                         </Link>
+                        <InvoiceUploadButton />
                         <Link
                             href="/dashboard/banking/upload"
-                            className="flex items-center gap-2 bg-uhuru-blue hover:bg-uhuru-blue-light text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-uhuru hover:shadow-uhuru-sm transform hover:scale-105"
+                            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all border border-slate-700 shadow-lg"
                         >
                             <Upload size={20} />
                             Upload Statement

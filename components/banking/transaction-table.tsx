@@ -267,10 +267,7 @@ export function TransactionTable({
                             <th className="py-3 px-4 font-medium hidden md:table-cell">Account</th>
                             <th className="py-3 px-4 font-medium text-right">Amount</th>
                             <th className="py-3 px-4 font-medium hidden md:table-cell">Category</th>
-                            {/* Attachments Column */}
-                            <th className="py-3 px-4 w-12 text-center text-slate-400 hidden md:table-cell">
-                                <Paperclip size={16} />
-                            </th>
+                            <th className="py-3 px-4 w-24 text-center text-slate-500 font-bold">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="text-sm">
@@ -336,11 +333,15 @@ export function TransactionTable({
                                         <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
                                             <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
                                         </td>
-                                        {/* Attachments Cell */}
-                                        <td className="py-3 px-4 text-center hidden md:table-cell" onClick={(e) => { e.stopPropagation(); setViewTransaction(tx); }}>
-                                            <div className="flex justify-center">
-                                                <button className={`p-1.5 rounded-lg transition-colors ${hasAttachments ? 'text-uhuru-blue bg-uhuru-blue/10' : 'text-slate-600 hover:text-slate-400'}`}>
-                                                    <Paperclip size={16} />
+                                        {/* Actions Cell */}
+                                        <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex justify-center gap-2">
+                                                <button
+                                                    onClick={() => setViewTransaction(tx)}
+                                                    className={`p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
+                                                    title={hasAttachments ? "View Details & Attachments" : "View Details"}
+                                                >
+                                                    {hasAttachments ? <Paperclip size={16} /> : <Search size={16} />}
                                                 </button>
                                             </div>
                                         </td>

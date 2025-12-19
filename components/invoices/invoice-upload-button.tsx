@@ -236,20 +236,28 @@ export function InvoiceUploadButton() {
                                         <div className="space-y-2">
                                             {analysisResult.potentialMatches?.length > 0 ? (
                                                 analysisResult.potentialMatches.map((match: any) => (
-                                                    <div key={match.id} className="flex items-center justify-between p-4 bg-uhuru-hover/30 border border-uhuru-border rounded-xl hover:border-emerald-500/30 transition-all group">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-white font-medium text-sm">{match.description}</span>
-                                                                <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded font-bold uppercase">{match.matchScore}% Match</span>
+                                                    <div key={match.id} className="p-4 bg-uhuru-hover/30 border border-uhuru-border rounded-xl hover:border-emerald-500/30 transition-all group">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-white font-medium text-sm">{match.description}</span>
+                                                                    <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded font-bold uppercase">{match.matchScore}% Match</span>
+                                                                </div>
+                                                                <div className="flex gap-3 mt-1">
+                                                                    <span className="text-xs text-uhuru-text-dim">{new Date(match.date).toLocaleDateString()}</span>
+                                                                    <span className="text-xs text-uhuru-text-dim font-bold">{match.currency} {Number(match.amount).toFixed(2)}</span>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex gap-3 mt-1">
-                                                                <span className="text-xs text-uhuru-text-dim">{new Date(match.date).toLocaleDateString()}</span>
-                                                                <span className="text-xs text-uhuru-text-dim font-bold">{match.currency} {Number(match.amount).toFixed(2)}</span>
-                                                            </div>
+                                                            <button onClick={() => initiateLink(match)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center gap-1 shadow-md shadow-emerald-900/20">
+                                                                <Check size={14} /> Link
+                                                            </button>
                                                         </div>
-                                                        <button onClick={() => initiateLink(match)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center gap-1">
-                                                            <Check size={14} /> Link
-                                                        </button>
+                                                        {match.description.toLowerCase().includes(analysisResult.analysis.amount.toFixed(2)) && match.currency !== analysisResult.analysis.currency && (
+                                                            <div className="mt-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg inline-flex items-center gap-2">
+                                                                <AlertCircle size={10} className="text-amber-400" />
+                                                                <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Amount found in description (Conversion detected)</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))
                                             ) : (
@@ -328,8 +336,9 @@ export function InvoiceUploadButton() {
                             )}
                         </div>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+            }
         </>
     );
 }
