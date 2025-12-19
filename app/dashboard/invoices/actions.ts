@@ -28,17 +28,18 @@ export async function uploadAttachment(formData: FormData) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save to /app/uploads
+    // Save to public/uploads
     const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-    const uploadDir = path.join(process.cwd(), 'uploads');
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     const filepath = path.join(uploadDir, filename);
+
+    const { mkdir } = await import('fs/promises');
+    await mkdir(uploadDir, { recursive: true });
 
     try {
         await writeFile(filepath, buffer);
     } catch (e) {
         console.error("Error writing file", e);
-        // Fallback for dev without folder? 
-        // We assume folder exists from Dockerfile
     }
 
     await prisma.attachment.create({
