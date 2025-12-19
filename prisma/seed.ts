@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T16:00:50.421Z');
+  console.log('Generated at: 2025-12-19T16:04:57.949Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5841,27 +5841,7 @@ async function main() {
   
   // --- 17. Attachments ---
   console.log('Seeding Attachments...');
-  for (const att of [
-  {
-    "id": "cmjcqmgt50000ia7l5b2rglfo",
-    "path": "/uploads/invoices/1766140783773-898559443.pdf",
-    "fileType": "application/pdf",
-    "originalName": "invoice_INV25-8.pdf",
-    "transactionId": null,
-    "uploadedAt": "2025-12-19T10:39:46.842Z",
-    "extractedData": {
-      "date": "",
-      "amount": 0,
-      "issuer": "",
-      "reason": "The filename suggests this is an invoice (INV25-8), but the content could not be extracted to provide detailed information.",
-      "currency": "",
-      "isInvoice": true,
-      "confidence": 0.9,
-      "documentRole": "EMITTED"
-    },
-    "fileHash": null
-  }
-] as any[]) {
+  for (const att of [] as any[]) {
       await prisma.attachment.create({
           data: {
               ...att,

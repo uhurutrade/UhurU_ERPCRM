@@ -142,45 +142,19 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
     const { issuer, amount, date, currency } = analysis;
 
     let targetDate = new Date(date);
-
-    // Fallback if AI produced an invalid date
     if (isNaN(targetDate.getTime())) {
         targetDate = new Date();
     }
 
-    // Search window: Entire calendar year of the document (or current year as fallback)
-    const dateStart = new Date(targetDate.getFullYear(), 0, 1);
-    const dateEnd = new Date(targetDate.getFullYear(), 11, 31, 23, 59, 59);
+    // Search window: +/- 90 days from the invoice date
+    const dateStart = new Date(targetDate.getTime() - (90 * 24 * 60 * 60 * 1000));
+    const dateEnd = new Date(targetDate.getTime() + (90 * 24 * 60 * 60 * 1000));
 
-    // Amount range: +/- 10% to account for fees, small discrepancies or approximate extractions
-    const minAmount = amount * 0.9;
-    const maxAmount = amount * 1.1;
-
-    // Build the query
-    const whereConditions: any[] = [
-        { date: { gte: dateStart, lte: dateEnd } }
-    ];
-
-    // Filter by sign and amount range
-    if (documentRole === 'RECEIVED') {
-        whereConditions.push({
-            amount: {
-                lte: -minAmount,
-                gte: -maxAmount
-            }
-        });
-    } else if (documentRole === 'EMITTED') {
-        whereConditions.push({
-            amount: {
-                gte: minAmount,
-                lte: maxAmount
-            }
-        });
-    }
-
-    const matches = await prisma.bankTransaction.findMany({
+    // Initial search: Wide enough to find both exact and converted amounts
+    // We'll search for transactions in the date range and then filter/score
+    const candidates = await prisma.bankTransaction.findMany({
         where: {
-            AND: whereConditions
+            date: { gte: dateStart, lte: dateEnd }
         },
         include: {
             bankAccount: {
@@ -188,49 +162,65 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
             },
             attachments: true
         },
-        take: 10 // Increase candidates
+        take: 30 // Broad candidancy
     });
 
-    // Score and filter matches
-    return matches.map(m => {
+    // Score and filter candidates
+    return candidates.map(m => {
         let score = 0;
         const transAmount = Math.abs(Number(m.amount));
+        const cleanDesc = m.description.toLowerCase();
 
-        // --- Amount Scoring (Max 50) ---
+        // --- 1. Amount Scoring ---
         const diff = Math.abs(transAmount - amount);
         const percentDiff = diff / amount;
 
-        if (percentDiff < 0.001) score += 50; // Exact
-        else if (percentDiff < 0.01) score += 40; // Very close
-        else if (percentDiff < 0.05) score += 25; // Close
-        else score += 10; // Within 10% range
+        // Logical check: Is the amount mentioned in the description? 
+        // (Crucial for card payments in foreign currencies)
+        const amountString = amount.toFixed(2);
+        const amountInDesc = cleanDesc.includes(amountString);
 
-        // --- Currency match (Max 15) ---
-        if (m.currency === currency) score += 15;
+        if (percentDiff < 0.001) score += 60; // Perfect match
+        else if (amountInDesc) score += 55;    // Exact amount mention in text (e.g. "transaction of 538.82 GBP")
+        else if (percentDiff < 0.02) score += 40; // Very close
+        else if (percentDiff < 0.2) score += 15;  // Broad range (+/- 20%) to account for exchange rates
 
-        // --- Provider/Issuer match (Max 35) ---
-        // We look for the provider in any field, even if it's a partial tag like "ALIBABA.COM" in a card transaction
+        // --- 2. Currency & Exchange Rate Scoring ---
+        if (m.currency === currency) {
+            score += 15;
+        } else if (cleanDesc.includes(currency.toLowerCase())) {
+            score += 10; // Currency mentioned in text
+        }
+
+        // --- 3. Provider/Issuer match ---
         if (issuer && issuer.toLowerCase() !== 'unknown' && issuer.length > 2) {
             const cleanIssuer = issuer.toLowerCase().trim();
-            const desc = m.description.toLowerCase();
             const cp = (m.counterparty || '').toLowerCase();
             const merch = (m.merchant || '').toLowerCase();
 
-            if (desc.includes(cleanIssuer) || cp.includes(cleanIssuer) || merch.includes(cleanIssuer)) {
-                score += 35;
+            if (cleanDesc.includes(cleanIssuer) || cp.includes(cleanIssuer) || merch.includes(cleanIssuer)) {
+                score += 30;
             } else {
-                // Check for individual words to be even less restrictive (e.g. "Google Cloud" matching "GOOGLE")
-                const words = cleanIssuer.split(/\s+/).filter(w => w.length > 3);
-                const hasWordMatch = words.some(w => desc.includes(w) || cp.includes(w) || merch.includes(w));
-                if (hasWordMatch) score += 20;
+                const words = cleanIssuer.split(/\s+/).filter((w: string) => w.length > 3);
+                const hasWordMatch = words.some((w: string) => cleanDesc.includes(w) || cp.includes(w) || merch.includes(w));
+                if (hasWordMatch) score += 15;
             }
+        }
+
+        // --- 4. Role Match (Bonus) ---
+        if ((documentRole === 'RECEIVED' && Number(m.amount) < 0) ||
+            (documentRole === 'EMITTED' && Number(m.amount) > 0)) {
+            score += 10;
         }
 
         return {
             ...m,
             matchScore: score
         };
-    }).sort((a, b) => b.matchScore - a.matchScore);
+    })
+        .filter(m => m.matchScore >= 40) // Only show semi-likely matches
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 5);
 }
 
 export async function linkAttachmentToTransaction(attachmentId: string, transactionId: string) {
