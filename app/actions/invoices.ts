@@ -32,9 +32,22 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         await writeFile(filepath, buffer);
 
         // 3. AI Analysis
-        // For simplicity, we'll read the text from PDF/Image text content
-        const fileContent = await file.text();
-        const analysis = await ai.analyzeInvoice(file.name, fileContent);
+        let fileText = "";
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            try {
+                // pdf-parse is a CommonJS module
+                const pdf = require('pdf-parse');
+                const pdfData = await pdf(buffer);
+                fileText = pdfData.text;
+            } catch (err) {
+                console.error("Error parsing PDF:", err);
+                fileText = `[Unable to extract text from PDF directly, falling back to raw read] ${await file.text()}`;
+            }
+        } else {
+            fileText = await file.text();
+        }
+
+        const analysis = await ai.analyzeInvoice(file.name, fileText);
 
         if (!analysis.isInvoice) {
             return {
