@@ -146,9 +146,9 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
         targetDate = new Date();
     }
 
-    // Search window: +/- 90 days from the invoice date
-    const dateStart = new Date(targetDate.getTime() - (90 * 24 * 60 * 60 * 1000));
-    const dateEnd = new Date(targetDate.getTime() + (90 * 24 * 60 * 60 * 1000));
+    // Search window: +/- 365 days from the invoice date
+    const dateStart = new Date(targetDate.getTime() - (365 * 24 * 60 * 60 * 1000));
+    const dateEnd = new Date(targetDate.getTime() + (365 * 24 * 60 * 60 * 1000));
 
     // Initial search: Wide enough to find both exact and converted amounts
     // We'll search for transactions in the date range and then filter/score
