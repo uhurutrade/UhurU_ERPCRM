@@ -17,11 +17,8 @@ export interface AIExtractionResult {
  * Handles switching between OpenAI and Google Gemini based on Company Settings.
  */
 export async function getAIClient() {
-    const settings = await prisma.companySettings.findFirst({
-        select: { aiProvider: true }
-    });
-
-    const provider = settings?.aiProvider || 'openai';
+    const settings = await prisma.companySettings.findFirst();
+    const provider = (settings as any)?.aiProvider || 'openai';
 
     return {
         provider,
@@ -53,16 +50,22 @@ async function analyzeWithOpenAI(filename: string, text: string): Promise<AIExtr
         messages: [
             {
                 role: "system",
-                content: `You are an expert accountant. Analyze the following invoice text and return a JSON object with:
+                content: `You are an expert accountant. Analyze the provided invoice text/data.
+                Even if the text seems fragmented or contains unreadable characters, try your best to extract the core details.
+                
+                Return a JSON object with:
                 {
                     "isInvoice": boolean,
-                    "issuer": string,
-                    "date": string (ISO),
-                    "amount": number,
-                    "currency": string (ISO code),
-                    "confidence": number,
-                    "reason": string (if not an invoice)
-                }`
+                    "issuer": string (Company name if found),
+                    "date": string (ISO date if found),
+                    "amount": number (Total amount),
+                    "currency": string (ISO code, e.g., 'USD', 'EUR', 'GBP'),
+                    "confidence": number (0 to 1),
+                    "reason": string (Explanation if analysis is difficult or if it's not an invoice)
+                }
+                
+                If you find a filename like 'INV25-8', it is a strong hint that it IS an invoice.
+                If no text is provided, use the filename to make a best guess if possible, otherwise explain the missing data.`
             },
             {
                 role: "user",

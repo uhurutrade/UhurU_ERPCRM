@@ -58,7 +58,7 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         }
 
         // 3. Save Attachment with Extracted Metadata
-        const attachment = await prisma.attachment.create({
+        const attachment = await (prisma.attachment.create as any)({
             data: {
                 path: publicPath,
                 originalName: file.name,
