@@ -58,5 +58,5 @@ export async function updateCategory(txId: string, category: string) {
         where: { id: txId },
         data: { category }
     });
-    revalidatePath('/dashboard/erp');
+    revalidatePath('/dashboard/invoices');
 }
