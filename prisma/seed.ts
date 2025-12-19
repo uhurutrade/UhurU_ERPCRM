@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:51:19.824Z');
+  console.log('Generated at: 2025-12-19T12:51:46.279Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -6323,6 +6323,254 @@ async function main() {
     "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-19T12:51:16.498Z"
+  },
+  {
+    "id": "cmjcvbnbx000713qlekfjpzfp",
+    "filename": "142390 150824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148676507-852887517.pdf",
+    "size": 112286,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "ccaddace24ddb496999f490a6106ef5c101eebb7bee2b85c4550ff0110e23a5d",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Unable to determine VAT obligations due to lack of content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Given the failed extraction, ensure access to a reliable document reader or request a different format. Verify if the document is critical for compliance or strategic planning.",
+      "irrelevanceReason": "The document's content could not be extracted, making it impossible to analyze for relevance or details."
+    },
+    "strategicInsights": "Given the failed extraction, ensure access to a reliable document reader or request a different format. Verify if the document is critical for compliance or strategic planning.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:20.157Z"
+  },
+  {
+    "id": "cmjcvbpuj000813qlffyktjgj",
+    "filename": "142390 120824-01L.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148680168-895435057.pdf",
+    "size": 438866,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "5c166d8f6344b9c66b2814e8ab41adf841c03f7b5b6641c306746394dbef0aca",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "Document content unavailable; unable to determine VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Without access to the document's content, strategic insights cannot be provided. Ensure that the document can be correctly extracted for analysis.",
+      "irrelevanceReason": "The content of the document could not be extracted, making it impossible to analyze its relevance or details."
+    },
+    "strategicInsights": "Without access to the document's content, strategic insights cannot be provided. Ensure that the document can be correctly extracted for analysis.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:23.419Z"
+  },
+  {
+    "id": "cmjcvbrvo000913qlkvm86a0z",
+    "filename": "virtual-office-Alta_05082024.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148683426-125559613.pdf",
+    "size": 52945,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "a9c2dcb3aa6f4a4483eb5b505fe2c07b4f652d78d713ac5ac75be9def02fec4a",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "Insufficient information to determine VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Ensure the document is correctly extracted and analyzed. It might contain important legal or strategic information.",
+      "irrelevanceReason": "The content of the document could not be extracted due to a failed PDF extraction process."
+    },
+    "strategicInsights": "Ensure the document is correctly extracted and analyzed. It might contain important legal or strategic information.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:26.053Z"
+  },
+  {
+    "id": "cmjcvbtho000a13ql9arzhbew",
+    "filename": "142390 210824-01.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148686069-28062860.pdf",
+    "size": 59006,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "0a79facf40b0097e46f708cd5090829d819751c9599bb84b927ec1f6da40ded9",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "Insufficient information to determine VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Without extracting content from the document, no strategic insights can be provided.",
+      "irrelevanceReason": "The document content could not be extracted, hence relevance cannot be determined."
+    },
+    "strategicInsights": "Without extracting content from the document, no strategic insights can be provided.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:28.141Z"
+  },
+  {
+    "id": "cmjcvbv7u000b13qlszx27061",
+    "filename": "Uhurutrade_Registration_2.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148688155-394032333.pdf",
+    "size": 214100,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "6ebb1a3fff27677f126a5d23e6e4801e257e10e6b78442094934fc4bbfce7a2b",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Unable to determine due to content extraction failure.",
+        "mustCharge": null
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Unable to provide insights without content access.",
+      "irrelevanceReason": "Content extraction failed, unable to determine relevance or extract details."
+    },
+    "strategicInsights": "Unable to provide insights without content access.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:30.378Z"
+  },
+  {
+    "id": "cmjcvbwty000c13qlsegsbcge",
+    "filename": "Exemptions _ ICO.pdf",
+    "fileType": "application/pdf",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148690386-552076177.pdf",
+    "size": 70779,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "51bddff7ca45ff2aa45ecbaee1e43f912a34326653fa2af4c43caaef886a68b7",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Insufficient information on the document to determine VAT obligations.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Without access to the document content, strategic insights cannot be provided.",
+      "irrelevanceReason": "The document is not accessible (PDF extraction failed) and lacks context to determine relevance to UK corporate, tax, legal, or strategy topics."
+    },
+    "strategicInsights": "Without access to the document content, strategic insights cannot be provided.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:32.471Z"
+  },
+  {
+    "id": "cmjcvc1ya000d13qlajol2iqj",
+    "filename": "Uhurutrade_Registration_3.png",
+    "fileType": "image/png",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148692487-17250859.png",
+    "size": 52263,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "1b3a478e5b13e6d52dc55d4a004643c6370cce524c07ee3b999bf59eab1334f6",
+    "extractedData": {
+      "docTopic": null,
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": null,
+      "vatLiability": {
+        "reason": "Not applicable due to lack of relevant content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "This file does not contain analyzable text related to UK corporate matters. Consider reviewing the file format or content for better analysis.",
+      "irrelevanceReason": "The document content appears to be non-text binary data (such as an image or encoded file), which cannot be processed for UK company management, tax, legal, or strategy analysis."
+    },
+    "strategicInsights": "This file does not contain analyzable text related to UK corporate matters. Consider reviewing the file format or content for better analysis.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:39.107Z"
+  },
+  {
+    "id": "cmjcvc67i000e13qla0h03zrd",
+    "filename": "companies house_Uhuru123456789@.docx",
+    "fileType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "documentType": "BASKET",
+    "path": "/uploads/basket/1766148699114-716462662.docx",
+    "size": 6438,
+    "isProcessed": true,
+    "vectorId": null,
+    "fiscalYear": null,
+    "fileHash": "9494b233d08151144aebf47e217e7ba84399a79936151f0f5016410df642f238",
+    "extractedData": {
+      "docTopic": "",
+      "deadlines": [],
+      "isRelevant": false,
+      "documentDate": "",
+      "vatLiability": {
+        "reason": "No information about the company's VAT status or related obligations is present in the binary content.",
+        "mustCharge": false
+      },
+      "extractedFacts": {},
+      "strategicInsight": "Cannot provide insights without readable and relevant content.",
+      "irrelevanceReason": "The content appears to be a binary or corrupted document file, which does not contain readable information related to UK company management, tax, legal, or strategy."
+    },
+    "strategicInsights": "Cannot provide insights without readable and relevant content.",
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
+    "uploadedBy": null,
+    "uploadedAt": "2025-12-19T12:51:44.623Z"
   }
 ] as any[]) {
       await prisma.complianceDocument.create({
