@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T16:30:28.119Z');
+  console.log('Generated at: 2025-12-19T16:31:10.112Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5841,27 +5841,7 @@ async function main() {
   
   // --- 17. Attachments ---
   console.log('Seeding Attachments...');
-  for (const att of [
-  {
-    "id": "cmjd3361r0000pmu6whtqgsp8",
-    "path": "/uploads/invoices/1766161715787-674668002.pdf",
-    "fileType": "application/pdf",
-    "originalName": "factura pedido 96 unidades set tupper.pdf",
-    "transactionId": null,
-    "uploadedAt": "2025-12-19T16:28:41.439Z",
-    "extractedData": {
-      "date": "2022-11-18",
-      "amount": 538.82,
-      "issuer": "Alibaba.com Singapore E-Commerce Private Ltd",
-      "reason": "Invoice format and details are clear, indicating amounts, issuer, and date.",
-      "currency": "GBP",
-      "isInvoice": true,
-      "confidence": 0.95,
-      "documentRole": "RECEIVED"
-    },
-    "fileHash": "52c87f7a79b496fd222cce86205685333cbb06f49c1322137070ce29009e1b0c"
-  }
-] as any[]) {
+  for (const att of [] as any[]) {
       await prisma.attachment.create({
           data: {
               ...att,

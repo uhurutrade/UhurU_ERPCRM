@@ -156,16 +156,19 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
     const amountStrDot = amount.toFixed(2);
     const amountStrComma = amountStrDot.replace('.', ',');
 
+    // Calculate a 10% margin for DB filtering
+    const minAmount = amount * 0.9;
+    const maxAmount = amount * 1.1;
+
     console.log(`[InvoiceMatch] Searching for: issuer=${issuer}, amount=${amount}, date=${targetDate.toISOString()}`);
-    console.log(`[InvoiceMatch] Keywords: ${issuerKeywords.join(', ')}`);
 
     const candidates = await prisma.bankTransaction.findMany({
         where: {
             date: { gte: dateStart, lte: dateEnd },
             OR: [
-                // 1. Amount matches roughly (FX/Conversion - up to 80% variation)
-                { amount: { gte: amount * 0.1, lte: amount * 3.0 } },
-                { amount: { gte: -amount * 3.0, lte: -amount * 0.1 } },
+                // 1. Amount matches within 10% (direct or negative for receipts)
+                { amount: { gte: minAmount, lte: maxAmount } },
+                { amount: { gte: -maxAmount, lte: -minAmount } },
                 // 2. Exact amount digits found in description (dot or comma)
                 { description: { contains: amountStrDot, mode: 'insensitive' } },
                 { description: { contains: amountStrComma, mode: 'insensitive' } },
@@ -182,7 +185,7 @@ async function findPotentialMatches(analysis: any, documentRole: string) {
             attachments: true
         },
         orderBy: { date: 'desc' },
-        take: 200
+        take: 300
     });
 
     console.log(`[InvoiceMatch] Found ${candidates.length} potential candidates in DB.`);
