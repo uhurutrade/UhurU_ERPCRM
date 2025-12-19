@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { getAIClient } from '@/lib/ai/ai-service';
+import { createHash } from 'crypto';
 
 export async function uploadAndAnalyzeInvoice(formData: FormData) {
     try {
@@ -24,6 +25,9 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         // 2. Save file locally
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
+
+        // 2b. Calculate hash for exact match detection
+        const fileHash = createHash('sha256').update(buffer).digest('hex');
 
         const uploadDir = join(process.cwd(), 'public', 'uploads', 'invoices');
         await mkdir(uploadDir, { recursive: true });
@@ -63,8 +67,12 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         }
 
         // 3. Duplicate Detection
-        // Check if an attachment with very similar metadata already exists
-        const existingDuplicate = await (prisma.attachment.findFirst as any)({
+        // Check for exact file contents or very similar metadata
+        const existingByHash = await prisma.attachment.findFirst({
+            where: { fileHash }
+        });
+
+        const existingByMetadata = await (prisma.attachment.findFirst as any)({
             where: {
                 extractedData: {
                     path: ['issuer'],
@@ -87,6 +95,8 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
             }
         });
 
+        const existingDuplicate = existingByHash || existingByMetadata;
+
         if (existingDuplicate && !formData.get('confirmDuplicate')) {
             return {
                 success: true,
@@ -102,6 +112,7 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
                 path: publicPath,
                 originalName: file.name,
                 fileType: file.type,
+                fileHash,
                 extractedData: {
                     ...analysis,
                     documentRole // Save whether it's emitted or received

@@ -42,7 +42,16 @@ export default async function UhuruWallPage() {
 
     // 2. Fetch Strategic Documents from Basket
     const strategicDocs = await prisma.complianceDocument.findMany({
-        where: { documentType: 'BASKET' },
+        where: {
+            documentType: 'BASKET',
+            isSuperseded: false,
+            NOT: {
+                extractedData: {
+                    path: ['isRelevant'],
+                    equals: false
+                }
+            }
+        },
         orderBy: { uploadedAt: 'desc' },
         take: 5
     });
@@ -145,12 +154,26 @@ export default async function UhuruWallPage() {
                                     </div>
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="px-2 py-0.5 bg-emerald-500/10 text-[10px] font-bold text-emerald-400 rounded uppercase">Doc Basket Item</span>
+                                            <span className="px-2 py-0.5 bg-emerald-500/10 text-[10px] font-bold text-emerald-400 rounded uppercase">Doc Basket Insight</span>
                                             <h3 className="font-bold text-white leading-tight">{doc.filename}</h3>
+                                            {(doc.extractedData as any)?.vatLiability?.mustCharge && (
+                                                <span className="px-2 py-0.5 bg-amber-500/10 text-[10px] font-bold text-amber-500 rounded uppercase">VAT Notice</span>
+                                            )}
                                         </div>
-                                        <p className="text-xs text-uhuru-text-dim mt-2">
-                                            Uploaded on {format(doc.uploadedAt, 'MMM d, yyyy')}. {doc.isProcessed ? 'AI has indexed this context.' : 'Queued for AI strategic analysis.'}
-                                        </p>
+                                        {doc.strategicInsights ? (
+                                            <p className="text-sm text-slate-300 leading-relaxed mt-2 bg-slate-900/40 p-3 rounded-xl border border-white/5">
+                                                {doc.strategicInsights}
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs text-uhuru-text-dim mt-2">
+                                                Uploaded on {format(doc.uploadedAt, 'MMM d, yyyy')}. Queued for AI strategic analysis.
+                                            </p>
+                                        )}
+                                        {(doc.extractedData as any)?.vatLiability && (
+                                            <p className="text-[10px] text-uhuru-text-dim mt-2 italic">
+                                                VAT Context: {(doc.extractedData as any).vatLiability.reason}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>

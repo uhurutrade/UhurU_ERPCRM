@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-19T12:24:28.787Z');
+  console.log('Generated at: 2025-12-19T12:48:34.129Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -849,106 +849,127 @@ async function main() {
   {
     "id": "cmj5y8hua000oozg67yr5by3u",
     "filename": "revolut_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:38:28.691Z"
   },
   {
     "id": "cmj5yamnv0019ozg60qfgo0yw",
     "filename": "statement_96832043_GBP_2025-08-01_2025-08-29.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:40:08.252Z"
   },
   {
     "id": "cmj5yclcr001cozg60r4va842",
     "filename": "statement_96832099_EUR_2024-08-01_2025-07-31.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:41:39.868Z"
   },
   {
     "id": "cmj5yt69300aaozg6ahzfhm8r",
     "filename": "statement_96832099_EUR_2024-08-01_2025-07-31.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:54:33.447Z"
   },
   {
     "id": "cmj5yts3000fzozg6r7mn40eh",
     "filename": "statement_96832099_EUR_2025-08-01_2025-08-29.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:55:01.740Z"
   },
   {
     "id": "cmj5ywjhn00gwozg6az79xpss",
     "filename": "revolut_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:57:10.572Z"
   },
   {
     "id": "cmj5yy77l00hrozg6unsegdpn",
     "filename": "revolut_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:58:27.969Z"
   },
   {
     "id": "cmj5yz25u00icozg6xjpowot3",
     "filename": "revolut_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:59:08.083Z"
   },
   {
     "id": "cmj5yzmrl00idozg6c08ty1lg",
     "filename": "revolut_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T16:59:34.785Z"
   },
   {
     "id": "cmj626zjy000arjaqfri53142",
     "filename": "revolutttttt.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T18:29:16.799Z"
   },
   {
     "id": "cmj627a32001xrjaqfpa6b3ae",
     "filename": "revolutttttt.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T18:29:30.447Z"
   },
   {
     "id": "cmj627lpu0022rjaq638b45es",
     "filename": "revolutttttt.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T18:29:45.522Z"
   },
   {
     "id": "cmj627z7y0023rjaqpycqwulx",
     "filename": "revolutttttt.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-14T18:30:03.023Z"
   },
   {
     "id": "cmj8xu89h001re43or03yi6bl",
     "filename": "Revolut_Inicio_14122025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:50:41.621Z"
   },
   {
     "id": "cmj8xukd4002ye43orrr52voy",
     "filename": "Revolut_Inicio_14122025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:50:57.304Z"
   },
   {
     "id": "cmj8xuy60004le43oavp1j6xz",
     "filename": "Revolut_Inicio_14122025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:51:15.193Z"
   },
   {
     "id": "cmj8xvoom004qe43otq4v15xz",
     "filename": "Wise_EUR_2024.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:51:49.559Z"
   },
   {
     "id": "cmj8xwdgn006te43oky23ua6p",
     "filename": "Wise_EUR_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:52:21.672Z"
   },
   {
     "id": "cmj8xwpth009me43o2tkg506w",
     "filename": "Wise_EUR_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:52:37.686Z"
   },
   {
     "id": "cmj8xx2u6009ne43ootb5254m",
     "filename": "Wise_GBP_2024.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:52:54.559Z"
   },
   {
     "id": "cmj8xxdj400ace43ogky5u011",
     "filename": "Wise_GBP_2025.csv",
+    "fileHash": null,
     "uploadedAt": "2025-12-16T18:53:08.416Z"
   }
 ] as any[]) {
@@ -5837,6 +5858,7 @@ async function main() {
       "documentRole": "EMITTED"
     },
     "transactionId": null,
+    "fileHash": null,
     "uploadedAt": "2025-12-19T10:39:46.842Z"
   }
 ] as any[]) {
@@ -5990,6 +6012,12 @@ async function main() {
     "isProcessed": true,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T17:10:43.820Z"
   },
@@ -6003,6 +6031,12 @@ async function main() {
     "isProcessed": true,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T17:15:29.751Z"
   },
@@ -6016,6 +6050,12 @@ async function main() {
     "isProcessed": true,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T17:50:52.774Z"
   },
@@ -6029,6 +6069,12 @@ async function main() {
     "isProcessed": true,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T17:04:59.876Z"
   },
@@ -6042,6 +6088,12 @@ async function main() {
     "isProcessed": true,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-18T18:22:36.800Z"
   },
@@ -6055,6 +6107,12 @@ async function main() {
     "isProcessed": false,
     "vectorId": null,
     "fiscalYear": null,
+    "fileHash": null,
+    "extractedData": null,
+    "strategicInsights": null,
+    "documentDate": null,
+    "isSuperseded": false,
+    "supersededById": null,
     "uploadedBy": null,
     "uploadedAt": "2025-12-19T12:23:28.844Z"
   }

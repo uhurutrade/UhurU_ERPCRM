@@ -380,6 +380,7 @@ model BankTransaction {
 model BankStatement {
   id           String            @id @default(cuid())
   filename     String
+  fileHash     String?           // SHA-256 for CSV deduplication
   uploadedAt   DateTime          @default(now())
 
   transactions BankTransaction[]
@@ -395,6 +396,7 @@ model Attachment {
   transactionId String?
   transaction   BankTransaction? @relation(fields: [transactionId], references: [id])
 
+  fileHash      String?         // SHA-256 for file deduplication
   uploadedAt    DateTime @default(now())
 }
 
@@ -607,6 +609,15 @@ model ComplianceDocument {
 
   // Context
   fiscalYear    String?  // e.g. "2024"
+  
+  fileHash      String?  
+  extractedData Json?    // AI-extracted key dates and facts
+  strategicInsights String? @db.Text // AI analysis related to UK LTD compliance
+  
+  // Versioning & Invalidation
+  documentDate  DateTime? // The effective date of the document (not upload date)
+  isSuperseded  Boolean  @default(false)
+  supersededById String?
   
   uploadedBy    String?
   uploadedAt    DateTime @default(now())
