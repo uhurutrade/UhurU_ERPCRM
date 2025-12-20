@@ -52,17 +52,17 @@ export default async function InvoicesPage({
     return (
         <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             {/* ... header and stats remain same ... */}
-            <header className="flex justify-between items-end shrink-0">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Invoice Management</h1>
+            <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 shrink-0">
+                <div className="text-center lg:text-left">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Invoice Management</h1>
                     <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Financial Operations & Expense Matching</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap justify-center lg:justify-end gap-3 lg:gap-4">
                     <InvoiceUploadButton />
 
                     <Link
                         href="/dashboard/invoices/create"
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 lg:px-5 py-2 lg:py-2.5 rounded-xl font-bold text-[10px] lg:text-xs uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
                     >
                         <Plus size={16} />
                         Generate Invoice

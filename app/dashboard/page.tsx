@@ -57,12 +57,12 @@ export default async function DashboardPage() {
 
     return (
         <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
-            <header className="flex justify-between items-end shrink-0">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Executive Dashboard</h1>
+            <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 shrink-0">
+                <div className="text-center sm:text-left">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Executive Dashboard</h1>
                     <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Strategic Management & Resource Planning</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex justify-center sm:justify-end">
                     <span className="text-[10px] font-bold text-slate-500 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-white/5 uppercase tracking-widest">
                         System Online
                     </span>

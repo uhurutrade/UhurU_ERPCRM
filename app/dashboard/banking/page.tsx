@@ -68,28 +68,28 @@ export default async function BankingPage({
         <div className="min-h-screen p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-4xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-uhuru-blue to-uhuru-purple">
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-8">
+                    <div className="text-center lg:text-left">
+                        <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-uhuru-blue to-uhuru-purple">
                             General Ledger
                         </h1>
-                        <p className="text-slate-400 text-lg">Manage your transactions and bank accounts.</p>
+                        <p className="text-slate-400 text-sm lg:text-lg">Manage your transactions and bank accounts.</p>
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap justify-center lg:justify-end gap-3 lg:gap-4">
                         <Link
                             href="/dashboard/banking/audit-log"
-                            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all border border-slate-700"
+                            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl font-semibold transition-all border border-slate-700 text-sm lg:text-base"
                             title="View Deleted Transactions Audit Log"
                         >
-                            <HistoryIcon size={20} />
+                            <HistoryIcon size={18} />
                             Audit Log
                         </Link>
                         <InvoiceUploadButton />
                         <Link
                             href="/dashboard/banking/upload"
-                            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all border border-slate-700 shadow-lg"
+                            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl font-semibold transition-all border border-slate-700 shadow-lg text-sm lg:text-base"
                         >
-                            <Upload size={20} />
+                            <Upload size={18} />
                             Upload Statement
                         </Link>
                     </div>

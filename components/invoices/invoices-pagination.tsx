@@ -47,12 +47,12 @@ export function StandardPagination({ currentPage, totalPages, baseUrl = '', page
     };
 
     return (
-        <div className="p-6 border-t border-uhuru-border flex justify-between items-center bg-slate-900/20">
-            <div className="flex items-center gap-4">
-                <div className="text-xs text-uhuru-text-dim uppercase font-bold tracking-widest">
+        <div className="p-4 sm:p-6 border-t border-uhuru-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/20">
+            <div className="flex items-center gap-3 sm:gap-4">
+                <div className="text-[10px] sm:text-xs text-uhuru-text-dim uppercase font-bold tracking-widest whitespace-nowrap">
                     Page <span className="text-white">{currentPage}</span> of <span className="text-white">{totalPages || 1}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] text-uhuru-text-dim bg-slate-900/40 px-3 py-1.5 rounded-lg border border-white/5">
+                <div className="flex items-center gap-2 text-[10px] text-uhuru-text-dim bg-slate-900/40 px-2 sm:px-3 py-1.5 rounded-lg border border-white/5">
                     <span>GO:</span>
                     <input
                         type="number"

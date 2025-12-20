@@ -60,12 +60,14 @@ export default async function CRMPage({
     return (
         <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Header */}
-            <header className="flex justify-between items-end shrink-0">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">CRM Command Center</h1>
+            <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 shrink-0">
+                <div className="text-center lg:text-left">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">CRM Command Center</h1>
                     <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Operational Excellence & Relationship Management</p>
                 </div>
-                <CRMHeaderActions organizations={organizations} />
+                <div className="flex justify-center lg:justify-end">
+                    <CRMHeaderActions organizations={organizations} />
+                </div>
             </header>
 
             {/* DARK SUMMARY CARDS */}

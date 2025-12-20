@@ -108,10 +108,10 @@ export default async function UhuruWallPage() {
     years.reverse();
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto">
-            <header>
-                <h1 className="text-3xl font-bold text-white tracking-tight">Uhuru Wall</h1>
-                <p className="text-uhuru-text-muted mt-1">Global strategic overview of performance and fiscal obligations</p>
+        <div className="space-y-8 max-w-7xl mx-auto p-4 sm:p-0">
+            <header className="text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Uhuru Wall</h1>
+                <p className="text-uhuru-text-muted mt-1 text-sm sm:text-base">Global strategic overview of performance and fiscal obligations</p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

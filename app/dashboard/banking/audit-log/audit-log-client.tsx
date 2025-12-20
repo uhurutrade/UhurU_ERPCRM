@@ -72,17 +72,17 @@ export default function AuditLogClient({ logs, totalPages, currentPage }: AuditL
                         <ArrowLeft size={20} />
                         Back to Banking
                     </Link>
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-3xl font-bold text-white mb-2">Transaction Avoided</h1>
-                            <p className="text-slate-400">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+                        <div className="text-center sm:text-left">
+                            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Transaction Avoided</h1>
+                            <p className="text-slate-400 text-sm sm:text-base">
                                 Audit log of all deleted financial transactions. These records are permanent and read-only.
                             </p>
                         </div>
                         <button
                             onClick={handleClearAuditLog}
                             disabled={isClearing || logs.length === 0}
-                            className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors text-sm font-medium disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors text-sm font-medium disabled:cursor-not-allowed mx-auto sm:mx-0"
                             title="Clear all audit log entries"
                         >
                             <Trash2 size={16} />

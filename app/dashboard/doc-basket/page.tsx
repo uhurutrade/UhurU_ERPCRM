@@ -262,8 +262,8 @@ export default function DocBasketPage() {
                         <Upload size={24} className="text-indigo-400" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Feed UhurU AI Engine</h1>
-                        <p className="text-uhuru-text-dim mt-1">AI-Powered Strategic Document Repository for UK Ltd Compliance.</p>
+                        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Feed UhurU AI Engine</h1>
+                        <p className="text-uhuru-text-dim mt-1 text-sm lg:text-base">AI-Powered Strategic Document Repository for UK Ltd Compliance.</p>
                     </div>
                 </div>
             </header>
@@ -274,7 +274,7 @@ export default function DocBasketPage() {
                         <div
                             onClick={() => fileInputRef.current?.click()}
                             className={`
-                                relative border-2 border-dashed rounded-[2rem] p-12 text-center cursor-pointer transition-all duration-500 group overflow-hidden
+                                relative border-2 border-dashed rounded-[2rem] p-6 lg:p-12 text-center cursor-pointer transition-all duration-500 group overflow-hidden
                                 ${files.length > 0 ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-uhuru-border hover:border-indigo-500/40 hover:bg-slate-900/40 hover:shadow-2xl'}
                             `}
                         >
@@ -332,11 +332,11 @@ export default function DocBasketPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-3">
+                        <div className="flex flex-col sm:flex-row justify-end gap-3">
                             {files.length > 0 && (
                                 <button
                                     onClick={() => setFiles([])}
-                                    className="px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-uhuru-text-dim hover:text-white transition-all"
+                                    className="px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-uhuru-text-dim hover:text-white transition-all text-center"
                                 >
                                     Clear Selection
                                 </button>
@@ -345,7 +345,7 @@ export default function DocBasketPage() {
                                 onClick={handleUpload}
                                 disabled={files.length === 0 || isUploading}
                                 className={`
-                                    flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl
+                                    flex items-center justify-center gap-2 px-10 py-3.5 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl
                                     ${isUploading ? 'bg-slate-800 text-slate-400' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20 hover:scale-[1.02] active:scale-95'}
                                     disabled:opacity-30
                                 `}

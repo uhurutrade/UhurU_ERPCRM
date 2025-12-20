@@ -97,16 +97,18 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 transition-opacity duration-300" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-start justify-center sm:pt-20 transition-opacity duration-300" onClick={onClose}>
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
             {/* Modal Card */}
             <div
-                className="relative w-full max-w-6xl transform transition-all duration-300 scale-100 translate-y-0"
+                className="relative w-full max-w-6xl transform transition-all duration-300 scale-100 translate-y-0 z-10"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="bg-uhuru-card backdrop-blur-3xl border border-slate-700/50 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-10 mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="bg-uhuru-card backdrop-blur-3xl border border-slate-700/50 rounded-t-[32px] sm:rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] p-5 sm:p-10 mx-0 sm:mx-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto no-scrollbar">
+                    {/* Handle for mobile */}
+                    <div className="w-12 h-1.5 bg-slate-700/50 rounded-full mx-auto mb-6 sm:hidden" />
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
@@ -126,11 +128,11 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Left Column: Transaction Core */}
                             <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-slate-900/40 p-8 rounded-[24px] border border-white/5">
+                                <div className="bg-slate-900/40 p-5 sm:p-8 rounded-[24px] border border-white/5">
                                     <div className="flex justify-between items-start mb-6">
                                         <div>
                                             <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Amount & Currency</label>
-                                            <div className={`text-5xl font-black tracking-tight ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                            <div className={`text-3xl sm:text-5xl font-black tracking-tight ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
                                                 {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
                                             </div>
                                         </div>
@@ -145,7 +147,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                     <div className="space-y-4 pt-6 border-t border-white/5">
                                         <div>
                                             <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Description</label>
-                                            <div className="text-xl text-white font-semibold leading-relaxed">{transaction.description}</div>
+                                            <div className="text-lg sm:text-xl text-white font-semibold leading-relaxed">{transaction.description}</div>
                                         </div>
 
                                         {transaction.merchant && (

@@ -182,12 +182,12 @@ export default function TaxAssistantPage() {
     };
 
     return (
-        <div className="h-[calc(100vh-6rem)] max-w-7xl mx-auto p-4 md:p-6 animate-in fade-in duration-500 flex flex-col gap-6">
+        <div className="min-h-screen lg:h-[calc(100vh-6rem)] max-w-7xl mx-auto p-4 md:p-6 animate-in fade-in duration-500 flex flex-col gap-6">
 
             {/* Header */}
-            <div className="flex justify-between items-start shrink-0">
-                <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 shrink-0">
+                <div className="text-center sm:text-left">
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center sm:justify-start gap-3">
                         <Bot className="text-emerald-400" size={32} />
                         AI Tax Assistant (RAG)
                     </h1>
@@ -195,9 +195,11 @@ export default function TaxAssistantPage() {
                         Upload historical declarations & HMRC letters. Data is stored in your private VPS.
                     </p>
                 </div>
-                <Link href="/dashboard/compliance" className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
-                    <X size={24} />
-                </Link>
+                <div className="flex justify-center sm:justify-end">
+                    <Link href="/dashboard/compliance" className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                        <X size={24} />
+                    </Link>
+                </div>
             </div>
 
             {/* Split Layout */}
