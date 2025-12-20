@@ -65,11 +65,11 @@ export async function getAIClient() {
             return analyzeStrategicWithOpenAI(filename, text, buffer, mimeType, userNotes);
         },
 
-        async chat(message: string, systemPrompt: string): Promise<string> {
+        async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
             if (provider === 'gemini') {
-                return chatWithGemini(message, systemPrompt);
+                return chatWithGemini(message, systemPrompt, history);
             }
-            return chatWithOpenAI(message, systemPrompt);
+            return chatWithOpenAI(message, systemPrompt, history);
         }
     };
 }
@@ -210,17 +210,21 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
     return JSON.parse(response.choices[0].message.content || '{}');
 }
 
-async function chatWithOpenAI(message: string, systemPrompt: string): Promise<string> {
+async function chatWithOpenAI(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
     const openai = new OpenAI({ apiKey });
+
+    const messages: any[] = [
+        { role: "system", content: systemPrompt },
+        ...history,
+        { role: "user", content: message }
+    ];
+
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: message }
-        ],
+        messages,
         temperature: 0.2
     });
 
@@ -267,14 +271,23 @@ async function analyzeWithGemini(filename: string, text: string, buffer?: Buffer
     return JSON.parse(response.text());
 }
 
-async function chatWithGemini(message: string, systemPrompt: string): Promise<string> {
+async function chatWithGemini(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key (GEMINI_API_KEY) is not configured.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const result = await model.generateContent(`${systemPrompt}\n\nUser Message: ${message}`);
+    // Format history for Gemini
+    const chat = model.startChat({
+        history: history.map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }]
+        })),
+        systemInstruction: systemPrompt
+    });
+
+    const result = await chat.sendMessage(message);
     const response = await result.response;
     return response.text();
 }

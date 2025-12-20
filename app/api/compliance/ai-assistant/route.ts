@@ -14,7 +14,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Gemini API Key not found.' }, { status: 500 });
         }
 
-        const { message, contextFiles } = await req.json();
+        const { message, history, contextFiles } = await req.json();
+        const chatHistory = history || [];
 
         // 2. FETCH LEDGER & TAX CONTEXT
         const { getFinancialContext } = require('@/lib/ai/financial-context');
@@ -23,9 +24,16 @@ export async function POST(req: Request) {
         let systemPrompt = `You are an expert UK Tax Consultant for HMRC and Companies House compliance. 
         You help the user prepare their tax obligations based on their ERP data and uploaded documents.
         
-        Keep responses professional, concise, and focused on UK tax law (VAT, Corporation Tax).
+        LANGUAGE POLICY:
+        - Respond in SPANISH by default. This is the preferred language of the Director.
+        - Only respond in English if the user explicitly asks you to switch to English or writes a prompt specifically requesting an English response.
+        - Even if responding in Spanish, keep technical terms like "VAT", "Corporation Tax", or "Companies House" as standard references where appropriate.
+
+        BEHAVIOR & CONTEXT:
+        - Use the provided conversation HISTORY to maintain continuity.
+        - Be concise but strategic.
         
-        CURRENT BUSINESS FINANCIAL DATA:
+        CURRENT BUSINESS FINANCIAL DATA (ERP):
         ${financialContext}`;
 
         // 3. RAG RETRIEVAL (from uploaded docs)
@@ -42,8 +50,8 @@ export async function POST(req: Request) {
             systemPrompt += `\n\nCONTEXT FROM UPLOADED FILES:\nThe user has uploaded ${contextFiles.length} documents for analysis.`;
         }
 
-        // 4. Call AI
-        const reply = await ai.chat(message, systemPrompt);
+        // 4. Call AI with history
+        const reply = await ai.chat(message, systemPrompt, chatHistory);
 
         return NextResponse.json({ reply });
 

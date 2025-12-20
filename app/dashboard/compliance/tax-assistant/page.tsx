@@ -154,6 +154,7 @@ export default function TaxAssistantPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: userMsg,
+                    history: messages.slice(1).map(m => ({ role: m.role, content: m.content })),
                     contextFiles: activeDocs.map(d => d.filename) // Send filenames as context reference
                 })
             });
