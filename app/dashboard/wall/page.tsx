@@ -51,10 +51,10 @@ export default async function UhuruWallPage() {
                     equals: false
                 }
             }
-        },
+        } as any,
         orderBy: { uploadedAt: 'desc' },
         take: 5
-    });
+    }) as any[];
 
     // 3. Calculate Fiscal Years
     const years: FiscalYearData[] = [];
@@ -108,7 +108,7 @@ export default async function UhuruWallPage() {
     years.reverse();
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto p-4 sm:p-0">
+        <div className="space-y-8 max-w-7xl mx-auto p-4 sm:p-0 overflow-hidden">
             <header className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Uhuru Wall</h1>
                 <p className="text-uhuru-text-muted mt-1 text-sm sm:text-base">Global strategic overview of performance and fiscal obligations</p>
@@ -120,7 +120,7 @@ export default async function UhuruWallPage() {
                     <h2 className="text-[10px] font-black text-uhuru-text-dim uppercase tracking-[0.2em] mb-4">Strategic Notice Wall</h2>
 
                     {/* Notice 1 */}
-                    <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/40 transition-all">
+                    <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/40 transition-all">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <TrendingUp size={80} />
                         </div>
@@ -147,7 +147,7 @@ export default async function UhuruWallPage() {
                     {/* Real Doc Basket Insights */}
                     {strategicDocs.length > 0 ? (
                         strategicDocs.map((doc) => (
-                            <div key={doc.id} className="bg-uhuru-card border border-uhuru-border rounded-3xl p-6 shadow-lg hover:border-emerald-500/30 transition-all">
+                            <div key={doc.id} className="bg-uhuru-card border border-uhuru-border rounded-3xl p-4 sm:p-6 shadow-lg hover:border-emerald-500/30 transition-all overflow-hidden">
                                 <div className="flex items-start gap-4">
                                     <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
                                         <FileText size={20} strokeWidth={1.5} />
@@ -155,13 +155,13 @@ export default async function UhuruWallPage() {
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
                                             <span className="px-2 py-0.5 bg-emerald-500/10 text-[10px] font-bold text-emerald-400 rounded uppercase">Doc Basket Insight</span>
-                                            <h3 className="font-bold text-white leading-tight">{doc.filename}</h3>
+                                            <h3 className="font-bold text-white leading-tight break-words">{doc.filename}</h3>
                                             {(doc.extractedData as any)?.vatLiability?.mustCharge && (
                                                 <span className="px-2 py-0.5 bg-amber-500/10 text-[10px] font-bold text-amber-500 rounded uppercase">VAT Notice</span>
                                             )}
                                         </div>
                                         {doc.strategicInsights ? (
-                                            <p className="text-sm text-slate-300 leading-relaxed mt-2 bg-slate-900/40 p-3 rounded-xl border border-white/5">
+                                            <p className="text-sm text-slate-300 leading-relaxed mt-2 bg-slate-900/40 p-3 rounded-xl border border-white/5 break-words">
                                                 {doc.strategicInsights}
                                             </p>
                                         ) : (
@@ -219,7 +219,7 @@ export default async function UhuruWallPage() {
             {years.map((fy) => (
                 <div
                     key={fy.id}
-                    className="group relative bg-uhuru-card border border-uhuru-border rounded-2xl p-6 transition-all duration-300 hover:border-uhuru-accent-blue/40 hover:shadow-glow overflow-hidden"
+                    className="group relative bg-uhuru-card border border-uhuru-border rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:border-uhuru-accent-blue/40 hover:shadow-glow overflow-hidden"
                 >
                     {/* Status Indicator Stripe */}
                     <div className={`absolute left-0 top-0 bottom-0 w-1 ${fy.isClosed ? 'bg-uhuru-accent-purple' : 'bg-uhuru-accent-green'}`} />
@@ -236,7 +236,7 @@ export default async function UhuruWallPage() {
                                     {fy.isClosed ? 'Closed Fiscal Year' : 'Current Period'}
                                 </span>
                             </div>
-                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2 break-all overflow-hidden">
                                 FY {fy.year}
                             </h3>
                             <p className="text-sm text-uhuru-text-muted mt-1 flex items-center gap-1">
@@ -249,7 +249,7 @@ export default async function UhuruWallPage() {
                                 User asked for "hover" effect to show data. 
                                 We'll make it partially visible and enhance on hover.
                             */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 flex-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 flex-1 opacity-80 group-hover:opacity-100 transition-opacity">
 
                             <div>
                                 <p className="text-xs text-uhuru-text-dim mb-1">Total Income</p>

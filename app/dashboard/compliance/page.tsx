@@ -69,7 +69,7 @@ export default async function CompliancePage() {
     ];
 
     return (
-        <div className="min-h-screen p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="min-h-screen p-4 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             <header className="flex justify-between items-end shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Fiscal Compliance Engine</h1>
@@ -136,7 +136,7 @@ export default async function CompliancePage() {
                                 <h3 className="text-uhuru-text-dim text-[9px] sm:text-[10px] font-black mb-2 sm:mb-3 uppercase tracking-[0.3em]">
                                     {ob.type.replace('_', ' ')}
                                 </h3>
-                                <p className="text-2xl sm:text-4xl font-black text-white tracking-tighter truncate">
+                                <p className="text-xl sm:text-4xl font-black text-white tracking-tighter truncate break-words">
                                     {ob.dueDate}
                                 </p>
                             </div>

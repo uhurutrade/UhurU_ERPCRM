@@ -201,16 +201,16 @@ export default function ComplianceOverview() {
                         key={index}
                         className={`p-4 rounded-lg border ${getStatusColor(deadline.status)}`}
                     >
-                        <div className="flex justify-between items-start mb-2">
-                            <div>
-                                <p className="font-semibold text-sm text-slate-200">{deadline.type}</p>
-                                <p className="text-slate-300">{deadline.description}</p>
+                        <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-sm text-slate-200 truncate">{deadline.type}</p>
+                                <p className="text-slate-300 text-xs sm:text-sm break-words">{deadline.description}</p>
                             </div>
                             {getStatusBadge(deadline.status)}
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-400">Due: {deadline.dueDate}</span>
-                            <span className="font-mono">
+                        <div className="flex flex-wrap justify-between items-center gap-2 text-sm">
+                            <span className="text-slate-400 whitespace-nowrap">Due: {deadline.dueDate}</span>
+                            <span className="font-mono text-xs sm:text-sm whitespace-nowrap">
                                 {deadline.daysUntil < 0
                                     ? `${Math.abs(deadline.daysUntil)} days overdue`
                                     : `${deadline.daysUntil} days remaining`}
