@@ -78,7 +78,7 @@ export default async function InvoicesPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Recent Document Feed (Matched & Unmatched) */}
-                <div className="xl:col-span-2 bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden">
+                <div className="xl:col-span-2 bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px]">
                     <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                         <div>
                             <h2 className="text-lg font-bold text-white tracking-tight">Recent Document Activity</h2>
@@ -224,7 +224,7 @@ export default async function InvoicesPage() {
             </div>
 
             {/* Outgoing Invoices Section */}
-            <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden">
+            <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px]">
                 <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                     <div>
                         <h2 className="text-lg font-bold text-white tracking-tight">Outgoing Invoices Record</h2>

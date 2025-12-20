@@ -92,7 +92,7 @@ export default function AuditLogClient({ logs, totalPages, currentPage }: AuditL
                 </div>
 
                 {/* Audit Table */}
-                <div className="bg-slate-900/50 backdrop-blur-xl rounded-3xl border border-slate-800 p-6 shadow-2xl">
+                <div className="bg-slate-900/50 backdrop-blur-xl rounded-3xl border border-slate-800 p-6 shadow-2xl min-h-[1200px]">
                     <AuditLogTable
                         logs={logs}
                         totalPages={totalPages}

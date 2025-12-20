@@ -362,7 +362,7 @@ export default function DocBasketPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-3 min-h-[800px]">
+                        <div className="space-y-3 min-h-[1200px]">
                             {isLoadingHistory ? (
                                 <div className="p-12 flex flex-col items-center gap-4 text-uhuru-text-dim">
                                     <Loader2 className="animate-spin" size={24} />

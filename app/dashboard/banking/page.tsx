@@ -98,7 +98,7 @@ export default async function BankingPage({
                 <ExchangeRatesWidget />
 
                 {/* Transactions Card */}
-                <div className="bg-gradient-card backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl min-h-[800px]">
+                <div className="bg-gradient-card backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl min-h-[1200px]">
                     <div className="p-6 border-b border-slate-700/50">
                         <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
                     </div>
