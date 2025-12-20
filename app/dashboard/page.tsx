@@ -56,7 +56,7 @@ export default async function DashboardPage() {
     const totalBalance = allAccounts.reduce((sum, acc) => sum + Number(acc.currentBalance), 0);
 
     return (
-        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 shrink-0">
                 <div className="text-center sm:text-left">
                     <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Executive Dashboard</h1>

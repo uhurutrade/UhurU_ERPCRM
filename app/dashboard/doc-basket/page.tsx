@@ -158,7 +158,7 @@ export default function DocBasketPage() {
                         className="bg-uhuru-card border border-uhuru-border w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="p-8 space-y-6 overflow-y-auto">
+                        <div className="p-0 sm:p-8 space-y-6 overflow-y-auto">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-indigo-500/10 rounded-2xl text-indigo-400">

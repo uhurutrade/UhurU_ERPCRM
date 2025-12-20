@@ -249,28 +249,28 @@ export function TransactionTable({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm">
-                            <th className="py-3 px-4 w-12">
+                            <th className="py-3 px-2 sm:px-4 w-10 sm:w-12">
                                 <button
                                     onClick={handleSelectAll}
                                     className="text-slate-400 hover:text-white transition-colors"
                                 >
                                     {selectedIds.size === transactions.length && transactions.length > 0 ?
-                                        <CheckSquare size={20} className="text-emerald-500" /> :
-                                        <Square size={20} />
+                                        <CheckSquare size={18} className="text-emerald-500" /> :
+                                        <Square size={18} />
                                     }
                                 </button>
                             </th>
-                            {isLinkingMode && <th className="py-3 px-4 w-32 text-emerald-400 font-bold uppercase text-[10px]">Action</th>}
-                            <th className="py-3 px-4 w-12 text-slate-500 font-bold">#</th>
-                            <th className="py-3 px-4 font-medium">Date</th>
-                            <th className="py-3 px-4 font-medium">Description</th>
-                            <th className="py-3 px-4 font-medium hidden md:table-cell">Account</th>
-                            <th className="py-3 px-4 font-medium text-right">Amount</th>
-                            <th className="py-3 px-4 font-medium hidden md:table-cell">Category</th>
-                            <th className="py-3 px-4 w-24 text-center text-slate-500 font-bold">Actions</th>
+                            {isLinkingMode && <th className="py-3 px-2 sm:px-4 w-24 sm:w-32 text-emerald-400 font-bold uppercase text-[9px] sm:text-[10px]">Action</th>}
+                            <th className="py-3 px-1 sm:px-4 w-8 sm:w-12 text-slate-500 font-bold hidden sm:table-cell">#</th>
+                            <th className="py-3 px-2 sm:px-4 font-medium text-[10px] sm:text-sm">Date</th>
+                            <th className="py-3 px-2 sm:px-4 font-medium text-[10px] sm:text-sm">Description</th>
+                            <th className="py-3 px-2 sm:px-4 font-medium hidden md:table-cell">Account</th>
+                            <th className="py-3 px-2 sm:px-4 font-medium text-right text-[10px] sm:text-sm">Amount</th>
+                            <th className="py-3 px-2 sm:px-4 font-medium hidden md:table-cell">Category</th>
+                            <th className="py-3 px-2 sm:px-4 w-20 sm:w-24 text-center text-slate-500 font-bold text-[10px] sm:text-sm">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="text-sm">
+                    <tbody className="text-[11px] sm:text-sm">
                         {transactions.map((tx, index) => {
                             const isSelected = selectedIds.has(tx.id);
                             const hasAttachments = tx.attachments && tx.attachments.length > 0;
@@ -278,49 +278,49 @@ export function TransactionTable({
                                 <tr
                                     key={tx.id}
                                     className={`
-                                        border-b border-slate-800 transition-colors cursor-pointer h-[60px]
+                                        border-b border-slate-800 transition-colors cursor-pointer h-[50px] sm:h-[60px]
                                         ${isSelected ? 'bg-emerald-900/20' : 'hover:bg-slate-800/50'}
                                     `}
                                     onClick={() => setViewTransaction(tx)}
                                 >
-                                    <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                    <td className="py-2 px-2 sm:px-4" onClick={(e) => e.stopPropagation()}>
                                         {isLinkingMode ? (
-                                            <div className="w-5 h-5 rounded border border-emerald-500/50 bg-emerald-500/10" />
+                                            <div className="w-4 h-4 rounded border border-emerald-500/50 bg-emerald-500/10" />
                                         ) : (
                                             <button onClick={() => handleSelectOne(tx.id)}>
                                                 {isSelected ?
-                                                    <CheckSquare size={20} className="text-emerald-500" /> :
-                                                    <Square size={20} className="text-slate-600" />
+                                                    <CheckSquare size={18} className="text-emerald-500" /> :
+                                                    <Square size={18} className="text-slate-600" />
                                                 }
                                             </button>
                                         )}
                                     </td>
                                     {isLinkingMode && (
-                                        <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                        <td className="py-2 px-2 sm:px-4" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => handleLinkDirect(tx.id)}
-                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold uppercase transition-all"
+                                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[8px] sm:text-[10px] font-bold uppercase transition-all"
                                             >
-                                                Link Here
+                                                Link
                                             </button>
                                         </td>
                                     )}
-                                    <td className="py-3 px-4 text-slate-500 font-mono text-[10px]">
+                                    <td className="py-2 px-1 sm:px-4 text-slate-500 font-mono text-[9px] sm:text-[10px] hidden sm:table-cell">
                                         {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
                                     </td>
-                                    <td className="py-3 px-4 text-slate-300">
-                                        {format(new Date(tx.date), 'MMM d, yyyy')}
+                                    <td className="py-2 px-2 sm:px-4 text-slate-300">
+                                        {format(new Date(tx.date), 'MMM d, yy')}
                                     </td>
-                                    <td className="py-3 px-4 text-white font-medium">
+                                    <td className="py-2 px-2 sm:px-4 text-white font-medium truncate max-w-[100px] sm:max-w-none">
                                         {tx.description}
-                                        {tx.reference && <span className="block text-xs text-slate-500 mt-0.5">{tx.reference}</span>}
+                                        {tx.reference && <span className="block text-[9px] sm:text-xs text-slate-500 mt-0.5 truncate">{tx.reference}</span>}
                                     </td>
-                                    <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
+                                    <td className="py-2 px-4 text-slate-500 hidden md:table-cell">
                                         <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
                                             {tx.bankAccount.bank.bankName}
                                         </span>
                                     </td>
-                                    <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
+                                    <td className={`py-2 px-2 sm:px-4 text-right font-bold sm:font-medium whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
                                         {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                     </td>
                                     <td className="py-3 px-4 text-slate-500 hidden md:table-cell">

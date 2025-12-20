@@ -58,7 +58,7 @@ export default async function CRMPage({
     const wonDealsValue = deals.filter(d => d.stage === 'WON').reduce((sum, d) => sum + Number(d.amount || 0), 0);
 
     return (
-        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 shrink-0">
                 <div className="text-center lg:text-left">

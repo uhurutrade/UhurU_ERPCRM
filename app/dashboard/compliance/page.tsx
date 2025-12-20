@@ -69,7 +69,7 @@ export default async function CompliancePage() {
     ];
 
     return (
-        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="min-h-screen p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             <header className="flex justify-between items-end shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Fiscal Compliance Engine</h1>
@@ -83,29 +83,29 @@ export default async function CompliancePage() {
             </header>
 
             {/* AI Tax Assistant Promo */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-uhuru-card border border-uhuru-border p-10 shadow-card">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-uhuru-card border border-uhuru-border p-5 sm:p-10 shadow-card">
                 <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-emerald-500/5 blur-[100px] rounded-full" />
 
-                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] border border-emerald-500/20">Autonomous Node</span>
-                            <h2 className="text-3xl font-black text-white tracking-tighter">
+                <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 sm:gap-10">
+                    <div className="text-center lg:text-left">
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mb-3 sm:mb-6">
+                            <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] border border-emerald-500/20">Autonomous Node</span>
+                            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tighter">
                                 UhurU Intelligence
                             </h2>
                         </div>
-                        <p className="text-uhuru-text-muted text-xl leading-relaxed max-w-2xl font-medium">
+                        <p className="text-uhuru-text-muted text-sm sm:text-xl leading-relaxed max-w-2xl font-medium">
                             RAG-powered analysis engine processing historical filings and cross-referencing ledger data for 99.9% automated return accuracy.
                         </p>
                     </div>
 
                     <Link
                         href="/dashboard/compliance/tax-assistant"
-                        className="group flex items-center gap-4 px-10 py-5 rounded-[2rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-indigo-600/30 transition-all active:scale-95 whitespace-nowrap"
+                        className="group flex items-center justify-center gap-3 px-6 sm:px-10 py-3 sm:py-5 rounded-2xl sm:rounded-[2rem] bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[9px] sm:text-xs uppercase tracking-[0.2em] shadow-2xl shadow-indigo-600/30 transition-all active:scale-95 w-full sm:w-auto"
                     >
                         Initialize Assistant
-                        <div className="p-1.5 bg-white/10 rounded-xl group-hover:rotate-12 transition-transform">
-                            <Bot size={20} />
+                        <div className="p-1 sm:p-1.5 bg-white/10 rounded-lg sm:rounded-xl group-hover:rotate-12 transition-transform">
+                            <Bot size={18} />
                         </div>
                     </Link>
                 </div>
@@ -133,10 +133,10 @@ export default async function CompliancePage() {
                             </div>
 
                             <div>
-                                <h3 className="text-uhuru-text-dim text-[10px] font-black mb-3 uppercase tracking-[0.3em]">
+                                <h3 className="text-uhuru-text-dim text-[9px] sm:text-[10px] font-black mb-2 sm:mb-3 uppercase tracking-[0.3em]">
                                     {ob.type.replace('_', ' ')}
                                 </h3>
-                                <p className="text-4xl font-black text-white tracking-tighter">
+                                <p className="text-2xl sm:text-4xl font-black text-white tracking-tighter truncate">
                                     {ob.dueDate}
                                 </p>
                             </div>

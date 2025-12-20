@@ -83,40 +83,42 @@ export function ExchangeRatesWidget() {
             </div>
 
             {/* Bottom: Converter */}
-            <div className="flex justify-start">
-                <div className="bg-slate-800/50 rounded-xl p-2 border border-slate-700/50 flex items-center gap-3 inline-flex">
-                    <div className="flex items-center gap-2 text-slate-400 px-2 border-r border-slate-700/50">
+            <div className="flex justify-start overflow-hidden">
+                <div className="bg-slate-800/50 rounded-xl p-2 sm:p-2 border border-slate-700/50 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <div className="flex items-center gap-2 text-slate-400 px-2 border-b sm:border-b-0 sm:border-r border-slate-700/50 pb-2 sm:pb-0">
                         <Calculator size={14} />
-                        <span className="text-xs font-medium uppercase tracking-wider">Converter</span>
+                        <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Converter</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between sm:justify-start gap-2 px-2 sm:px-0">
                         <input
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="w-24 bg-transparent text-right font-mono text-sm text-white focus:outline-none focus:border-b border-uhuru-cyan/50"
+                            className="w-20 sm:w-24 bg-transparent text-right font-mono text-xs sm:text-sm text-white focus:outline-none focus:border-b border-uhuru-cyan/50"
                             placeholder="0"
                         />
                         <select
                             value={fromCurrency}
                             onChange={(e) => setFromCurrency(e.target.value)}
-                            className="bg-transparent text-sm text-uhuru-cyan font-bold focus:outline-none cursor-pointer"
+                            className="bg-transparent text-xs sm:text-sm text-uhuru-cyan font-bold focus:outline-none cursor-pointer"
                         >
                             {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code} className="bg-slate-900 text-white">{c.code}</option>)}
                         </select>
                     </div>
 
-                    <ArrowRightLeft size={12} className="text-slate-500" />
+                    <div className="flex justify-center sm:block">
+                        <ArrowRightLeft size={12} className="text-slate-500 rotate-90 sm:rotate-0" />
+                    </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm text-white min-w-[4rem] text-right">
+                    <div className="flex items-center justify-between sm:justify-start gap-2 px-2 sm:px-0">
+                        <span className="font-mono text-xs sm:text-sm text-white min-w-[3.5rem] sm:min-w-[4rem] text-right">
                             {convertedAmount ? convertedAmount.toFixed(2) : '...'}
                         </span>
                         <select
                             value={toCurrency}
                             onChange={(e) => setToCurrency(e.target.value)}
-                            className="bg-transparent text-sm text-white font-bold focus:outline-none cursor-pointer"
+                            className="bg-transparent text-xs sm:text-sm text-white font-bold focus:outline-none cursor-pointer"
                         >
                             {SUPPORTED_CURRENCIES.map(c => <option key={c.code} value={c.code} className="bg-slate-900 text-white">{c.code}</option>)}
                         </select>

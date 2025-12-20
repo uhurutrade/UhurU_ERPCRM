@@ -50,7 +50,7 @@ export default async function InvoicesPage({
     const totalDocPages = Math.ceil(totalAttachments / docItemsPerPage);
 
     return (
-        <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
             {/* ... header and stats remain same ... */}
             <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 shrink-0">
                 <div className="text-center lg:text-left">

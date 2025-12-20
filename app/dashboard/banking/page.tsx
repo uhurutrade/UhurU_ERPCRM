@@ -65,7 +65,7 @@ export default async function BankingPage({
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
-        <div className="min-h-screen p-8">
+        <div className="min-h-screen p-0 sm:p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-8">

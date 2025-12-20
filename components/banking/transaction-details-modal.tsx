@@ -129,16 +129,16 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                             {/* Left Column: Transaction Core */}
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="bg-slate-900/40 p-5 sm:p-8 rounded-[24px] border border-white/5">
-                                    <div className="flex justify-between items-start mb-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
                                         <div>
                                             <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Amount & Currency</label>
-                                            <div className={`text-3xl sm:text-5xl font-black tracking-tight ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'}`}>
+                                            <div className={`text-2xl sm:text-5xl font-black tracking-tighter ${transaction.amount > 0 ? 'text-emerald-400' : 'text-white'} break-words`}>
                                                 {new Intl.NumberFormat('en-GB', { style: 'currency', currency: transaction.currency }).format(transaction.amount)}
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="sm:text-right">
                                             <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Status</label>
-                                            <span className="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase">
+                                            <span className="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] sm:text-xs font-bold border border-emerald-500/20 uppercase">
                                                 Verified
                                             </span>
                                         </div>
@@ -147,13 +147,13 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                     <div className="space-y-4 pt-6 border-t border-white/5">
                                         <div>
                                             <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Description</label>
-                                            <div className="text-lg sm:text-xl text-white font-semibold leading-relaxed">{transaction.description}</div>
+                                            <div className="text-base sm:text-xl text-white font-semibold leading-relaxed break-words">{transaction.description}</div>
                                         </div>
 
                                         {transaction.merchant && (
                                             <div className="pt-2">
                                                 <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-[0.2em] mb-2 block">Identified Merchant</label>
-                                                <div className="text-lg text-uhuru-blue font-bold">{transaction.merchant}</div>
+                                                <div className="text-base sm:text-lg text-uhuru-blue font-bold">{transaction.merchant}</div>
                                             </div>
                                         )}
                                     </div>
@@ -161,34 +161,34 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                             </div>
 
                             {/* Right Column: Metadata Cards */}
-                            <div className="space-y-4">
-                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
-                                        <Calendar size={24} />
+                            <div className="space-y-3 sm:space-y-4">
+                                <div className="bg-slate-900/60 p-4 sm:p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+                                        <Calendar size={20} />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Transaction Date</label>
-                                        <span className="text-white font-bold">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
+                                        <label className="text-[9px] sm:text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Transaction Date</label>
+                                        <span className="text-white font-bold text-sm sm:text-base">{format(new Date(transaction.date), 'MMMM d, yyyy')}</span>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
-                                        <CreditCard size={24} />
+                                <div className="bg-slate-900/60 p-4 sm:p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                                        <CreditCard size={20} />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Bank Connection</label>
-                                        <span className="text-white font-bold">{transaction.bankAccount.bank.bankName}</span>
-                                        <span className="text-[10px] text-uhuru-text-dim block">{transaction.bankAccount.accountName}</span>
+                                        <label className="text-[9px] sm:text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Bank Connection</label>
+                                        <span className="text-white font-bold text-sm sm:text-base">{transaction.bankAccount.bank.bankName}</span>
+                                        <span className="text-[9px] sm:text-[10px] text-uhuru-text-dim block">{transaction.bankAccount.accountName}</span>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-900/60 p-6 rounded-2xl border border-white/5 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400">
-                                        <Tag size={24} />
+                                <div className="bg-slate-900/60 p-4 sm:p-6 rounded-2xl border border-white/5 flex items-center gap-4">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 shrink-0">
+                                        <Tag size={20} />
                                     </div>
-                                    <div className="flex-1">
-                                        <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Internal Category</label>
+                                    <div className="flex-1 min-w-0">
+                                        <label className="text-[9px] sm:text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Internal Category</label>
                                         <div className="mt-1">
                                             <CategoryBadge
                                                 transactionId={transaction.id}
