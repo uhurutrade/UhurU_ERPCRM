@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { updateTransactionCategory } from '@/app/actions/banking';
 import { getTransactionCategories, createTransactionCategory, deleteTransactionCategory, updateTransactionCategoryDefinition } from '@/app/actions/categories';
 import { Check, Plus, Tag, Palette, Trash2, X, Pencil } from 'lucide-react';
@@ -20,6 +21,7 @@ const PRESET_COLORS = [
 ];
 
 export function CategoryBadge({ transactionId, initialCategory, allCategories = [] }: { transactionId: string, initialCategory: string | null, allCategories?: any[] }) {
+    const router = useRouter();
     const [category, setCategory] = useState(initialCategory);
     const { confirm } = useConfirm();
 
@@ -66,6 +68,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
         setIsOpen(false);
         setIsCustomMode(false);
         await updateTransactionCategory(transactionId, newCategory);
+        router.refresh(); // Sync all instances of this transaction in UI
     };
 
     const handleCustomSubmit = async (e: React.FormEvent) => {
@@ -90,6 +93,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
 
                 await createTransactionCategory(name, customColor);
                 await updateTransactionCategory(transactionId, name);
+                router.refresh();
             }
 
             setIsOpen(false);

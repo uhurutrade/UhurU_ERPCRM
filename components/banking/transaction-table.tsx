@@ -429,6 +429,7 @@ export function TransactionTable({
                 isOpen={!!viewTransaction}
                 onClose={() => setViewTransaction(null)}
                 transaction={viewTransaction}
+                allCategories={categories}
             />
 
             {/* --- Super Confirmation Modal --- */}

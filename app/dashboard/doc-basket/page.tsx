@@ -23,6 +23,7 @@ export default function DocBasketPage() {
     const [basketPage, setBasketPage] = useState(1);
     const [basketTotalPages, setBasketTotalPages] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const folderInputRef = useRef<HTMLInputElement>(null);
 
 
     const fetchHistory = async (page = 1) => {
@@ -280,8 +281,15 @@ export default function DocBasketPage() {
                             <input
                                 type="file"
                                 multiple
-                                {...({ webkitdirectory: "", directory: "" } as any)}
                                 ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                className="hidden"
+                            />
+                            <input
+                                type="file"
+                                multiple
+                                {...({ webkitdirectory: "", directory: "" } as any)}
+                                ref={folderInputRef}
                                 onChange={handleFileSelect}
                                 className="hidden"
                             />
@@ -292,11 +300,27 @@ export default function DocBasketPage() {
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-bold text-white tracking-tight">Feed UhuRu AI Engine</h3>
                                     <p className="text-uhuru-text-dim text-sm max-w-xs mx-auto">
-                                        Drop contracts, HMRC letters, or valuation reports.
+                                        Select individual intelligence docs or entire project folders.
                                     </p>
                                 </div>
+
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                                        className="px-5 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-[10px] font-black text-indigo-400 uppercase tracking-widest transition-all"
+                                    >
+                                        Pick Files
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
+                                        className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest transition-all"
+                                    >
+                                        Upload Folder
+                                    </button>
+                                </div>
+
                                 {files.length > 0 && (
-                                    <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                                    <div className="mt-4 flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto p-2">
                                         {files.map((f, i) => (
                                             <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
                                                 <FileText size={12} />

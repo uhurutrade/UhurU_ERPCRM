@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { X, Paperclip, FileText, Calendar, CreditCard, Tag, Upload, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { uploadTransactionAttachment } from '@/app/actions/banking';
+import { CategoryBadge } from './category-badge';
 
 type Attachment = {
     id: string;
@@ -38,9 +39,10 @@ interface TransactionDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     transaction: Transaction | null;
+    allCategories?: any[];
 }
 
-export function TransactionDetailsModal({ isOpen, onClose, transaction }: TransactionDetailsModalProps) {
+export function TransactionDetailsModal({ isOpen, onClose, transaction, allCategories = [] }: TransactionDetailsModalProps) {
     const [uploading, setUploading] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
@@ -185,7 +187,13 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction }: Transa
                                     </div>
                                     <div className="flex-1">
                                         <label className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest block">Internal Category</label>
-                                        <span className="text-white font-bold">{transaction.category || 'Uncategorized'}</span>
+                                        <div className="mt-1">
+                                            <CategoryBadge
+                                                transactionId={transaction.id}
+                                                initialCategory={transaction.category}
+                                                allCategories={allCategories}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
