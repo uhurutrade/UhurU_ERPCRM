@@ -6,7 +6,7 @@ import { createOrganization } from '@/app/actions/crm';
 import {
     Building2, Globe, MapPin, Briefcase,
     ShieldCheck, Hash, Landmark, CreditCard,
-    AlertCircle, Save, Loader2
+    AlertCircle, Save, Loader2, Mail, Phone
 } from 'lucide-react';
 
 interface OrganizationModalProps {
@@ -76,18 +76,56 @@ export function OrganizationModal({ isOpen, onClose }: OrganizationModalProps) {
                     {/* Localization & Basics */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-2 mb-2">
-                            <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em]">Localization</h4>
+                            <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em]">Contact & Location</h4>
                             <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 to-transparent" />
                         </div>
 
                         <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        placeholder="Corporate Email"
+                                        className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium text-sm"
+                                    />
+                                </div>
+                                <div className="relative group">
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
+                                    <input
+                                        name="phone"
+                                        placeholder="Phone Number"
+                                        className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium text-sm"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="relative group">
                                 <MapPin className="absolute left-4 top-4 text-slate-500 group-focus-within:text-emerald-400 transition-colors" size={18} />
                                 <textarea
                                     name="address"
-                                    placeholder="Corporate Headquarters Address"
-                                    rows={3}
+                                    placeholder="Street Address"
+                                    rows={2}
                                     className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium resize-none"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <input
+                                    name="city"
+                                    placeholder="City"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-emerald-500 transition-all text-xs"
+                                />
+                                <input
+                                    name="country"
+                                    placeholder="Country"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-emerald-500 transition-all text-xs"
+                                />
+                                <input
+                                    name="postcode"
+                                    placeholder="CP"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-emerald-500 transition-all text-xs font-mono"
                                 />
                             </div>
                         </div>

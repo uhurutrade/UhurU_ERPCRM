@@ -61,6 +61,11 @@ model Organization {
   isBillable Boolean   @default(false)
   legalName  String?
   taxId      String?
+  email      String?
+  phone      String?
+  city       String?
+  country    String?
+  postcode   String?
   contacts   Contact[]
   deals      Deal[]
   invoices   Invoice[]
@@ -82,8 +87,12 @@ model Contact {
   taxId          String?
   linkedin       String?
   website        String?
+  address        String?
+  city           String?
+  country        String?
+  postcode       String?
   activities     Activity[]
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Lead {
@@ -107,7 +116,7 @@ model Deal {
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Task {
@@ -343,7 +352,7 @@ model Invoice {
   organizationId String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   items          InvoiceItem[]
 }
 

@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { updateDealStage } from '@/app/actions/crm';
+import { updateDeal, deleteDeal, updateDealStage } from '@/app/actions/crm';
+import { useConfirm } from '@/components/providers/modal-provider';
 import {
     Target, Building2, Calendar, DollarSign,
     ShieldCheck, Hash, Landmark, CreditCard,
     AlertCircle, Save, ArrowRight, CheckCircle2,
-    Archive
+    Archive, Trash2
 } from 'lucide-react';
 
 interface DealDetailModalProps {
@@ -21,6 +22,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFacturable, setIsFacturable] = useState(false); // UI toggle for billing info visibility
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     if (!deal) return null;
 
@@ -37,25 +39,82 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
         setIsSubmitting(false);
     }
 
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError(null);
+
+        const formData = new FormData(e.currentTarget);
+        const result = await updateDeal(deal.id, formData);
+
+        if (result.success) {
+            onClose();
+        } else {
+            setError(result.error || 'Failed to update');
+        }
+        setIsSubmitting(false);
+    }
+
+    async function onDelete() {
+        const ok = await confirm({
+            title: 'Delete Deal',
+            message: `Are you sure you want to delete this opportunity: ${deal.title}?`,
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+
+        if (ok) {
+            setIsSubmitting(true);
+            const result = await deleteDeal(deal.id);
+            if (result.success) {
+                onClose();
+            } else {
+                setError(result.error || 'Failed to delete');
+            }
+            setIsSubmitting(false);
+        }
+    }
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Opportunity Intelligence" size="lg">
-            <div className="space-y-8 p-1">
+            <form onSubmit={handleSubmit} className="space-y-8 p-1">
                 {/* Deal Header */}
                 <div className="flex items-center gap-6 pb-6 border-b border-uhuru-border/50">
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-blue-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
                         <Target size={40} />
                     </div>
                     <div className="flex-1">
-                        <h2 className="text-2xl font-bold text-white leading-tight">{deal.title}</h2>
+                        <input
+                            name="title"
+                            defaultValue={deal.title}
+                            className="text-2xl font-bold text-white leading-tight bg-transparent border-none focus:ring-0 w-full p-0"
+                            placeholder="Deal Title"
+                        />
                         <div className="flex items-center gap-4 mt-2">
                             <div className="flex items-center gap-1.5 text-uhuru-text-dim text-xs font-bold uppercase tracking-widest">
                                 <Building2 size={14} className="text-slate-500" />
-                                {organization?.name || 'Unknown Entity'}
+                                <select
+                                    name="organizationId"
+                                    defaultValue={deal.organizationId}
+                                    className="bg-transparent border-none p-0 focus:ring-0 text-xs font-bold uppercase tracking-widest text-white cursor-pointer"
+                                >
+                                    {organizations.map(org => (
+                                        <option key={org.id} value={org.id} className="bg-slate-900 text-white">{org.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="h-1 w-1 rounded-full bg-slate-700" />
                             <div className="flex items-center gap-1.5 text-indigo-400 text-xs font-bold uppercase tracking-widest">
                                 <DollarSign size={14} />
-                                {new Intl.NumberFormat('en-GB', { style: 'currency', currency: deal.currency }).format(Number(deal.amount))}
+                                <input
+                                    name="amount"
+                                    type="number"
+                                    step="0.01"
+                                    defaultValue={deal.amount}
+                                    className="bg-transparent border-none p-0 focus:ring-0 w-24 font-bold"
+                                />
+                                <input type="hidden" name="stage" value={deal.stage} />
                             </div>
                         </div>
                     </div>
@@ -73,6 +132,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
                             {['PROSPECTING', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST'].map((s) => (
                                 <button
                                     key={s}
+                                    type="button"
                                     onClick={() => handleStageChange(s)}
                                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${deal.stage === s
                                         ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
@@ -171,18 +231,50 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
 
                 {/* Footer Footer */}
                 <div className="flex items-center justify-between pt-8 border-t border-uhuru-border/50">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-3 rounded-2xl text-sm font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all"
-                    >
-                        Close Dossier
-                    </button>
-
-                    <div className="flex gap-4">
-                        {/* Other actions could go here */}
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            className="p-3 rounded-2xl text-rose-500 hover:bg-rose-500/10 transition-all border border-transparent hover:border-rose-500/20"
+                            title="Delete Opportunity"
+                        >
+                            <Trash2 size={24} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-6 py-3 rounded-2xl text-sm font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all"
+                        >
+                            Cancel
+                        </button>
                     </div>
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-600/20 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Save size={18} className="animate-pulse" />
+                                Synchronizing...
+                            </>
+                        ) : (
+                            <>
+                                <Save size={18} />
+                                Save Opportunity
+                            </>
+                        )}
+                    </button>
                 </div>
-            </div>
+
+                {error && (
+                    <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-sm font-bold animate-in fade-in zoom-in duration-300">
+                        <AlertCircle size={18} />
+                        {error}
+                    </div>
+                )}
+            </form>
         </Modal>
     );
 }

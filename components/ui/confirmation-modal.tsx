@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, Info, CheckCircle, X } from 'lucide-react';
 
 interface ConfirmationModalProps {
@@ -24,7 +25,12 @@ export function ConfirmationModal({
     confirmText = 'Confirm',
     cancelText = 'Cancel'
 }: ConfirmationModalProps) {
+    const [mounted, setMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -35,7 +41,7 @@ export function ConfirmationModal({
         }
     }, [isOpen]);
 
-    if (!isVisible) return null;
+    if (!mounted || !isVisible) return null;
 
     const getIcon = () => {
         switch (type) {
@@ -55,8 +61,8 @@ export function ConfirmationModal({
         }
     };
 
-    return (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+    const modalContent = (
+        <div className={`fixed inset-0 z-[10000] flex items-center justify-center transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -96,10 +102,7 @@ export function ConfirmationModal({
                                 </button>
                             )}
                             <button
-                                onClick={() => {
-                                    onConfirm();
-                                    onClose();
-                                }}
+                                onClick={onConfirm}
                                 className={`flex-1 px-4 py-2.5 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl ${getConfirmButtonClass()}`}
                             >
                                 {confirmText}
@@ -110,4 +113,6 @@ export function ConfirmationModal({
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

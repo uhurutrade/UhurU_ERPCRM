@@ -102,11 +102,11 @@ export function DealModal({ isOpen, onClose, organizations, initialStage = 'PROS
                         <select
                             name="organizationId"
                             required
-                            className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all font-medium appearance-none"
+                            className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all font-medium appearance-none cursor-pointer"
                         >
-                            <option value="">Select an organization...</option>
+                            <option value="" className="bg-slate-900">Select an organization...</option>
                             {organizations.map((org) => (
-                                <option key={org.id} value={org.id}>{org.name}</option>
+                                <option key={org.id} value={org.id} className="bg-slate-900">{org.name}</option>
                             ))}
                         </select>
                     </div>

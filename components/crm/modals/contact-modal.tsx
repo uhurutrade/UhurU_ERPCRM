@@ -6,7 +6,7 @@ import { createContact } from '@/app/actions/crm';
 import {
     User, Mail, Phone, Briefcase, Building2,
     ShieldCheck, CreditCard, Hash, Landmark,
-    AlertCircle, Save, Loader2, Linkedin, Globe
+    AlertCircle, Save, Loader2, Linkedin, Globe, MapPin
 } from 'lucide-react';
 
 interface ContactModalProps {
@@ -122,6 +122,40 @@ export function ContactModal({ isOpen, onClose, organizations }: ContactModalPro
                                     name="website"
                                     placeholder="Website / Portfolio"
                                     className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-medium"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Location Fields */}
+                        <div className="pt-4 space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Contact Location</h4>
+                                <div className="h-px flex-1 bg-gradient-to-r from-slate-500/30 to-transparent" />
+                            </div>
+                            <div className="relative group">
+                                <MapPin className="absolute left-4 top-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
+                                <textarea
+                                    name="address"
+                                    placeholder="Physical Address"
+                                    rows={2}
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition-all font-medium resize-none text-sm"
+                                />
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <input
+                                    name="city"
+                                    placeholder="City"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-blue-500 transition-all text-xs"
+                                />
+                                <input
+                                    name="country"
+                                    placeholder="Country"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-blue-500 transition-all text-xs"
+                                />
+                                <input
+                                    name="postcode"
+                                    placeholder="CP"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-blue-500 transition-all text-xs font-mono"
                                 />
                             </div>
                         </div>

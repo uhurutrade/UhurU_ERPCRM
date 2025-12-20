@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-20T09:07:29.715Z');
+  console.log('Generated at: 2025-12-20T16:48:28.761Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -609,7 +609,12 @@ async function main() {
     "bankSwift": null,
     "isBillable": false,
     "legalName": null,
-    "taxId": null
+    "taxId": null,
+    "email": null,
+    "phone": null,
+    "city": null,
+    "country": null,
+    "postcode": null
   },
   {
     "id": "cmjbubqbo0001ha2l5skvvqm9",
@@ -624,7 +629,12 @@ async function main() {
     "bankSwift": null,
     "isBillable": false,
     "legalName": null,
-    "taxId": null
+    "taxId": null,
+    "email": null,
+    "phone": null,
+    "city": null,
+    "country": null,
+    "postcode": null
   }
 ] as any[]) {
     await prisma.organization.upsert({
@@ -656,7 +666,11 @@ async function main() {
     "legalName": null,
     "taxId": null,
     "linkedin": null,
-    "website": null
+    "website": null,
+    "address": null,
+    "city": null,
+    "country": null,
+    "postcode": null
   },
   {
     "id": "cmjbubqbs0003ha2lztz1oomp",
@@ -673,7 +687,11 @@ async function main() {
     "legalName": null,
     "taxId": null,
     "linkedin": null,
-    "website": null
+    "website": null,
+    "address": null,
+    "city": null,
+    "country": null,
+    "postcode": null
   },
   {
     "id": "cmjbubqbs0004ha2l85t1emdf",
@@ -690,7 +708,11 @@ async function main() {
     "legalName": null,
     "taxId": null,
     "linkedin": null,
-    "website": null
+    "website": null,
+    "address": null,
+    "city": null,
+    "country": null,
+    "postcode": null
   }
 ] as any[]) {
     await prisma.contact.create({
@@ -748,17 +770,6 @@ async function main() {
     "organizationId": "cmjbubqbd0000ha2lp9ftb957",
     "createdAt": "2025-12-18T19:35:38.259Z",
     "updatedAt": "2025-12-18T19:35:38.259Z"
-  },
-  {
-    "id": "cmjbunozn0009gui8jc90af29",
-    "title": "Deal with Quantum Systems",
-    "amount": "0",
-    "currency": "GBP",
-    "stage": "PROSPECTING",
-    "closeDate": null,
-    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
-    "createdAt": "2025-12-18T19:44:56.387Z",
-    "updatedAt": "2025-12-18T19:44:56.387Z"
   },
   {
     "id": "cmjbunne30007gui8sm4tcb7t",

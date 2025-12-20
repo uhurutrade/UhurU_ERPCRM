@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { updateOrganization } from '@/app/actions/crm';
+import { updateOrganization, deleteOrganization } from '@/app/actions/crm';
+import { useConfirm } from '@/components/providers/modal-provider';
 import {
     Building2, Globe, MapPin, Hash, Briefcase,
     CreditCard, Landmark, ShieldCheck, Mail,
     Phone, Users, Plus, Target, Archive,
-    CheckCircle2, AlertCircle, Save
+    CheckCircle2, AlertCircle, Save, Trash2
 } from 'lucide-react';
 
 interface OrganizationDetailModalProps {
@@ -20,6 +21,7 @@ export function OrganizationDetailModal({ isOpen, onClose, organization }: Organ
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isBillable, setIsBillable] = useState(organization?.isBillable || false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     if (!organization) return null;
 
@@ -37,6 +39,27 @@ export function OrganizationDetailModal({ isOpen, onClose, organization }: Organ
             setError(result.error || 'Failed to update');
         }
         setIsSubmitting(false);
+    }
+
+    async function onDelete() {
+        const ok = await confirm({
+            title: 'Delete Organization',
+            message: `Are you sure you want to delete ${organization.name}? All associated contacts and deals may be affected.`,
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+
+        if (ok) {
+            setIsSubmitting(true);
+            const result = await deleteOrganization(organization.id);
+            if (result.success) {
+                onClose();
+            } else {
+                setError(result.error || 'Failed to delete');
+            }
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -93,14 +116,56 @@ export function OrganizationDetailModal({ isOpen, onClose, organization }: Organ
                                 />
                             </div>
 
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                                    <input
+                                        name="email"
+                                        defaultValue={organization.email}
+                                        placeholder="Corporate Email"
+                                        className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all font-medium"
+                                    />
+                                </div>
+                                <div className="relative group">
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                                    <input
+                                        name="phone"
+                                        defaultValue={organization.phone}
+                                        placeholder="Corporate Phone"
+                                        className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="relative group">
                                 <MapPin className="absolute left-4 top-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
                                 <textarea
                                     name="address"
                                     defaultValue={organization.address}
-                                    placeholder="Registered Office Address"
-                                    rows={3}
+                                    placeholder="Street Address"
+                                    rows={2}
                                     className="w-full bg-slate-900/50 border border-uhuru-border rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-indigo-500 transition-all font-medium resize-none"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <input
+                                    name="city"
+                                    defaultValue={organization.city}
+                                    placeholder="City"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-indigo-500 transition-all text-sm"
+                                />
+                                <input
+                                    name="country"
+                                    defaultValue={organization.country}
+                                    placeholder="Country"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-indigo-500 transition-all text-sm"
+                                />
+                                <input
+                                    name="postcode"
+                                    defaultValue={organization.postcode}
+                                    placeholder="Postcode"
+                                    className="w-full bg-slate-900/50 border border-uhuru-border rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-indigo-500 transition-all text-sm font-mono"
                                 />
                             </div>
                         </div>
@@ -187,13 +252,23 @@ export function OrganizationDetailModal({ isOpen, onClose, organization }: Organ
 
                 {/* Footer Actions */}
                 <div className="flex items-center justify-between pt-8 border-t border-uhuru-border/50">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-6 py-3 rounded-2xl text-sm font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all"
-                    >
-                        Cancel
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            className="p-3 rounded-2xl text-rose-500 hover:bg-rose-500/10 transition-all border border-transparent hover:border-rose-500/20"
+                            title="Delete organization"
+                        >
+                            <Trash2 size={24} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-6 py-3 rounded-2xl text-sm font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all"
+                        >
+                            Cancel
+                        </button>
+                    </div>
 
                     <button
                         type="submit"

@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { updateContact } from '@/app/actions/crm';
+import { updateContact, deleteContact } from '@/app/actions/crm';
+import { useConfirm } from '@/components/providers/modal-provider';
 import {
     User, Mail, Phone, Briefcase, Building2,
     ShieldCheck, CreditCard, Hash, Landmark,
     AlertCircle, Save, Trash2, Linkedin, Globe,
-    ExternalLink, MapPin, MessageSquare, Plus,
+    ExternalLink, MapPin, MessageSquare, Plus, Loader2,
     Activity as ActivityIcon
 } from 'lucide-react';
 
@@ -22,6 +23,7 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isBillable, setIsBillable] = useState(contact?.isBillable || false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     if (!contact) return null;
 
@@ -39,6 +41,27 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
             setError(result.error || 'Failed to update');
         }
         setIsSubmitting(false);
+    }
+
+    async function onDelete() {
+        const ok = await confirm({
+            title: 'Delete Contact',
+            message: `Are you sure you want to permanently delete ${contact.name}? This action cannot be undone.`,
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+
+        if (ok) {
+            setIsSubmitting(true);
+            const result = await deleteContact(contact.id);
+            if (result.success) {
+                onClose();
+            } else {
+                setError(result.error || 'Failed to delete');
+            }
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -73,7 +96,7 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
                                 <select
                                     name="organizationId"
                                     defaultValue={contact.organizationId || ''}
-                                    className="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold"
+                                    className="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold text-white cursor-pointer"
                                 >
                                     <option value="" className="bg-slate-900">Independent</option>
                                     {organizations.map(org => (
@@ -158,6 +181,45 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
                                         <ExternalLink size={14} />
                                     </a>
                                 )}
+                            </div>
+
+                            <div className="space-y-4 pt-4">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Postal Location</h4>
+                                    <div className="h-px flex-1 bg-slate-500/10" />
+                                </div>
+                                <div className="relative group">
+                                    <div className="absolute left-3 top-3 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                        <MapPin size={16} />
+                                    </div>
+                                    <textarea
+                                        name="address"
+                                        defaultValue={contact.address}
+                                        placeholder="Street Address"
+                                        rows={2}
+                                        className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all resize-none"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <input
+                                        name="city"
+                                        defaultValue={contact.city}
+                                        placeholder="City"
+                                        className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-all font-medium"
+                                    />
+                                    <input
+                                        name="country"
+                                        defaultValue={contact.country}
+                                        placeholder="Country"
+                                        className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-all font-medium"
+                                    />
+                                    <input
+                                        name="postcode"
+                                        defaultValue={contact.postcode}
+                                        placeholder="Postcode"
+                                        className="w-full bg-slate-900/40 border border-white/5 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-blue-500/50 transition-all font-mono font-medium"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -259,13 +321,23 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
 
                 {/* Footer Footer */}
                 <div className="flex items-center justify-between pt-4">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all border border-transparent hover:border-white/5"
-                    >
-                        Discard Changes
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            className="p-2.5 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all border border-transparent hover:border-rose-500/20"
+                            title="Delete contact"
+                        >
+                            <Trash2 size={20} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-5 py-2.5 rounded-xl text-xs font-bold text-uhuru-text-dim hover:text-white hover:bg-slate-800 transition-all border border-transparent hover:border-white/5"
+                        >
+                            Discard
+                        </button>
+                    </div>
 
                     <button
                         type="submit"

@@ -11,12 +11,17 @@ export async function createOrganization(formData: FormData) {
     const sector = formData.get('sector') as string;
     const website = formData.get('website') as string;
     const address = formData.get('address') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const city = formData.get('city') as string;
+    const country = formData.get('country') as string;
+    const postcode = formData.get('postcode') as string;
 
     if (!name) return { error: 'Name is required' };
 
     try {
         await prisma.organization.create({
-            data: { name, sector, website, address }
+            data: { name, sector, website, address, email, phone, city, country, postcode }
         });
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -36,6 +41,11 @@ export async function updateOrganization(id: string, formData: FormData) {
     const sector = formData.get('sector') as string;
     const website = formData.get('website') as string;
     const address = formData.get('address') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const city = formData.get('city') as string;
+    const country = formData.get('country') as string;
+    const postcode = formData.get('postcode') as string;
 
     try {
         await prisma.organization.update({
@@ -50,7 +60,12 @@ export async function updateOrganization(id: string, formData: FormData) {
                 legalName,
                 bankName,
                 bankIban,
-                bankSwift
+                bankSwift,
+                email,
+                phone,
+                city,
+                country,
+                postcode
             }
         });
         revalidatePath('/dashboard/crm');
@@ -80,6 +95,10 @@ export async function createContact(formData: FormData) {
     const linkedin = formData.get('linkedin') as string;
     const website = formData.get('website') as string;
     const organizationId = formData.get('organizationId') as string;
+    const address = formData.get('address') as string;
+    const city = formData.get('city') as string;
+    const country = formData.get('country') as string;
+    const postcode = formData.get('postcode') as string;
 
     if (!name) return { error: 'Name is required' };
 
@@ -93,7 +112,11 @@ export async function createContact(formData: FormData) {
                 linkedin,
                 website,
                 organizationId: organizationId || null,
-                isClient: true // Default to client for now
+                isClient: true, // Default to client for now
+                address,
+                city,
+                country,
+                postcode
             }
         });
         revalidatePath('/dashboard/crm');
@@ -115,6 +138,10 @@ export async function updateContact(id: string, formData: FormData) {
     const taxId = formData.get('taxId') as string;
     const legalName = formData.get('legalName') as string;
     const bankIban = formData.get('bankIban') as string;
+    const address = formData.get('address') as string;
+    const city = formData.get('city') as string;
+    const country = formData.get('country') as string;
+    const postcode = formData.get('postcode') as string;
 
     try {
         await prisma.contact.update({
@@ -130,7 +157,11 @@ export async function updateContact(id: string, formData: FormData) {
                 isBillable: Boolean(isBillable),
                 taxId,
                 legalName,
-                bankIban
+                bankIban,
+                address,
+                city,
+                country,
+                postcode
             }
         });
         revalidatePath('/dashboard/crm');
@@ -190,6 +221,29 @@ export async function updateDealStage(dealId: string, newStage: string) {
     }
 }
 
+export async function updateDeal(id: string, formData: FormData) {
+    const title = formData.get('title') as string;
+    const amount = parseFloat(formData.get('amount') as string);
+    const stage = formData.get('stage') as string;
+    const organizationId = formData.get('organizationId') as string;
+
+    try {
+        await prisma.deal.update({
+            where: { id },
+            data: {
+                title,
+                amount: isNaN(amount) ? 0 : amount,
+                stage,
+                organizationId
+            }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to update deal' };
+    }
+}
+
 export async function deleteDeal(id: string) {
     try {
         await prisma.deal.delete({ where: { id } });
@@ -218,6 +272,25 @@ export async function createLead(formData: FormData) {
         return { success: true };
     } catch (error) {
         return { error: 'Failed to create lead' };
+    }
+}
+
+export async function updateLead(id: string, formData: FormData) {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const source = formData.get('source') as string;
+    const notes = formData.get('notes') as string;
+    const status = formData.get('status') as string;
+
+    try {
+        await prisma.lead.update({
+            where: { id },
+            data: { name, email, source, notes, status }
+        });
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to update lead' };
     }
 }
 
