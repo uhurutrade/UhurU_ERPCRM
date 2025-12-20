@@ -77,90 +77,137 @@ export function AuditLogTable({
                             <th className="px-6 py-4 text-right">Details</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-700 bg-slate-900">
-                        {logs.length === 0 ? (
-                            <tr>
-                                <td colSpan={8} className="px-6 py-8 text-center text-slate-500">
-                                    No deleted transactions found.
+                    <tbody className="divide-y divide-slate-700 bg-slate-900 shadow-inner">
+                        {logs.map((log) => (
+                            <tr key={log.id} className="hover:bg-slate-800 transition-colors h-[65px]">
+                                <td className="px-6 py-4 whitespace-nowrap text-rose-400 font-mono">
+                                    {format(new Date(log.deletedAt), "dd/MM/yyyy HH:mm")}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-slate-300 hidden md:table-cell">
+                                    {format(new Date(log.date), "dd/MM/yyyy")}
+                                </td>
+                                <td className="px-6 py-4 font-medium text-white max-w-xs truncate">
+                                    {log.description}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap font-mono font-bold text-white">
+                                    {Number(log.amount).toLocaleString()} {log.currency}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                                    {log.deletedBy}
+                                </td>
+                                <td className="px-6 py-4 hidden md:table-cell">
+                                    <div className="flex flex-col text-xs">
+                                        <span className="text-emerald-400 font-bold">{log.bankName}</span>
+                                        <span className="text-slate-500">{log.bankAccountName}</span>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-center hidden md:table-cell">
+                                    {(() => {
+                                        try {
+                                            const snapshot = JSON.parse(log.fullSnapshot || "{}");
+                                            const hasAttachments = snapshot.attachments && snapshot.attachments.length > 0;
+                                            return hasAttachments ? (
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <Paperclip size={16} className="text-emerald-400" />
+                                                    <span className="text-xs text-slate-400">{snapshot.attachments.length}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-600">-</span>
+                                            );
+                                        } catch {
+                                            return <span className="text-slate-600">-</span>;
+                                        }
+                                    })()}
+                                </td>
+                                <td className="px-6 py-4 text-right">
+                                    <button
+                                        onClick={() => setSelectedLog(log)}
+                                        className="p-2 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-white transition-all border border-transparent hover:border-slate-600 shadow-lg"
+                                        title="View Snapshot"
+                                    >
+                                        <Eye size={18} />
+                                    </button>
                                 </td>
                             </tr>
-                        ) : (
-                            logs.map((log) => (
-                                <tr key={log.id} className="hover:bg-slate-800 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-rose-400 font-mono">
-                                        {format(new Date(log.deletedAt), "dd/MM/yyyy HH:mm")}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 hidden md:table-cell">
-                                        {format(new Date(log.date), "dd/MM/yyyy")}
-                                    </td>
-                                    <td className="px-6 py-4 font-medium text-white max-w-xs truncate">
-                                        {log.description}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap font-mono font-bold text-white">
-                                        {Number(log.amount).toLocaleString()} {log.currency}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                        {log.deletedBy}
-                                    </td>
-                                    <td className="px-6 py-4 hidden md:table-cell">
-                                        <div className="flex flex-col text-xs">
-                                            <span className="text-emerald-400">{log.bankName}</span>
-                                            <span className="text-slate-500">{log.bankAccountName}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-center hidden md:table-cell">
-                                        {(() => {
-                                            try {
-                                                const snapshot = JSON.parse(log.fullSnapshot || "{}");
-                                                const hasAttachments = snapshot.attachments && snapshot.attachments.length > 0;
-                                                return hasAttachments ? (
-                                                    <div className="flex items-center justify-center gap-1">
-                                                        <Paperclip size={16} className="text-emerald-400" />
-                                                        <span className="text-xs text-slate-400">{snapshot.attachments.length}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-600">-</span>
-                                                );
-                                            } catch {
-                                                return <span className="text-slate-600">-</span>;
-                                            }
-                                        })()}
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => setSelectedLog(log)}
-                                            className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors"
-                                            title="View Snapshot"
-                                        >
-                                            <Eye size={18} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
+                        ))}
+                        {/* Dummy Rows to fill 20 slots */}
+                        {Array.from({ length: Math.max(0, 20 - logs.length) }).map((_, i) => (
+                            <tr key={`dummy-${i}`} className="divide-y divide-slate-800/10 h-[65px]">
+                                <td className="px-6 py-4">&nbsp;</td>
+                                <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                <td className="px-6 py-4">
+                                    {logs.length === 0 && i === 10 && (
+                                        <div className="text-center text-slate-600 italic">No deleted transactions found.</div>
+                                    )}
+                                </td>
+                                <td className="px-6 py-4">&nbsp;</td>
+                                <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                <td className="px-6 py-4 text-center hidden md:table-cell">&nbsp;</td>
+                                <td className="px-6 py-4 text-right">&nbsp;</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
 
             {/* --- Pagination --- */}
-            <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-400">
-                    Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+            <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
+                <div className="flex items-center gap-4">
+                    <div className="text-sm text-slate-400">
+                        Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700">
+                        <span>Go:</span>
+                        <input
+                            type="number"
+                            min={1}
+                            max={totalPages || 1}
+                            defaultValue={currentPage}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const val = parseInt((e.target as HTMLInputElement).value);
+                                    if (val >= 1 && val <= (totalPages || 1)) {
+                                        handlePageChange(val);
+                                    }
+                                }
+                            }}
+                            className="w-10 bg-transparent text-white focus:outline-none text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-b border-slate-600 focus:border-emerald-500"
+                        />
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <button
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage <= 1}
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg shadow-black/20"
+                        title="First Page"
+                    >
+                        &lt;&lt;
+                    </button>
+                    <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage <= 1}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg shadow-black/20"
+                        title="Previous Page"
                     >
-                        Previous
+                        &lt;
                     </button>
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage >= totalPages}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg shadow-black/20"
+                        title="Next Page"
                     >
-                        Next
+                        &gt;
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage >= totalPages}
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg shadow-black/20"
+                        title="Last Page"
+                    >
+                        &gt;&gt;
                     </button>
                 </div>
             </div>

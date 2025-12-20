@@ -12,7 +12,7 @@ export default async function AuditLogPage({
 }) {
     const currentPage = Number(searchParams.page) || 1;
     const query = searchParams.query || "";
-    const itemsPerPage = 25;
+    const itemsPerPage = 20;
 
     // --- Build Where Clause ---
     const whereClause: any = query ? {

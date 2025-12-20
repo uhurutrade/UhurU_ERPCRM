@@ -5,6 +5,8 @@ import { Upload, FileText, Check, AlertCircle, Loader2, Info, History, ShieldAle
 import { toast } from 'sonner';
 import { uploadToBasket, getBasketHistory, removeFromBasket, updateDocumentNotes, reprocessDocument } from '@/app/actions/basket';
 import { format } from 'date-fns';
+import { StandardPagination } from '@/components/invoices/invoices-pagination';
+
 
 export default function DocBasketPage() {
     const [isUploading, setIsUploading] = useState(false);
@@ -18,17 +20,23 @@ export default function DocBasketPage() {
     const [docNotes, setDocNotes] = useState('');
     const [isSavingNotes, setIsSavingNotes] = useState(false);
     const [isReprocessing, setIsReprocessing] = useState(false);
+    const [basketPage, setBasketPage] = useState(1);
+    const [basketTotalPages, setBasketTotalPages] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const fetchHistory = async () => {
+
+    const fetchHistory = async (page = 1) => {
         setIsLoadingHistory(true);
-        const res = await getBasketHistory();
+        const res = await getBasketHistory(page);
         if (res.success) {
             setHistory(res.data || []);
+            setBasketTotalPages((res as any).totalPages || 1);
+            setBasketPage(page);
             setSelectedIds([]); // Reset selection on refresh
         }
         setIsLoadingHistory(false);
     };
+
 
     useEffect(() => {
         fetchHistory();
@@ -439,12 +447,30 @@ export default function DocBasketPage() {
                                             </div>
                                         );
                                     })
-                            ) : (
-                                <div className="border border-dashed border-uhuru-border rounded-[2rem] p-12 text-center text-uhuru-text-dim text-sm italic">
-                                    {searchQuery ? "No results found." : "Repository is empty."}
+                            ) : null}
+
+                            {/* Dummy Items to fill 20 slots */}
+                            {Array.from({ length: Math.max(0, 20 - history.length) }).map((_, i) => (
+                                <div key={`dummy-${i}`} className="p-5 flex items-center gap-4 h-[120px] bg-slate-900/10 border border-uhuru-border/30 rounded-3xl">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-800/10" />
+                                    <div className="flex-1">
+                                        {history.length === 0 && i === 5 && (
+                                            <div className="text-center text-uhuru-text-dim italic">No documents found in your Strategic Basket.</div>
+                                        )}
+                                        &nbsp;
+                                    </div>
                                 </div>
-                            )}
+                            ))}
                         </div>
+                    </div>
+
+                    {/* Repository Pagination */}
+                    <div className="mt-6 bg-slate-900/20 rounded-2xl border border-uhuru-border overflow-hidden">
+                        <StandardPagination
+                            currentPage={basketPage}
+                            totalPages={basketTotalPages}
+                            onPageChange={(p) => fetchHistory(p)}
+                        />
                     </div>
                 </div>
 

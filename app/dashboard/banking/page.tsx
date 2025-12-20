@@ -16,7 +16,7 @@ export default async function BankingPage({
     const currentPage = Number(searchParams.page) || 1;
     const query = searchParams.query || "";
     const accountId = searchParams.accountId;
-    const itemsPerPage = 25;
+    const itemsPerPage = 20;
 
     // --- Build Where Clause ---
     const whereClause: any = {

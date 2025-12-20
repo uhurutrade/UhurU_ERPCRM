@@ -4,16 +4,31 @@ import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
 import { DeleteAttachmentButton, LinkAttachmentButton } from '@/components/invoices/invoice-actions';
 
-export default async function InvoicesPage() {
-    const [invoices, allRecentAttachments, unassignedAttachments] = await Promise.all([
+import { StandardPagination } from '@/components/invoices/invoices-pagination';
+
+export default async function InvoicesPage({
+    searchParams
+}: {
+    searchParams: { page?: string, docPage?: string }
+}) {
+    const currentPage = Number(searchParams.page) || 1;
+    const docPage = Number(searchParams.docPage) || 1;
+    const invoicesPerPage = 5;
+    const docItemsPerPage = 20;
+
+    const [totalInvoices, invoices, totalAttachments, allRecentAttachments, unassignedAttachments] = await Promise.all([
+        prisma.invoice.count(),
         prisma.invoice.findMany({
             orderBy: { date: 'desc' },
-            take: 5,
+            take: invoicesPerPage,
+            skip: (currentPage - 1) * invoicesPerPage,
             include: { organization: true }
         }),
+        prisma.attachment.count(),
         prisma.attachment.findMany({
             orderBy: { uploadedAt: 'desc' },
-            take: 10,
+            take: docItemsPerPage,
+            skip: (docPage - 1) * docItemsPerPage,
             include: {
                 transaction: {
                     select: {
@@ -27,12 +42,16 @@ export default async function InvoicesPage() {
         prisma.attachment.findMany({
             where: { transactionId: null },
             orderBy: { uploadedAt: 'desc' },
-            take: 10
+            take: 20
         })
     ]);
 
+    const totalPages = Math.ceil(totalInvoices / invoicesPerPage);
+    const totalDocPages = Math.ceil(totalAttachments / docItemsPerPage);
+
     return (
         <div className="p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
+            {/* ... header and stats remain same ... */}
             <header className="flex justify-between items-end shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Invoice Management</h1>
@@ -55,14 +74,14 @@ export default async function InvoicesPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-indigo-500/30 transition-all duration-300">
                     <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Outgoing Invoices</div>
-                    <div className="text-3xl font-bold text-white tracking-tight">{invoices.length}</div>
+                    <div className="text-3xl font-bold text-white tracking-tight">{totalInvoices}</div>
                     <div className="mt-4 flex items-center text-[11px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Total Records</span>
                     </div>
                 </div>
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-blue-500/30 transition-all duration-300">
                     <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Processed Documents</div>
-                    <div className="text-3xl font-bold text-white tracking-tight">{allRecentAttachments.length}</div>
+                    <div className="text-3xl font-bold text-white tracking-tight">{totalAttachments}</div>
                     <div className="mt-4 flex items-center text-[11px] text-blue-400 font-bold bg-blue-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Matched & Unmatched</span>
                     </div>
@@ -78,7 +97,7 @@ export default async function InvoicesPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Recent Document Feed (Matched & Unmatched) */}
-                <div className="xl:col-span-2 bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px]">
+                <div className="xl:col-span-2 bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px] flex flex-col">
                     <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                         <div>
                             <h2 className="text-lg font-bold text-white tracking-tight">Recent Document Activity</h2>
@@ -86,95 +105,73 @@ export default async function InvoicesPage() {
                         </div>
                         <Link href="/dashboard/banking" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">General Ledger</Link>
                     </div>
-                    <div className="divide-y divide-uhuru-border">
-                        {allRecentAttachments.length === 0 ? (
-                            <div className="px-6 py-12 text-center text-uhuru-text-dim italic">No document activity detected.</div>
-                        ) : (
-                            allRecentAttachments.map((att) => (
-                                <div key={att.id} className="p-4 hover:bg-slate-800/40 transition-all flex items-center gap-4 group">
-                                    <div className={`p-3 rounded-xl border ${att.transactionId ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
-                                        <FileText size={20} />
+                    <div className="divide-y divide-uhuru-border flex-1">
+                        {allRecentAttachments.map((att) => (
+                            <div key={att.id} className="p-4 hover:bg-slate-800/40 transition-all flex items-center gap-4 group h-[60px]">
+                                <div className={`p-2 rounded-xl border ${att.transactionId ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
+                                    <FileText size={16} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm font-bold text-white truncate">{att.originalName}</p>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tight ${att.transactionId ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                            {att.transactionId ? 'MATCHED' : 'UNASSIGNED'}
+                                        </span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-sm font-bold text-white truncate">{att.originalName}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tight ${att.transactionId ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
-                                                {att.transactionId ? 'MATCHED' : 'UNASSIGNED'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-3 mt-1">
-                                            {/* Nature Indicator */}
-                                            <div className="flex items-center gap-1">
-                                                {(att as any).extractedData?.documentRole === 'EMITTED' ? (
-                                                    <>
-                                                        <ArrowUpRight size={11} className="text-uhuru-blue" />
-                                                        <span className="text-[10px] font-black text-uhuru-blue tracking-wider uppercase">Sales</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <ArrowDownLeft size={11} className="text-rose-500" />
-                                                        <span className="text-[10px] font-black text-rose-500 tracking-wider uppercase">Expense</span>
-                                                    </>
-                                                )}
-                                            </div>
-
-                                            <div className="w-1 h-1 rounded-full bg-slate-700" />
-
-                                            {/* Payment Status */}
-                                            {att.transactionId ? (
-                                                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">PAID</span>
+                                    <div className="flex items-center gap-3 mt-0.5">
+                                        <div className="flex items-center gap-1">
+                                            {(att as any).extractedData?.documentRole === 'EMITTED' ? (
+                                                <span className="text-[10px] font-black text-uhuru-blue tracking-wider uppercase">Sales</span>
                                             ) : (
-                                                (att as any).extractedData?.documentRole === 'RECEIVED' ? (
-                                                    <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 rounded border border-amber-500/20">A PAGAR / WAITING</span>
-                                                ) : (
-                                                    <span className="text-[10px] font-bold text-uhuru-blue uppercase tracking-widest px-2 py-0.5 bg-uhuru-blue/10 rounded border border-uhuru-blue/20">AWAITING COLLECTION</span>
-                                                )
+                                                <span className="text-[10px] font-black text-rose-500 tracking-wider uppercase">Expense</span>
                                             )}
-
-                                            <div className="w-1 h-1 rounded-full bg-slate-700" />
-
-                                            <p className="text-[9px] text-uhuru-text-dim uppercase font-bold tracking-widest">
-                                                {new Date(att.uploadedAt).toLocaleDateString()}
-                                            </p>
                                         </div>
-                                        {att.transaction && (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <div className="w-1.5 h-[2px] bg-slate-700" />
-                                                <p className="text-[10px] text-indigo-400 font-bold uppercase truncate max-w-[200px]">
-                                                    Match: {att.transaction.description}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="text-right shrink-0 flex items-start gap-2">
-                                        <div className="flex flex-col items-end">
-                                            {(att as any).extractedData?.amount ? (
-                                                <p className="text-sm font-mono font-bold text-white">
-                                                    {(att as any).extractedData.currency || ''} {typeof (att as any).extractedData.amount === 'number' ? (att as any).extractedData.amount.toLocaleString() : (att as any).extractedData.amount || '0.00'}
-                                                </p>
-                                            ) : (
-                                                <p className="text-[10px] text-uhuru-text-dim italic">No data</p>
-                                            )}
-                                            <Link
-                                                href={att.path.startsWith('/uploads/') ? `/api/uploads/${att.path.replace('/uploads/', '')}` : att.path}
-                                                target="_blank"
-                                                className="text-[10px] font-bold text-indigo-400 hover:underline uppercase tracking-widest block mt-1"
-                                            >
-                                                View File
-                                            </Link>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <LinkAttachmentButton id={att.id} hasTransaction={!!att.transactionId} />
-                                            <DeleteAttachmentButton id={att.id} />
-                                        </div>
+                                        <div className="w-1 h-1 rounded-full bg-slate-700" />
+                                        <p className="text-[9px] text-uhuru-text-dim uppercase font-bold tracking-widest">
+                                            {new Date(att.uploadedAt).toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
-                            ))
-                        )}
+                                <div className="text-right shrink-0 flex items-center gap-2">
+                                    <Link
+                                        href={att.path.startsWith('/uploads/') ? `/api/uploads/${att.path.replace('/uploads/', '')}` : att.path}
+                                        target="_blank"
+                                        className="text-[10px] font-bold text-indigo-400 hover:underline uppercase tracking-widest"
+                                    >
+                                        View
+                                    </Link>
+                                    <div className="flex items-center gap-1">
+                                        <LinkAttachmentButton id={att.id} hasTransaction={!!att.transactionId} />
+                                        <DeleteAttachmentButton id={att.id} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {/* Dummy Items to fill 20 slots */}
+                        {Array.from({ length: Math.max(0, 20 - allRecentAttachments.length) }).map((_, i) => (
+                            <div key={`dummy-att-${i}`} className="p-4 flex items-center gap-4 h-[60px]">
+                                <div className="w-8 h-8 rounded-xl bg-slate-800/10" />
+                                <div className="flex-1">
+                                    {allRecentAttachments.length === 0 && i === 10 && (
+                                        <div className="text-center text-uhuru-text-dim italic">No document activity detected.</div>
+                                    )}
+                                    &nbsp;
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Activity Pagination */}
+                    <div className="bg-slate-900/10">
+                        <StandardPagination
+                            currentPage={docPage}
+                            totalPages={totalDocPages}
+                            baseUrl="/dashboard/invoices"
+                            pageParam="docPage"
+                        />
                     </div>
                 </div>
 
-                {/* Awaiting Matching (Sidebar focused on pending actions) */}
+                {/* Sidebar focus remains same ... */}
                 <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden">
                     <div className="p-6 border-b border-uhuru-border bg-slate-900/40">
                         <h2 className="text-lg font-bold text-white tracking-tight">Attention Required</h2>
@@ -223,30 +220,28 @@ export default async function InvoicesPage() {
                 </div>
             </div>
 
-            {/* Outgoing Invoices Section */}
-            <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px]">
+            {/* Outgoing Invoices Section (5 records) */}
+            <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[400px] flex flex-col">
                 <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                     <div>
                         <h2 className="text-lg font-bold text-white tracking-tight">Outgoing Invoices Record</h2>
                         <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest mt-1">Legally binding invoices issued by your company</p>
                     </div>
                 </div>
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest border-b border-uhuru-border bg-slate-900/20">
-                            <th className="px-6 py-4">Number</th>
-                            <th className="px-6 py-4 hidden md:table-cell">Client</th>
-                            <th className="px-6 py-4 hidden md:table-cell">Date</th>
-                            <th className="px-6 py-4">Amount</th>
-                            <th className="px-6 py-4">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-uhuru-border">
-                        {invoices.length === 0 ? (
-                            <tr><td colSpan={5} className="px-6 py-12 text-center text-uhuru-text-dim italic">No issued invoices found.</td></tr>
-                        ) : (
-                            invoices.map((inv) => (
-                                <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors group cursor-default text-sm">
+                <div className="flex-1">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest border-b border-uhuru-border bg-slate-900/20">
+                                <th className="px-6 py-4">Number</th>
+                                <th className="px-6 py-4 hidden md:table-cell">Client</th>
+                                <th className="px-6 py-4 hidden md:table-cell">Date</th>
+                                <th className="px-6 py-4">Amount</th>
+                                <th className="px-6 py-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-uhuru-border">
+                            {invoices.map((inv) => (
+                                <tr key={inv.id} className="hover:bg-slate-800/40 transition-colors group cursor-default text-sm h-[60px]">
                                     <td className="px-6 py-4 font-bold text-white">{inv.number}</td>
                                     <td className="px-6 py-4 text-slate-300 hidden md:table-cell">{inv.organization.name}</td>
                                     <td className="px-6 py-4 text-uhuru-text-dim text-xs hidden md:table-cell">{inv.date.toLocaleDateString()}</td>
@@ -260,11 +255,33 @@ export default async function InvoicesPage() {
                                         </span>
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ))}
+                            {/* Dummy Rows to fill 5 slots */}
+                            {Array.from({ length: Math.max(0, 5 - invoices.length) }).map((_, i) => (
+                                <tr key={`dummy-${i}`} className="h-[60px]">
+                                    <td className="px-6 py-4">
+                                        {invoices.length === 0 && i === 2 && (
+                                            <div className="text-center text-uhuru-text-dim italic">No issued invoices found.</div>
+                                        )}
+                                        &nbsp;
+                                    </td>
+                                    <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                    <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                    <td className="px-6 py-4">&nbsp;</td>
+                                    <td className="px-6 py-4">&nbsp;</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <StandardPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    baseUrl="/dashboard/invoices"
+                />
             </div>
         </div >
     );
 }
+
+

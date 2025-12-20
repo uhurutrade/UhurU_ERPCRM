@@ -174,14 +174,18 @@ export async function uploadToBasket(formData: FormData) {
     }
 }
 
-export async function getBasketHistory() {
+export async function getBasketHistory(page = 1, itemsPerPage = 20) {
     try {
-        const docs = await prisma.complianceDocument.findMany({
-            where: { documentType: 'BASKET' },
-            orderBy: { uploadedAt: 'desc' },
-            take: 20
-        });
-        return { success: true, data: docs };
+        const [total, docs] = await Promise.all([
+            prisma.complianceDocument.count({ where: { documentType: 'BASKET' } }),
+            prisma.complianceDocument.findMany({
+                where: { documentType: 'BASKET' },
+                orderBy: { uploadedAt: 'desc' },
+                take: itemsPerPage,
+                skip: (page - 1) * itemsPerPage
+            })
+        ]);
+        return { success: true, data: docs, total, totalPages: Math.ceil(total / itemsPerPage) };
     } catch (error) {
         return { success: false, error: 'Failed to fetch history' };
     }

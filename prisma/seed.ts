@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-20T07:53:03.846Z');
+  console.log('Generated at: 2025-12-20T08:06:02.507Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -5843,20 +5843,20 @@ async function main() {
   console.log('Seeding Attachments...');
   for (const att of [
   {
-    "id": "cmjd3mslt0006pmu6lr06k0mr",
-    "path": "/uploads/invoices/1766162630729-908193238.pdf",
+    "id": "cmje0kbl0000apmu6dryxocpm",
+    "path": "/uploads/invoices/1766217945142-626342295.pdf",
     "fileType": "application/pdf",
     "originalName": "factura pedido 96 unidades set tupper.pdf",
     "transactionId": "cmj8xvoqc004we43opodemtdt",
-    "uploadedAt": "2025-12-19T16:43:57.137Z",
+    "uploadedAt": "2025-12-20T08:05:49.092Z",
     "extractedData": {
       "date": "2022-11-18",
       "amount": 538.82,
       "issuer": "Alibaba.com Singapore E-Commerce Private Ltd.",
-      "reason": "Clearly labeled as an invoice with identifiable issuer and date, and itemized amounts are provided.",
+      "reason": "The document is clearly labeled as an invoice with details including issuer, date, and amounts in GBP.",
       "currency": "GBP",
       "isInvoice": true,
-      "confidence": 0.95,
+      "confidence": 0.99,
       "documentRole": "RECEIVED"
     },
     "fileHash": "52c87f7a79b496fd222cce86205685333cbb06f49c1322137070ce29009e1b0c"

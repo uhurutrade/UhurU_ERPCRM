@@ -35,6 +35,7 @@ export function InvoiceUploadButton() {
         formData.append('documentRole', documentRole);
         if (confirmed) {
             formData.append('confirmDuplicate', 'true');
+            setIsConfirmingDuplicate(false); // Close modal immediately
         }
 
         try {
@@ -311,7 +312,7 @@ export function InvoiceUploadButton() {
                                             </div>
                                             <div>
                                                 <h4 className="text-3xl font-extrabold text-white tracking-tight">Duplicate Detected</h4>
-                                                <p className="text-slate-400 mt-2 text-sm">A document with the same content or metadata (Amount: {analysisResult.analysis.currency} {analysisResult.analysis.amount}, Date: {analysisResult.analysis.date}) already exists in your vault.</p>
+                                                <p className="text-slate-400 mt-2 text-sm">A document with the same content or metadata (Amount: {analysisResult?.analysis?.currency} {analysisResult?.analysis?.amount}, Date: {analysisResult?.analysis?.date}) already exists in your vault.</p>
                                             </div>
                                         </div>
 

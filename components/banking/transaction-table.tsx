@@ -271,107 +271,155 @@ export function TransactionTable({
                         </tr>
                     </thead>
                     <tbody className="text-sm">
-                        {transactions.length === 0 ? (
-                            <tr>
-                                <td colSpan={7} className="py-8 text-center text-slate-500">
-                                    {searchTerm ? "No matching transactions found." : "No transactions found."}
-                                </td>
-                            </tr>
-                        ) : (
-                            transactions.map((tx, index) => {
-                                const isSelected = selectedIds.has(tx.id);
-                                const hasAttachments = tx.attachments && tx.attachments.length > 0;
-                                return (
-                                    <tr
-                                        key={tx.id}
-                                        className={`
-                                            border-b border-slate-800 transition-colors cursor-pointer
-                                            ${isSelected ? 'bg-emerald-900/20' : 'hover:bg-slate-800/50'}
-                                        `}
-                                        onClick={() => setViewTransaction(tx)}
-                                    >
-                                        <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
-                                            {isLinkingMode ? (
-                                                <div className="w-5 h-5 rounded border border-emerald-500/50 bg-emerald-500/10" />
-                                            ) : (
-                                                <button onClick={() => handleSelectOne(tx.id)}>
-                                                    {isSelected ?
-                                                        <CheckSquare size={20} className="text-emerald-500" /> :
-                                                        <Square size={20} className="text-slate-600" />
-                                                    }
-                                                </button>
-                                            )}
-                                        </td>
-                                        {isLinkingMode && (
-                                            <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    onClick={() => handleLinkDirect(tx.id)}
-                                                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold uppercase transition-all"
-                                                >
-                                                    Link Here
-                                                </button>
-                                            </td>
+                        {transactions.map((tx, index) => {
+                            const isSelected = selectedIds.has(tx.id);
+                            const hasAttachments = tx.attachments && tx.attachments.length > 0;
+                            return (
+                                <tr
+                                    key={tx.id}
+                                    className={`
+                                        border-b border-slate-800 transition-colors cursor-pointer h-[60px]
+                                        ${isSelected ? 'bg-emerald-900/20' : 'hover:bg-slate-800/50'}
+                                    `}
+                                    onClick={() => setViewTransaction(tx)}
+                                >
+                                    <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                        {isLinkingMode ? (
+                                            <div className="w-5 h-5 rounded border border-emerald-500/50 bg-emerald-500/10" />
+                                        ) : (
+                                            <button onClick={() => handleSelectOne(tx.id)}>
+                                                {isSelected ?
+                                                    <CheckSquare size={20} className="text-emerald-500" /> :
+                                                    <Square size={20} className="text-slate-600" />
+                                                }
+                                            </button>
                                         )}
-                                        <td className="py-3 px-4 text-slate-500 font-mono text-[10px]">
-                                            {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
+                                    </td>
+                                    {isLinkingMode && (
+                                        <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                onClick={() => handleLinkDirect(tx.id)}
+                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold uppercase transition-all"
+                                            >
+                                                Link Here
+                                            </button>
                                         </td>
-                                        <td className="py-3 px-4 text-slate-300">
-                                            {format(new Date(tx.date), 'MMM d, yyyy')}
-                                        </td>
-                                        <td className="py-3 px-4 text-white font-medium">
-                                            {tx.description}
-                                            {tx.reference && <span className="block text-xs text-slate-500 mt-0.5">{tx.reference}</span>}
-                                        </td>
-                                        <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
-                                            <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
-                                                {tx.bankAccount.bank.bankName}
-                                            </span>
-                                        </td>
-                                        <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
-                                            {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
-                                        </td>
-                                        <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
-                                            <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
-                                        </td>
-                                        {/* Actions Cell */}
-                                        <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                            <div className="flex justify-center gap-2">
-                                                <button
-                                                    onClick={() => setViewTransaction(tx)}
-                                                    className={`p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
-                                                    title={hasAttachments ? "View Details & Attachments" : "View Details"}
-                                                >
-                                                    {hasAttachments ? <Paperclip size={16} /> : <Search size={16} />}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        )}
+                                    )}
+                                    <td className="py-3 px-4 text-slate-500 font-mono text-[10px]">
+                                        {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
+                                    </td>
+                                    <td className="py-3 px-4 text-slate-300">
+                                        {format(new Date(tx.date), 'MMM d, yyyy')}
+                                    </td>
+                                    <td className="py-3 px-4 text-white font-medium">
+                                        {tx.description}
+                                        {tx.reference && <span className="block text-xs text-slate-500 mt-0.5">{tx.reference}</span>}
+                                    </td>
+                                    <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
+                                        <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
+                                            {tx.bankAccount.bank.bankName}
+                                        </span>
+                                    </td>
+                                    <td className={`py-3 px-4 text-right font-medium ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
+                                        {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
+                                    </td>
+                                    <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
+                                        <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
+                                    </td>
+                                    {/* Actions Cell */}
+                                    <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex justify-center gap-2">
+                                            <button
+                                                onClick={() => setViewTransaction(tx)}
+                                                className={`p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
+                                                title={hasAttachments ? "View Details & Attachments" : "View Details"}
+                                            >
+                                                {hasAttachments ? <Paperclip size={16} /> : <Search size={16} />}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                        {/* Dummy Rows to fill 20 slots */}
+                        {Array.from({ length: Math.max(0, 20 - transactions.length) }).map((_, i) => (
+                            <tr key={`dummy-${i}`} className="border-b border-slate-800/10 h-[60px]">
+                                <td className="py-3 px-4">&nbsp;</td>
+                                {isLinkingMode && <td className="py-3 px-4">&nbsp;</td>}
+                                <td className="py-3 px-4">&nbsp;</td>
+                                <td className="py-3 px-4">&nbsp;</td>
+                                <td className="py-3 px-4">
+                                    {transactions.length === 0 && i === 10 && (
+                                        <div className="text-center text-slate-600 italic">No transactions found</div>
+                                    )}
+                                </td>
+                                <td className="py-3 px-4 hidden md:table-cell">&nbsp;</td>
+                                <td className="py-3 px-4">&nbsp;</td>
+                                <td className="py-3 px-4 hidden md:table-cell">&nbsp;</td>
+                                <td className="py-3 px-4">&nbsp;</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
 
             {/* --- Pagination --- */}
-            <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-slate-400">
-                    Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+            <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-800">
+                <div className="flex items-center gap-4">
+                    <div className="text-sm text-slate-400">
+                        Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span>Go to:</span>
+                        <input
+                            type="number"
+                            min={1}
+                            max={totalPages || 1}
+                            defaultValue={currentPage}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const val = parseInt((e.target as HTMLInputElement).value);
+                                    if (val >= 1 && val <= (totalPages || 1)) {
+                                        handlePageChange(val);
+                                    }
+                                }
+                            }}
+                            className="w-12 bg-transparent text-white focus:outline-none text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-b border-slate-700 focus:border-uhuru-blue"
+                        />
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <button
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage <= 1}
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
+                        title="First Page"
+                    >
+                        &lt;&lt;
+                    </button>
+                    <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage <= 1}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
+                        title="Previous Page"
                     >
-                        Previous
+                        &lt;
                     </button>
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage >= totalPages}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors border border-slate-700"
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
+                        title="Next Page"
                     >
-                        Next
+                        &gt;
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage >= totalPages}
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
+                        title="Last Page"
+                    >
+                        &gt;&gt;
                     </button>
                 </div>
             </div>
