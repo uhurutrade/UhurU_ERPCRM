@@ -166,14 +166,14 @@ export async function uploadToBasket(formData: FormData) {
         revalidatePath('/dashboard/doc-basket');
         revalidatePath('/dashboard/wall');
 
-        if (skippedCount > 0 && results.length === 0) {
-            return { success: false, error: `All provided files (${skippedCount}) are already in the Basket.`, skipped: skippedCount };
-        }
-
+        // Always return success, even if some/all files were skipped
         return {
             success: true,
             count: results.length,
-            skipped: skippedCount
+            skipped: skippedCount,
+            message: results.length > 0
+                ? `Uploaded ${results.length} file(s)${skippedCount > 0 ? `, skipped ${skippedCount} duplicate(s)` : ''}`
+                : `All ${skippedCount} file(s) were already in the Basket`
         };
 
     } catch (error: any) {
