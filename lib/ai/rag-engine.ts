@@ -64,6 +64,22 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  */
 export async function ingestDocument(docId: string, filePath: string) {
     try {
+        // Obtener nombre original del archivo desde la DB para logs más claros
+        let originalFilename = path.basename(filePath);
+        try {
+            const doc = await prisma.complianceDocument.findUnique({
+                where: { id: docId },
+                select: { filename: true }
+            });
+            if (doc?.filename) {
+                originalFilename = doc.filename;
+            }
+        } catch (err) {
+            // Si falla, usar el basename del path
+        }
+
+        console.log(`[RAG] 📄 Procesando: "${originalFilename}" (ID: ${docId})`);
+
         // Resolución de ruta para Docker/Producción
         const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
         let fullPath = path.join(process.cwd(), cleanPath);
@@ -76,7 +92,7 @@ export async function ingestDocument(docId: string, filePath: string) {
         }
 
         const dataBuffer = await fs.readFile(fullPath);
-        console.log(`[RAG] Archivo leído: ${fullPath} (${dataBuffer.length} bytes)`);
+        console.log(`[RAG] ✓ Archivo leído: ${dataBuffer.length} bytes`);
 
         // 1. Extraer texto basado en extensión (Modo Blindado para Producción)
         let text = "";
@@ -84,7 +100,7 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         try {
             if (ext === 'pdf') {
-                console.log(`[RAG] Procesando PDF con pdfjs-dist...`);
+                console.log(`[RAG] 🔍 Extrayendo texto de PDF con pdfjs-dist...`);
 
                 // Estrategia 1: pdfjs-dist (Mozilla PDF.js) - Más compatible con Next.js standalone
                 try {
@@ -103,7 +119,7 @@ export async function ingestDocument(docId: string, filePath: string) {
                         fullText += pageText + '\n';
                     }
                     text = fullText;
-                    console.log(`[RAG] PDF parseado exitosamente con pdfjs-dist: ${text.length} caracteres, ${pdf.numPages} páginas.`);
+                    console.log(`[RAG] ✅ PDF parseado con pdfjs-dist: ${text.length} caracteres, ${pdf.numPages} páginas`);
                 } catch (pdfjsErr: any) {
                     console.warn(`[RAG] pdfjs-dist falló: ${pdfjsErr.message}`);
 
@@ -143,7 +159,7 @@ export async function ingestDocument(docId: string, filePath: string) {
                 text = result.value;
             }
             else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext || '')) {
-                console.log(`[RAG] Iniciando Vision OCR para ${filePath}...`);
+                console.log(`[RAG] 👁️ Iniciando Vision OCR para "${originalFilename}"...`);
                 const response = await openai.chat.completions.create({
                     model: "gpt-4o-mini",
                     messages: [
@@ -162,7 +178,7 @@ export async function ingestDocument(docId: string, filePath: string) {
                     ]
                 });
                 text = response.choices[0].message.content || "";
-                console.log(`[RAG] OCR completado con éxito.`);
+                console.log(`[RAG] ✅ OCR completado: ${text.length} caracteres extraídos`);
             }
             else {
                 text = dataBuffer.toString('utf-8').replace(/\u0000/g, '');
@@ -198,7 +214,7 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         // 3. Crear Chunks
         const chunks = chunkText(text);
-        console.log(`[RAG] Texto extraído (${text.length} caracteres). Generados ${chunks.length} fragmentos.`);
+        console.log(`[RAG] 📊 "${originalFilename}": ${text.length} caracteres → ${chunks.length} fragmentos`);
 
         if (chunks.length === 0) {
             console.warn(`[RAG] Documento ${docId} resultó en 0 fragmentos.`);
@@ -244,7 +260,7 @@ export async function ingestDocument(docId: string, filePath: string) {
             data: { isProcessed: true }
         });
 
-        console.log(`[RAG] ✅ FINALIZADO: ${docId}. Insertados ${inserted}/${chunks.length} fragmentos.`);
+        console.log(`[RAG] ✅ FINALIZADO: "${originalFilename}" - ${inserted}/${chunks.length} fragmentos vectorizados`);
         return { success: true, chunksProcessed: inserted };
     } catch (error) {
         console.error("RAG Ingestion Error:", error);
