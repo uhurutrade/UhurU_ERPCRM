@@ -7,16 +7,18 @@ export const authConfig = {
         clientSecret: process.env.AUTH_GOOGLE_SECRET,
     })],
     callbacks: {
-        authorized({ auth, request: { nextUrl } }) {
+        authorized({ auth, request }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-            const isOnApiRoute = nextUrl.pathname.startsWith('/api');
+            const hasAccessCookie = request.cookies?.get('uhuru_access')?.value === 'true';
+            const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard');
+            const isOnApiRoute = request.nextUrl.pathname.startsWith('/api');
 
             // Allow API routes to handle their own auth
             if (isOnApiRoute) return true;
 
-            // If trying to access dashboard without login, redirect to landing
-            if (isOnDashboard && !isLoggedIn) {
+            // If trying to access dashboard without login (either OAuth or Password cookie)
+            // Redirect to landing
+            if (isOnDashboard && !isLoggedIn && !hasAccessCookie) {
                 return false; // This will redirect to signIn page (/)
             }
 

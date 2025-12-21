@@ -69,12 +69,16 @@ export default function Home() {
         return Math.pow(2, attemptCount - MAX_ATTEMPTS) * 60; // Exponential: 2min, 4min, 8min...
     };
 
-    const handlePasswordSubmit = (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (isBlocked) return;
 
-        if (password === CORRECT_PASSWORD) {
+        // Use Server Action to set cookie
+        const { loginWithPassword } = await import('@/app/actions/auth-password');
+        const result = await loginWithPassword(password);
+
+        if (result.success) {
             setShowPasswordModal(false);
             setError('');
             setPassword('');
@@ -82,10 +86,7 @@ export default function Home() {
             localStorage.removeItem('crm_attempts');
             localStorage.removeItem('crm_block');
             setAttempts(0);
-            const unlocked = sessionStorage.getItem('crm_unlocked');
-            if (!unlocked) {
-                sessionStorage.setItem('crm_unlocked', 'true');
-            }
+
             router.push('/dashboard');
         } else {
             const newAttempts = attempts + 1;
