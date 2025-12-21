@@ -61,16 +61,18 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function ingestDocument(docId: string, filePath: string) {
     try {
         // Resolución de ruta para Docker/Producción
-        let fullPath = path.join(process.cwd(), filePath);
+        const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+        let fullPath = path.join(process.cwd(), cleanPath);
 
-        // Si no existe en la raíz (típico en Docker), buscar en public/
+        // Si no existe, buscar en public/
         try {
             await fs.access(fullPath);
         } catch {
-            fullPath = path.join(process.cwd(), 'public', filePath);
+            fullPath = path.join(process.cwd(), 'public', cleanPath);
         }
 
         const dataBuffer = await fs.readFile(fullPath);
+        console.log(`[RAG] Archivo leído: ${fullPath} (${dataBuffer.length} bytes)`);
 
         // 1. Extraer texto basado en extensión
         let text = "";
@@ -88,7 +90,7 @@ export async function ingestDocument(docId: string, filePath: string) {
             text = result.value;
         }
         else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext || '')) {
-            // IA VISION PARA OCR: "Leemos" la imagen usando OpenAI
+            console.log(`[RAG] Iniciando Vision OCR para ${filePath}...`);
             const response = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
                 messages: [
@@ -118,15 +120,31 @@ export async function ingestDocument(docId: string, filePath: string) {
             return { success: false, reason: "No text content extractable" };
         }
 
-        // 2. Crear Chunks
+        // 2. Asegurar que el documento existe en ComplianceDocument 
+        // para mantener integridad referencial en DocumentChunk
+        let docName = path.basename(filePath);
+        let doc = await prisma.complianceDocument.findUnique({ where: { id: docId } });
+
+        if (!doc) {
+            console.log(`[RAG] Registrando soporte en ComplianceDocument para attachment: ${docId}`);
+            doc = await prisma.complianceDocument.create({
+                data: {
+                    id: docId,
+                    filename: docName,
+                    path: filePath,
+                    documentType: 'ATTACHMENT',
+                    isProcessed: true
+                }
+            });
+        }
+
+        // 3. Crear Chunks
         const chunks = chunkText(text);
 
-        // 3. Guardar en DB (Limpiando previos si los hubiera)
+        // 4. Guardar en DB (Limpiando previos si los hubiera)
         await prisma.documentChunk.deleteMany({ where: { documentId: docId } });
 
         // Guardamos los chunks masivamente
-        // Nota: En producción generaríamos los embeddings aquí
-        // Guardamos los chunks
         for (const chunk of chunks) {
             const vector = await generateEmbedding(chunk.content);
             const vectorSql = `[${vector.join(',')}]`;
@@ -142,12 +160,13 @@ export async function ingestDocument(docId: string, filePath: string) {
             );
         }
 
-        // 4. Marcar como procesado
+        // 5. Marcar como procesado el documento original si es necesario
         await prisma.complianceDocument.update({
             where: { id: docId },
             data: { isProcessed: true }
         });
 
+        console.log(`[RAG] ✅ Éxito: ${docId} vectorizado en ${chunks.length} fragmentos.`);
         return { success: true, chunksProcessed: chunks.length };
     } catch (error) {
         console.error("RAG Ingestion Error:", error);
