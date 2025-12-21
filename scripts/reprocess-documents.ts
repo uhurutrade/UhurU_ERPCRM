@@ -2,8 +2,6 @@ import { prisma } from '../lib/prisma';
 import { ingestDocument } from '../lib/ai/rag-engine';
 
 async function main() {
-    process.env.NODE_ENV = 'production';
-
     console.log('--- Resonancia Vectorial: Re-procesando Documentos ---');
 
     const docs = await prisma.complianceDocument.findMany();
