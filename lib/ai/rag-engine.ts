@@ -85,27 +85,35 @@ export async function ingestDocument(docId: string, filePath: string) {
         try {
             if (ext === 'pdf') {
                 console.log(`[RAG] Procesando PDF con pdf-parse...`);
-                const pdfExtract = require('pdf-parse');
-                // Detectar función correcta en entorno minificado
-                let parse = (pdfExtract && pdfExtract.default) || (typeof pdfExtract === 'function' ? pdfExtract : null);
-
-                if (!parse && typeof pdfExtract === 'object') {
-                    // Intento desesperado: buscar cualquier función en el objeto
-                    const keys = Object.keys(pdfExtract);
-                    const funcKey = keys.find(k => typeof pdfExtract[k] === 'function');
-                    if (funcKey) parse = pdfExtract[funcKey];
-                }
-
-                if (typeof parse !== 'function') {
-                    throw new Error("Extractor de PDF no inicializado correctamente (t is not a function)");
-                }
 
                 try {
+                    // Usar import dinámico para evitar problemas de ES modules
+                    const pdfParse = await import('pdf-parse');
+                    const parse = pdfParse.default || pdfParse;
+
                     const data = await parse(dataBuffer);
                     text = data.text;
+                    console.log(`[RAG] PDF parseado exitosamente: ${text.length} caracteres extraídos.`);
                 } catch (pdfErr: any) {
-                    if (pdfErr.message?.includes('font') || pdfErr.message?.includes('Helvetica')) {
-                        console.warn("[RAG] Error de fuentes en PDF, extrayendo texto bruto como fallback...");
+                    console.warn(`[RAG] Error en pdf-parse: ${pdfErr.message}`);
+
+                    // Fallback 1: Intentar con require (para compatibilidad)
+                    if (pdfErr.message?.includes('constructor') || pdfErr.message?.includes('new')) {
+                        console.log(`[RAG] Intentando fallback con require()...`);
+                        try {
+                            const pdfExtract = require('pdf-parse');
+                            // Llamar directamente como función
+                            const data = await pdfExtract(dataBuffer);
+                            text = data.text;
+                            console.log(`[RAG] PDF parseado con fallback: ${text.length} caracteres.`);
+                        } catch (fallbackErr: any) {
+                            console.warn(`[RAG] Fallback también falló: ${fallbackErr.message}`);
+                            // Fallback 2: Extracción de texto bruto
+                            console.log(`[RAG] Usando extracción de texto bruto como último recurso...`);
+                            text = dataBuffer.toString('utf-8').replace(/[^\x20-\x7E\n]/g, '');
+                        }
+                    } else if (pdfErr.message?.includes('font') || pdfErr.message?.includes('Helvetica')) {
+                        console.warn("[RAG] Error de fuentes en PDF, extrayendo texto bruto...");
                         text = dataBuffer.toString('utf-8').replace(/[^\x20-\x7E\n]/g, '');
                     } else {
                         throw pdfErr;
