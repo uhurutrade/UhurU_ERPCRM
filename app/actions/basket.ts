@@ -138,6 +138,12 @@ export async function uploadToBasket(formData: FormData) {
                 }
             });
 
+            // --- TRIGGER RAG VECTORIZATION ---
+            const { ingestDocument } = await import('@/lib/ai/rag-engine');
+            await ingestDocument(doc.id, publicPath).catch(err =>
+                console.error(`[RAG] Error vectorizing basket doc ${doc.id}:`, err)
+            );
+
             // 5. If analysis found deadlines, create ComplianceEvents
             if (analysis.deadlines && Array.isArray(analysis.deadlines)) {
                 for (const d of analysis.deadlines) {

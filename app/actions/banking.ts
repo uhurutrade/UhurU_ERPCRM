@@ -213,6 +213,14 @@ export async function uploadTransactionAttachment(formData: FormData, transactio
             }
         });
 
+        // --- TRIGGER RAG VECTORIZATION ---
+        try {
+            const { ingestDocument } = await import('@/lib/ai/rag-engine');
+            await ingestDocument(attachment.id, attachment.path);
+        } catch (ragError) {
+            console.error(`[RAG] Vectorization failed for banking attachment ${attachment.id}:`, ragError);
+        }
+
         revalidatePath('/dashboard/banking');
         return { success: true, attachment };
 

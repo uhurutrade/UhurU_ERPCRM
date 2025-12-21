@@ -115,10 +115,18 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
                 fileHash,
                 extractedData: {
                     ...analysis,
-                    documentRole // Save whether it's emitted or received
+                    documentRole
                 } as any
             }
         });
+
+        // --- TRIGGER RAG VECTORIZATION ---
+        try {
+            const { ingestDocument } = await import('@/lib/ai/rag-engine');
+            await ingestDocument(attachment.id, publicPath);
+        } catch (ragError) {
+            console.error(`[RAG] Vectorization failed for invoice ${attachment.id}:`, ragError);
+        }
 
         // 4. Try to find potential matches in General Ledger
         const potentialMatches = await findPotentialMatches(analysis, documentRole);
