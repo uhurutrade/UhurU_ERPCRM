@@ -73,6 +73,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copiar scripts de mantenimiento
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+
 # Crear carpeta de uploads
 RUN mkdir -p /app/public/uploads && chown nextjs:nodejs /app/public/uploads
 
