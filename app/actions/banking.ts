@@ -14,6 +14,8 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
         return { success: false, error: 'No file provided' };
     }
 
+    console.log(`[UPLOAD] 📊 Bank Statement: "${file.name}" (${(file.size / 1024).toFixed(2)} KB)`);
+
     try {
         // 1. Fetch Target Account Currency AND Bank Name to enforce integrity
         const targetAccount = await prisma.bankAccount.findUnique({
@@ -173,6 +175,8 @@ export async function uploadTransactionAttachment(formData: FormData, transactio
     try {
         const file = formData.get('file') as File;
         if (!file) return { success: false, error: 'No file provided' };
+
+        console.log(`[UPLOAD] 📎 Transaction Attachment: "${file.name}" (${(file.size / 1024).toFixed(2)} KB)`);
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);

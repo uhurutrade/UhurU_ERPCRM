@@ -15,6 +15,8 @@ export async function uploadToBasket(formData: FormData) {
             return { success: false, error: 'No files provided' };
         }
 
+        console.log(`[UPLOAD] 📁 Doc Basket: ${files.length} file(s) - [${files.map(f => `"${f.name}"`).join(', ')}]`);
+
         const ai = await getAIClient();
         const uploadDir = join(process.cwd(), 'public', 'uploads', 'basket');
         await mkdir(uploadDir, { recursive: true });

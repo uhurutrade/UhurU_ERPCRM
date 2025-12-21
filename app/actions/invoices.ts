@@ -19,6 +19,8 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
             return { success: false, error: 'Document type is mandatory' };
         }
 
+        console.log(`[UPLOAD] 🧾 Invoice: "${file.name}" (${(file.size / 1024).toFixed(2)} KB) - Role: ${documentRole}`);
+
         // 1. Get AI Client (Provider selected in Settings)
         const ai = await getAIClient();
 
