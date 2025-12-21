@@ -88,8 +88,9 @@ export async function ingestDocument(docId: string, filePath: string) {
 
                 try {
                     // Usar import dinámico para evitar problemas de ES modules
-                    const pdfParse = await import('pdf-parse');
-                    const parse = pdfParse.default || pdfParse;
+                    const pdfParse = await import('pdf-parse') as any;
+                    const parse = typeof pdfParse === 'function' ? pdfParse : (pdfParse.default || pdfParse);
+
 
                     const data = await parse(dataBuffer);
                     text = data.text;
