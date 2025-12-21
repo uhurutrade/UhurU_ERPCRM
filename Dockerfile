@@ -4,7 +4,17 @@
 FROM node:20-alpine AS base
 
 # Instalar dependencias necesarias para Prisma, OpenSSL, procesamiento de PDFs y Sharp
-RUN apk add --no-cache libc6-compat openssl libstdc++ poppler-utils vips-dev
+# vips-dev: librería para sharp
+# python3, make, g++: herramientas de compilación para sharp
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl \
+    libstdc++ \
+    poppler-utils \
+    vips-dev \
+    python3 \
+    make \
+    g++
 
 # ----------------------------------------------------
 # 2. Etapa de Dependencias (Deps Stage)
