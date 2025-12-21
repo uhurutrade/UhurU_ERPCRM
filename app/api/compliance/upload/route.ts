@@ -17,15 +17,15 @@ export async function POST(req: Request) {
         // For security in a real App, we should sanitize filename and use specific IDs
         // Here we just use original name for simplicity
         const filename = file.name;
-        const uploadDir = join(process.cwd(), 'uploads');
+        const uploadDir = join(process.cwd(), 'public', 'uploads');
 
         // COMPATIBILITY FIX: 
         // We store the 'relativePath' in the database (e.g., 'uploads/file.pdf')
         // This ensures that if you move from Local -> VPS, the path remains valid 
         // relative to the application root in both environments.
         const relativePath = join('uploads', filename);
-        // We use absolutePath ONLY for writing the file to disk in the current environment
-        const absolutePath = join(process.cwd(), relativePath);
+        // We use absolutePath ONLY for writing the file to disk
+        const absolutePath = join(uploadDir, filename);
 
         // 1. Save File to Disk (In VPS context)
         // Ensure uploads directory exists
