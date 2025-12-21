@@ -60,7 +60,16 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  */
 export async function ingestDocument(docId: string, filePath: string) {
     try {
-        const fullPath = path.join(process.cwd(), filePath);
+        // Resolución de ruta para Docker/Producción
+        let fullPath = path.join(process.cwd(), filePath);
+
+        // Si no existe en la raíz (típico en Docker), buscar en public/
+        try {
+            await fs.access(fullPath);
+        } catch {
+            fullPath = path.join(process.cwd(), 'public', filePath);
+        }
+
         const dataBuffer = await fs.readFile(fullPath);
 
         // 1. Extraer texto basado en extensión
