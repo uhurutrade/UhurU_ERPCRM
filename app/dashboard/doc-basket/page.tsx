@@ -7,8 +7,10 @@ import { uploadToBasket, getBasketHistory, removeFromBasket, updateDocumentNotes
 import { format } from 'date-fns';
 import { StandardPagination } from '@/components/invoices/invoices-pagination';
 
+import { useConfirm } from "@/components/providers/modal-provider";
 
 export default function DocBasketPage() {
+    const { confirm } = useConfirm();
     const [isUploading, setIsUploading] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [history, setHistory] = useState<any[]>([]);
@@ -59,7 +61,7 @@ export default function DocBasketPage() {
         try {
             const res = await uploadToBasket(formData);
             if (res.success) {
-                toast.success(`${files.length} documents added to your Strategic Basket`);
+                toast.success(res.message || `${files.length} documents added to your Strategic Basket`);
                 setFiles([]);
                 fetchHistory();
             } else {
@@ -74,7 +76,16 @@ export default function DocBasketPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to remove this document?')) return;
+        const confirmed = await confirm({
+            title: 'Delete Document',
+            message: 'Are you sure you want to remove this document? This action cannot be undone.',
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+
+        if (!confirmed) return;
+
         try {
             const res = await removeFromBasket(id);
             if (res.success) {
@@ -96,7 +107,15 @@ export default function DocBasketPage() {
     };
 
     const handleBulkDelete = async () => {
-        if (!confirm(`Are you sure you want to remove ${selectedIds.length} documents?`)) return;
+        const confirmed = await confirm({
+            title: 'Delete Multiple Documents',
+            message: `Are you sure you want to remove ${selectedIds.length} documents? This action cannot be undone.`,
+            type: 'danger',
+            confirmText: `Delete ${selectedIds.length} Docs`,
+            cancelText: 'Cancel'
+        });
+
+        if (!confirmed) return;
 
         let successCount = 0;
         for (const id of selectedIds) {
