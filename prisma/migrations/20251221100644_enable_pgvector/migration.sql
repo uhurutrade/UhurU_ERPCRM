@@ -8,4 +8,4 @@
 CREATE EXTENSION IF NOT EXISTS "vector";
 
 -- AlterTable
-ALTER TABLE "DocumentChunk" ALTER COLUMN "embedding" SET DATA TYPE vector(1536);
+ALTER TABLE "DocumentChunk" ALTER COLUMN "embedding" SET DATA TYPE vector(1536) USING embedding::vector(1536);
