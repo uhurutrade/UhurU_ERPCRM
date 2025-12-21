@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
-import { ingestDocument } from '../lib/ai/rag-engine';
+import { prisma } from '/app/lib/prisma';
+import { ingestDocument } from '/app/lib/ai/rag-engine';
 
 async function main() {
     console.log('--- Resonancia Vectorial: Re-procesando Documentos ---');
