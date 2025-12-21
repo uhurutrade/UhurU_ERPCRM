@@ -149,7 +149,7 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
                         </div>
 
                         <div className="space-y-3">
-                            <div className="relative group text-indigo-100 italic">
+                            <div className="relative group text-indigo-100 ">
                                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors">
                                     <Linkedin size={16} />
                                 </div>
@@ -291,7 +291,7 @@ export function ContactDetailModal({ isOpen, onClose, contact, organizations }: 
 
                         {!isBillable && (
                             <div className="p-4 rounded-xl bg-slate-900/20 border border-white/5 text-center">
-                                <p className="text-[10px] text-uhuru-text-dim italic">Billing data is currently disabled for this professional profile.</p>
+                                <p className="text-[10px] text-uhuru-text-dim ">Billing data is currently disabled for this professional profile.</p>
                             </div>
                         )}
                     </div>

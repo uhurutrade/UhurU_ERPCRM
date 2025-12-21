@@ -155,7 +155,7 @@ export default async function DashboardPage() {
                             </div>
                         ))}
                         {transactions.length === 0 && (
-                            <div className="py-12 text-center text-uhuru-text-dim italic text-sm">No recent interactions detected.</div>
+                            <div className="py-12 text-center text-uhuru-text-dim  text-sm">No recent interactions detected.</div>
                         )}
                     </div>
                 </div>
@@ -175,7 +175,7 @@ export default async function DashboardPage() {
                     {accounts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-48 py-8 text-center bg-slate-900/40 rounded-2xl border border-dashed border-uhuru-border">
                             <CreditCard className="text-slate-700 mb-3" size={32} />
-                            <p className="text-uhuru-text-dim text-xs italic">No active accounts registered.</p>
+                            <p className="text-uhuru-text-dim text-xs ">No active accounts registered.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

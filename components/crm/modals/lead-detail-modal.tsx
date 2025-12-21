@@ -130,7 +130,7 @@ export function LeadDetailModal({ isOpen, onClose, lead, onConvert }: LeadDetail
                                         defaultValue={lead.notes}
                                         rows={3}
                                         placeholder="Discovery notes..."
-                                        className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm text-slate-300 mt-1 italic leading-relaxed resize-none"
+                                        className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm text-slate-300 mt-1  leading-relaxed resize-none"
                                     />
                                 </div>
                             </div>
@@ -163,7 +163,7 @@ export function LeadDetailModal({ isOpen, onClose, lead, onConvert }: LeadDetail
 
                             {lead.status !== 'QUALIFIED' && (
                                 <div className="pt-4 mt-4 border-t border-uhuru-border/50">
-                                    <p className="text-xs text-uhuru-text-dim mb-4 italic">
+                                    <p className="text-xs text-uhuru-text-dim mb-4 ">
                                         Ready to move this prospect into your active pipeline? This will create an Organization and a Deal.
                                     </p>
                                     <button

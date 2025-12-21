@@ -145,7 +145,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.companyName}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -160,7 +160,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             onChange={handleChange}
                             required
                             placeholder="e.g., 12345678"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -174,7 +174,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.incorporationDate}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -187,7 +187,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.companyType}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         >
                             <option value="">Select type...</option>
                             <option value="Ltd">Private Limited Company (Ltd)</option>
@@ -208,7 +208,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.sicCodes}
                             onChange={handleChange}
                             placeholder="e.g., 62012, 62020 (comma separated)"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -228,7 +228,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.registeredAddress}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -242,7 +242,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.registeredCity}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -256,7 +256,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.registeredPostcode}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -270,7 +270,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.registeredCountry}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -289,7 +289,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="tradingAddress"
                             value={formData.tradingAddress}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -302,7 +302,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="tradingCity"
                             value={formData.tradingCity}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -315,7 +315,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="tradingPostcode"
                             value={formData.tradingPostcode}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -336,7 +336,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             onChange={handleChange}
                             required
                             placeholder="DD-MM (e.g., 31-03)"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -349,7 +349,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="accountsNextDueDate"
                             value={formData.accountsNextDueDate}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -362,7 +362,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="confirmationNextDueDate"
                             value={formData.confirmationNextDueDate}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -397,7 +397,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                                     value={formData.vatNumber}
                                     onChange={handleChange}
                                     placeholder="GB123456789"
-                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                    className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                                 />
                             </div>
 
@@ -410,7 +410,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                                     name="vatRegistrationDate"
                                     value={formData.vatRegistrationDate}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                    className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                                 />
                             </div>
 
@@ -422,7 +422,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                                     name="vatScheme"
                                     value={formData.vatScheme}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                    className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                                 >
                                     <option value="">Select scheme...</option>
                                     <option value="Standard">Standard</option>
@@ -440,7 +440,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                                     name="vatReturnFrequency"
                                     value={formData.vatReturnFrequency}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                                    className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                                 >
                                     <option value="">Select frequency...</option>
                                     <option value="Quarterly">Quarterly</option>
@@ -467,7 +467,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             value={formData.utr}
                             onChange={handleChange}
                             placeholder="1234567890"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -480,7 +480,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="corporationTaxReference"
                             value={formData.corporationTaxReference}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -493,7 +493,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="payeReference"
                             value={formData.payeReference}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -513,7 +513,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             onChange={handleChange}
                             rows={3}
                             placeholder='e.g., John Smith, Jane Doe'
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -526,7 +526,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="companySecretary"
                             value={formData.companySecretary}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -546,7 +546,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="shareCapital"
                             value={formData.shareCapital}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -559,7 +559,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="numberOfShares"
                             value={formData.numberOfShares}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -577,7 +577,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="accountingSoftware"
                             value={formData.accountingSoftware}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         >
                             <option value="">Select software...</option>
                             <option value="Xero">Xero</option>
@@ -597,7 +597,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="accountingMethod"
                             value={formData.accountingMethod}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         >
                             <option value="">Select method...</option>
                             <option value="Cash Basis">Cash Basis</option>
@@ -620,7 +620,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="contactEmail"
                             value={formData.contactEmail}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -633,7 +633,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="contactPhone"
                             value={formData.contactPhone}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
 
@@ -646,7 +646,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             name="website"
                             value={formData.website}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                         />
                     </div>
                 </div>
@@ -699,7 +699,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             <div className={`w-2 h-2 rounded-full ${process.env.NEXT_PUBLIC_AI_STATUS === 'ready' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
                             <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">System Status</span>
                         </div>
-                        <p className="text-xs text-slate-400 italic">
+                        <p className="text-xs text-slate-400 ">
                             All API keys are securely managed via environment variables. Ensure OPENAI_API_KEY or GEMINI_API_KEY are configured in your .env file on the VPS.
                         </p>
                     </div>
@@ -719,7 +719,7 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                         value={formData.notes}
                         onChange={handleChange}
                         rows={4}
-                        className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
+                        className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
                     />
                 </div>
             </section>

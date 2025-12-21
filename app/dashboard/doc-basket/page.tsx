@@ -186,7 +186,7 @@ export default function DocBasketPage() {
                                 >
                                     <div className="absolute top-4 right-4 text-[10px] font-black text-indigo-400/50 uppercase tracking-widest">English</div>
                                     <h4 className="text-xs font-black text-white uppercase tracking-widest">Executive Summary</h4>
-                                    <p className="text-sm text-slate-300 leading-relaxed italic">
+                                    <p className="text-sm text-slate-300 leading-relaxed ">
                                         {selectedDoc.extractedData?.summaryEN || "No English summary generated for this document."}
                                     </p>
                                 </div>
@@ -196,7 +196,7 @@ export default function DocBasketPage() {
                                 >
                                     <div className="absolute top-4 right-4 text-[10px] font-black text-indigo-400/50 uppercase tracking-widest">Español</div>
                                     <h4 className="text-xs font-black text-white uppercase tracking-widest">Resumen Ejecutivo</h4>
-                                    <p className="text-sm text-slate-300 leading-relaxed italic">
+                                    <p className="text-sm text-slate-300 leading-relaxed ">
                                         {selectedDoc.extractedData?.summaryES || "No se ha generado un resumen en español para este documento."}
                                     </p>
                                 </div>
@@ -462,7 +462,7 @@ export default function DocBasketPage() {
                                                             )}
                                                         </div>
                                                         {doc.strategicInsights && (
-                                                            <p className="text-xs text-uhuru-text-dim leading-relaxed line-clamp-1 italic">
+                                                            <p className="text-xs text-uhuru-text-dim leading-relaxed line-clamp-1 ">
                                                                 "{doc.strategicInsights}"
                                                             </p>
                                                         )}
@@ -479,7 +479,7 @@ export default function DocBasketPage() {
                                     <div className="w-10 h-10 rounded-xl bg-slate-800/10" />
                                     <div className="flex-1">
                                         {history.length === 0 && i === 5 && (
-                                            <div className="text-center text-uhuru-text-dim italic">No documents found in your Strategic Basket.</div>
+                                            <div className="text-center text-uhuru-text-dim ">No documents found in your Strategic Basket.</div>
                                         )}
                                         &nbsp;
                                     </div>

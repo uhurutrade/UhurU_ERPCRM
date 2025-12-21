@@ -111,7 +111,7 @@ export function DealModal({ isOpen, onClose, organizations, initialStage = 'PROS
                         </select>
                     </div>
                     {organizations.length === 0 && (
-                        <p className="text-[10px] text-amber-500 mt-1 font-bold italic">No organizations found. Create one first.</p>
+                        <p className="text-[10px] text-amber-500 mt-1 font-bold ">No organizations found. Create one first.</p>
                     )}
                 </div>
 

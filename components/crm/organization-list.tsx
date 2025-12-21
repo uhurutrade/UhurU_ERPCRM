@@ -74,7 +74,7 @@ export function OrganizationList({ organizations }: { organizations: any[] }) {
             {organizations.length === 0 && (
                 <div className="col-span-full py-20 text-center text-uhuru-text-dim bg-uhuru-card/50 rounded-2xl border border-dashed border-uhuru-border">
                     <Building2 className="mx-auto mb-4 opacity-20" size={48} />
-                    <p className="font-medium italic">Your organization directory is currently empty.</p>
+                    <p className="font-medium ">Your organization directory is currently empty.</p>
                 </div>
             )}
 

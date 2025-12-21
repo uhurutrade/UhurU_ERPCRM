@@ -350,7 +350,7 @@ export function TransactionTable({
                                 <td className="py-3 px-4">&nbsp;</td>
                                 <td className="py-3 px-4">
                                     {transactions.length === 0 && i === 10 && (
-                                        <div className="text-center text-slate-600 italic">No transactions found</div>
+                                        <div className="text-center text-slate-600 ">No transactions found</div>
                                     )}
                                 </td>
                                 <td className="py-3 px-4 hidden md:table-cell">&nbsp;</td>

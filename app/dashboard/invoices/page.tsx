@@ -153,7 +153,7 @@ export default async function InvoicesPage({
                                 <div className="w-8 h-8 rounded-xl bg-slate-800/10" />
                                 <div className="flex-1">
                                     {allRecentAttachments.length === 0 && i === 10 && (
-                                        <div className="text-center text-uhuru-text-dim italic">No document activity detected.</div>
+                                        <div className="text-center text-uhuru-text-dim ">No document activity detected.</div>
                                     )}
                                     &nbsp;
                                 </div>
@@ -181,7 +181,7 @@ export default async function InvoicesPage({
                         {unassignedAttachments.length === 0 ? (
                             <div className="py-12 text-center">
                                 <Check className="mx-auto text-emerald-400 mb-2" size={24} />
-                                <p className="text-uhuru-text-dim text-xs italic">All documents reconciled</p>
+                                <p className="text-uhuru-text-dim text-xs ">All documents reconciled</p>
                             </div>
                         ) : (
                             unassignedAttachments.map((att) => (
@@ -261,7 +261,7 @@ export default async function InvoicesPage({
                                 <tr key={`dummy-${i}`} className="h-[60px]">
                                     <td className="px-6 py-4">
                                         {invoices.length === 0 && i === 2 && (
-                                            <div className="text-center text-uhuru-text-dim italic">No issued invoices found.</div>
+                                            <div className="text-center text-uhuru-text-dim ">No issued invoices found.</div>
                                         )}
                                         &nbsp;
                                     </td>

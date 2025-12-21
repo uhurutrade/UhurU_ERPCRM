@@ -189,7 +189,7 @@ export default async function CRMPage({
                         {activities.length === 0 && (
                             <div className="py-12 text-center bg-uhuru-card/20 rounded-2xl border border-dashed border-uhuru-border">
                                 <MessageSquare className="mx-auto mb-3 opacity-10 text-white" size={32} />
-                                <p className="text-uhuru-text-dim text-sm italic">No recent interactions logged.</p>
+                                <p className="text-uhuru-text-dim text-sm ">No recent interactions logged.</p>
                             </div>
                         )}
                     </div>
@@ -222,7 +222,7 @@ export default async function CRMPage({
                     </div>
 
                     <div className="p-5 bg-uhuru-card border border-uhuru-border rounded-2xl">
-                        <p className="text-xs text-uhuru-text-dim italic font-medium">"Efficiency is doing things right; effectiveness is doing the right things."</p>
+                        <p className="text-xs text-uhuru-text-dim  font-medium">"Efficiency is doing things right; effectiveness is doing the right things."</p>
                     </div>
                 </div>
             </div>

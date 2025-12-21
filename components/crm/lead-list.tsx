@@ -112,7 +112,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                         <tr>
                             <td colSpan={5} className="py-20 text-center">
                                 <Users className="mx-auto mb-4 opacity-10 text-white" size={48} />
-                                <p className="text-uhuru-text-dim text-sm italic">No leads found in your pipeline.</p>
+                                <p className="text-uhuru-text-dim text-sm ">No leads found in your pipeline.</p>
                             </td>
                         </tr>
                     )}

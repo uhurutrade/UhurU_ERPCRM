@@ -151,7 +151,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
                                     <ShieldCheck size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-bold text-white italic">Facturable</p>
+                                    <p className="text-sm font-bold text-white ">Facturable</p>
                                     <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tight">Show client billing details</p>
                                 </div>
                                 <div className="relative inline-flex items-center cursor-pointer">
@@ -212,7 +212,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
                                         <Archive size={12} />
                                         Billing Address
                                     </p>
-                                    <p className="text-xs text-slate-300 leading-relaxed italic">
+                                    <p className="text-xs text-slate-300 leading-relaxed ">
                                         {organization.address || 'No address provided in master record.'}
                                     </p>
                                 </div>
@@ -220,7 +220,7 @@ export function DealDetailModal({ isOpen, onClose, deal, organizations }: DealDe
                         ) : (
                             <div className="p-8 text-center bg-uhuru-card/30 rounded-2xl border border-dashed border-uhuru-border">
                                 <AlertCircle className="mx-auto mb-4 text-amber-500 opacity-50" size={32} />
-                                <p className="text-sm text-uhuru-text-dim italic">
+                                <p className="text-sm text-uhuru-text-dim ">
                                     The associated organization is not marked as billable.
                                     Enable billing in Organization details first.
                                 </p>

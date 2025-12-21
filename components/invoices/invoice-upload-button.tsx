@@ -175,7 +175,7 @@ export function InvoiceUploadButton() {
                                                 <ArrowUpRight size={24} className={documentRole === 'EMITTED' ? 'text-uhuru-blue' : ''} />
                                                 <div className="text-center">
                                                     <div className="font-bold text-sm">EMITTED</div>
-                                                    <div className="text-[10px] opacity-70 italic font-medium">Sales / Income</div>
+                                                    <div className="text-[10px] opacity-70  font-medium">Sales / Income</div>
                                                 </div>
                                             </button>
                                             <button
@@ -185,7 +185,7 @@ export function InvoiceUploadButton() {
                                                 <ArrowDownLeft size={24} className={documentRole === 'RECEIVED' ? 'text-rose-500' : ''} />
                                                 <div className="text-center">
                                                     <div className="font-bold text-sm">RECEIVED</div>
-                                                    <div className="text-[10px] opacity-70 italic font-medium">Expenses / Purchases</div>
+                                                    <div className="text-[10px] opacity-70  font-medium">Expenses / Purchases</div>
                                                 </div>
                                             </button>
                                         </div>
@@ -289,7 +289,7 @@ export function InvoiceUploadButton() {
                                                 ))
                                             ) : (
                                                 <div className="text-center py-6 bg-slate-900/20 border border-dashed border-uhuru-border rounded-xl">
-                                                    <p className="text-uhuru-text-dim text-sm italic">No close matches found in General Ledger</p>
+                                                    <p className="text-uhuru-text-dim text-sm ">No close matches found in General Ledger</p>
                                                 </div>
                                             )}
                                         </div>
@@ -349,7 +349,7 @@ export function InvoiceUploadButton() {
                                             </div>
                                             <div>
                                                 <h4 className="text-3xl font-extrabold text-white tracking-tight">Smart Association</h4>
-                                                <p className="text-slate-400 mt-2 text-sm italic">Are you sure you want to link this document to this transaction?</p>
+                                                <p className="text-slate-400 mt-2 text-sm ">Are you sure you want to link this document to this transaction?</p>
                                                 <div className={`mt-5 p-4 rounded-2xl border text-sm font-semibold leading-relaxed ${matchAnalysis.colorClass}`}>
                                                     {matchAnalysis.message}
                                                 </div>

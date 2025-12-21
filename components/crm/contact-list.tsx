@@ -55,7 +55,7 @@ export function ContactList({ contacts, organizations }: { contacts: any[], orga
                                         {contact.organization.name}
                                     </div>
                                 ) : (
-                                    <span className="text-slate-500 text-xs italic">Independent</span>
+                                    <span className="text-slate-500 text-xs ">Independent</span>
                                 )}
                             </td>
                             <td className="py-4 px-6">
@@ -91,7 +91,7 @@ export function ContactList({ contacts, organizations }: { contacts: any[], orga
                         <tr>
                             <td colSpan={4} className="py-20 text-center text-uhuru-text-dim">
                                 <Users className="mx-auto mb-4 opacity-10" size={48} />
-                                <p className="text-sm italic">No contacts found in your database.</p>
+                                <p className="text-sm ">No contacts found in your database.</p>
                             </td>
                         </tr>
                     )}

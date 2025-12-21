@@ -80,7 +80,7 @@ export default function CreateInvoiceForm({ organizations }: { organizations: an
                                 type="date"
                                 name="date"
                                 required
-                                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+                                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-2 px-3 sm:py-3 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
                             />
                         </div>
                         <div>
@@ -89,7 +89,7 @@ export default function CreateInvoiceForm({ organizations }: { organizations: an
                                 type="date"
                                 name="dueDate"
                                 required
-                                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+                                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-2 px-3 sm:py-3 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
                             />
                         </div>
                     </div>

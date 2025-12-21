@@ -79,7 +79,7 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
 
                             <div className="mt-2 pt-2 border-t border-uhuru-border">
                                 <div className="px-4 py-2">
-                                    <p className="text-[10px] text-uhuru-text-muted italic">Capture new opportunities quickly.</p>
+                                    <p className="text-[10px] text-uhuru-text-muted ">Capture new opportunities quickly.</p>
                                 </div>
                             </div>
                         </div>

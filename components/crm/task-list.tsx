@@ -104,7 +104,7 @@ export function TaskList({ tasks }: { tasks: any[] }) {
                         <tr>
                             <td colSpan={5} className="py-20 text-center">
                                 <ClipboardList className="mx-auto mb-4 opacity-10 text-white" size={48} />
-                                <p className="text-uhuru-text-dim text-sm italic">All tasks have been cleared! 🚀</p>
+                                <p className="text-uhuru-text-dim text-sm ">All tasks have been cleared! 🚀</p>
                             </td>
                         </tr>
                     )}

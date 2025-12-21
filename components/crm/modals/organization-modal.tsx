@@ -137,7 +137,7 @@ export function OrganizationModal({ isOpen, onClose }: OrganizationModalProps) {
                                     <ShieldCheck size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-bold text-white italic">Facturable</p>
+                                    <p className="text-sm font-bold text-white ">Facturable</p>
                                     <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tight">Enable legal & financial dossier</p>
                                 </div>
                                 <div className="relative inline-flex items-center cursor-pointer">

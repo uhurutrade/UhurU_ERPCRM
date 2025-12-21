@@ -72,7 +72,7 @@ export default async function BankSettingsPage() {
                         <div className="w-16 h-16 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-600 group-hover:text-emerald-500 transition-colors">
                             <Building2 size={32} />
                         </div>
-                        <p className="text-uhuru-text-dim text-sm italic mb-8">No banking institutions registered in the current perimeter.</p>
+                        <p className="text-uhuru-text-dim text-sm  mb-8">No banking institutions registered in the current perimeter.</p>
                         <Link
                             href="/dashboard/bank-settings/add-bank"
                             className="inline-flex px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest"
@@ -93,11 +93,11 @@ export default async function BankSettingsPage() {
 
                                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
                                         <div className="space-y-2">
-                                            <div className="flex items-center gap-4">
-                                                <h3 className="text-2xl font-black text-white tracking-tighter">{bank.bankName}</h3>
-                                                <div className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-1.5 flex items-center gap-3">
-                                                    <span className="text-[10px] font-black text-uhuru-text-dim uppercase tracking-widest">Total Liquidity</span>
-                                                    <span className="text-sm font-black text-emerald-400 font-mono">
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 overflow-hidden">
+                                                <h3 className="text-lg sm:text-2xl font-black text-white tracking-tighter truncate max-w-full">{bank.bankName}</h3>
+                                                <div className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-1 sm:px-4 sm:py-1.5 flex items-center gap-3 w-fit shrink-0">
+                                                    <span className="text-[10px] font-black text-uhuru-text-dim uppercase tracking-widest shrink-0">Total Liquidity</span>
+                                                    <span className="text-xs sm:text-sm font-black text-emerald-400 font-mono">
                                                         £{totalBalanceGBP.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                     </span>
                                                 </div>
@@ -164,7 +164,7 @@ export default async function BankSettingsPage() {
                         <div className="w-16 h-16 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-600 group-hover:text-amber-500 transition-colors">
                             <Wallet size={32} />
                         </div>
-                        <p className="text-uhuru-text-dim text-sm italic mb-8">No digital asset containers detected in the current vault.</p>
+                        <p className="text-uhuru-text-dim text-sm  mb-8">No digital asset containers detected in the current vault.</p>
                         <Link
                             href="/dashboard/bank-settings/add-crypto-wallet"
                             className="inline-flex px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest"

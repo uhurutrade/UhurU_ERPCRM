@@ -137,7 +137,7 @@ export function AuditLogTable({
                                 <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
                                 <td className="px-6 py-4">
                                     {logs.length === 0 && i === 10 && (
-                                        <div className="text-center text-slate-600 italic">No deleted transactions found.</div>
+                                        <div className="text-center text-slate-600 ">No deleted transactions found.</div>
                                     )}
                                 </td>
                                 <td className="px-6 py-4">&nbsp;</td>

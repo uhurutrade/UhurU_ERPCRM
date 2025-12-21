@@ -170,7 +170,7 @@ export default async function UhuruWallPage() {
                                             </p>
                                         )}
                                         {(doc.extractedData as any)?.vatLiability && (
-                                            <p className="text-[10px] text-uhuru-text-dim mt-2 italic">
+                                            <p className="text-[10px] text-uhuru-text-dim mt-2 ">
                                                 VAT Context: {(doc.extractedData as any).vatLiability.reason}
                                             </p>
                                         )}
@@ -180,7 +180,7 @@ export default async function UhuruWallPage() {
                         ))
                     ) : (
                         <div className="bg-uhuru-card border border-uhuru-border border-dashed rounded-3xl p-8 text-center">
-                            <p className="text-uhuru-text-dim text-sm italic">No strategic documents in the basket yet.</p>
+                            <p className="text-uhuru-text-dim text-sm ">No strategic documents in the basket yet.</p>
                         </div>
                     )}
                 </div>

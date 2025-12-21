@@ -4,6 +4,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+@media (max-width: 1023px) {
+  html {
+    font-size: 13px;
+  }
+}
+
 :root {
   --background: #0B1121;
   --foreground: #F8FAFC;
@@ -91,5 +97,7 @@ body {
 
 .bg-gradient-card:hover {
   @apply transform scale-[1.01] border-uhuru-accent-green/30 shadow-glow;
-}/* Cache Buster: jue 18 dic 2025 18:20:26 CET */
+}
+
+/* Cache Buster: jue 18 dic 2025 18:20:26 CET */
 /* Force Rebuild */
