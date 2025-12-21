@@ -40,6 +40,16 @@ export async function DELETE(req: Request) {
             console.error("File likely already deleted or path mismatch", e);
         }
 
+        // Desvectorizar (eliminar chunks del RAG)
+        try {
+            await prisma.documentChunk.deleteMany({
+                where: { documentId: id }
+            });
+            console.log(`[RAG] 🗑️ Desvectorizado: "${doc.filename}" - Chunks eliminados`);
+        } catch (err) {
+            console.error('[RAG] Error desvectorizando:', err);
+        }
+
         await prisma.complianceDocument.delete({ where: { id } });
 
         return NextResponse.json({ success: true });

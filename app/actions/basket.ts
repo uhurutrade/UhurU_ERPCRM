@@ -218,7 +218,17 @@ export async function removeFromBasket(id: string) {
             console.error('File deletion error (might already be gone):', err);
         }
 
-        // 2. Delete from DB
+        // 2. Desvectorizar (eliminar chunks del RAG)
+        try {
+            await prisma.documentChunk.deleteMany({
+                where: { documentId: id }
+            });
+            console.log(`[RAG] 🗑️ Desvectorizado: "${doc.filename}" - Chunks eliminados`);
+        } catch (err) {
+            console.error('[RAG] Error desvectorizando:', err);
+        }
+
+        // 3. Delete from DB
         await prisma.complianceDocument.delete({
             where: { id }
         });
