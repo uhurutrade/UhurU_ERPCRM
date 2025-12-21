@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "generate-seed": "ts-node scripts/generate-seed.ts",
-    "reprocess-documents": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/reprocess-documents.ts",
+    "reprocess-documents": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} scripts/reprocess-documents.ts",
     "prepare": "husky || true"
   },
   "dependencies": {
