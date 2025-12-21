@@ -3,8 +3,8 @@
 # ----------------------------------------------------
 FROM node:20-alpine AS base
 
-# Instalar dependencias necesarias para Prisma, OpenSSL y procesamiento de PDFs
-RUN apk add --no-cache libc6-compat openssl libstdc++ poppler-utils
+# Instalar dependencias necesarias para Prisma, OpenSSL, procesamiento de PDFs y Sharp
+RUN apk add --no-cache libc6-compat openssl libstdc++ poppler-utils vips-dev
 
 # ----------------------------------------------------
 # 2. Etapa de Dependencias (Deps Stage)
