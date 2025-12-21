@@ -9,12 +9,16 @@ async function main() {
     console.log(`Encontrados ${docs.length} documentos para re-vectorizar.`);
 
     for (const doc of docs) {
-        console.log(`\n[+] Procesando: ${doc.filename}`);
+        console.log(`\n[+] Analizando: ${doc.filename}`);
         try {
             const result = await ingestDocument(doc.id, doc.path);
             console.log(`    ✅ Éxito: ${result.chunksProcessed} fragmentos vectorizados.`);
         } catch (error: any) {
-            console.error(`    ❌ Error en ${doc.filename}: ${error.message}`);
+            if (error.code === 'ENOENT') {
+                console.warn(`    ⚠️  Omitido: El archivo físico no existe en el VPS (${doc.path})`);
+            } else {
+                console.error(`    ❌ Error en ${doc.filename}: ${error.message}`);
+            }
         }
     }
 
