@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';
+import OpenAI from 'openai';
+import { randomUUID } from 'crypto';
 
-// pdf-parse doesn't play well with ESM default imports in Next.js
-// We'll require it inside the processing function or use a more robust import.
+const openai = new OpenAI();
 
 /**
  * RAG ENGINE (PRE-PRODUCTION)
@@ -42,13 +43,16 @@ export function chunkText(text: string, chunkSize = 1000, overlap = 200): Chunk[
 }
 
 /**
- * Genera un vector (Embedding) mockeado para demostración
- * En un sistema real, aquí llamaríamos a OpenAI 'text-embedding-3-small'
+ * Genera un vector (Embedding) real usando OpenAI
  */
-export async function getMockEmbedding(text: string): Promise<number[]> {
-    // Generamos un vector ruidoso determinista basado en el texto para pruebas
-    const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return Array.from({ length: 1536 }, (_, i) => Math.sin(hash + i) * 0.1);
+export async function generateEmbedding(text: string): Promise<number[]> {
+    const response = await openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: text,
+        encoding_format: "float",
+    });
+
+    return response.data[0].embedding;
 }
 
 /**
@@ -81,17 +85,20 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         // Guardamos los chunks masivamente
         // Nota: En producción generaríamos los embeddings aquí
+        // Guardamos los chunks
         for (const chunk of chunks) {
-            const mockVector = await getMockEmbedding(chunk.content);
+            const vector = await generateEmbedding(chunk.content);
+            const vectorSql = `[${vector.join(',')}]`;
 
-            await prisma.documentChunk.create({
-                data: {
-                    documentId: docId,
-                    content: chunk.content,
-                    tokenCount: chunk.tokenCount,
-                    embedding: JSON.stringify(mockVector)
-                }
-            });
+            await prisma.$executeRawUnsafe(
+                `INSERT INTO "DocumentChunk" ("id", "documentId", "content", "tokenCount", "embedding", "createdAt") 
+                 VALUES ($1, $2, $3, $4, $5::vector, NOW())`,
+                randomUUID(),
+                docId,
+                chunk.content,
+                chunk.tokenCount,
+                vectorSql
+            );
         }
 
         // 4. Marcar como procesado
@@ -108,21 +115,21 @@ export async function ingestDocument(docId: string, filePath: string) {
 }
 
 /**
- * Búsqueda de Chunks similares (Simulada por palabra clave hasta tener Vector DB real)
+ * Búsqueda de Chunks similares usando Cosine Similarity nativo de pgvector
  */
 export async function retrieveContext(query: string, maxResults = 3) {
-    // En producción: Vector similarity search (Cosine Similarity)
-    // En este mock: Búsqueda de texto simple
-    const relevantChunks = await prisma.documentChunk.findMany({
-        where: {
-            content: { contains: query, mode: 'insensitive' }
-        },
-        take: maxResults,
-        select: {
-            content: true,
-            document: { select: { filename: true } }
-        }
-    });
+    const queryEmbedding = await generateEmbedding(query);
+    const vectorSql = `[${queryEmbedding.join(',')}]`;
 
-    return relevantChunks.map((c: any) => `[Fuente: ${c.document.filename}]\n${c.content}`).join('\n\n---\n\n');
+    // Búsqueda por similitud de coseno <=> 
+    // similarity = 1 - distance
+    const relevantChunks: any[] = await prisma.$queryRawUnsafe(`
+        SELECT c.content, d.filename, (1 - (c.embedding <=> $1::vector)) as similarity
+        FROM "DocumentChunk" c
+        JOIN "ComplianceDocument" d ON c."documentId" = d.id
+        ORDER BY similarity DESC
+        LIMIT $2
+    `, vectorSql, maxResults);
+
+    return relevantChunks.map((c: any) => `[Fuente: ${c.filename} | Similitud: ${(c.similarity * 100).toFixed(1)}%]\n${c.content}`).join('\n\n---\n\n');
 }

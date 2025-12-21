@@ -31,7 +31,7 @@ services:
     cpus: 1.0
 
   db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15-alpine
     container_name: uhuru-erp-db
     restart: always
 
