@@ -249,25 +249,25 @@ export function TransactionTable({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm">
-                            <th className="py-3 px-2 sm:px-4 w-10 sm:w-12">
+                            <th className="py-3 px-1 sm:px-4 w-8 sm:w-12">
                                 <button
                                     onClick={handleSelectAll}
                                     className="text-slate-400 hover:text-white transition-colors"
                                 >
                                     {selectedIds.size === transactions.length && transactions.length > 0 ?
-                                        <CheckSquare size={18} className="text-emerald-500" /> :
-                                        <Square size={18} />
+                                        <CheckSquare size={16} className="text-emerald-500 sm:w-[18px]" /> :
+                                        <Square size={16} className="sm:w-[18px]" />
                                     }
                                 </button>
                             </th>
-                            {isLinkingMode && <th className="py-3 px-2 sm:px-4 w-24 sm:w-32 text-emerald-400 font-bold uppercase text-[9px] sm:text-[10px]">Action</th>}
+                            {isLinkingMode && <th className="py-3 px-1 sm:px-4 w-16 sm:w-32 text-emerald-400 font-bold uppercase text-[8px] sm:text-[10px]">Action</th>}
                             <th className="py-3 px-1 sm:px-4 w-8 sm:w-12 text-slate-500 font-bold hidden sm:table-cell">#</th>
-                            <th className="py-3 px-2 sm:px-4 font-medium text-[10px] sm:text-sm">Date</th>
-                            <th className="py-3 px-2 sm:px-4 font-medium text-[10px] sm:text-sm">Description</th>
-                            <th className="py-3 px-2 sm:px-4 font-medium hidden md:table-cell">Account</th>
-                            <th className="py-3 px-2 sm:px-4 font-medium text-right text-[10px] sm:text-sm">Amount</th>
-                            <th className="py-3 px-2 sm:px-4 font-medium hidden md:table-cell">Category</th>
-                            <th className="py-3 px-2 sm:px-4 w-20 sm:w-24 text-center text-slate-500 font-bold text-[10px] sm:text-sm">Actions</th>
+                            <th className="py-3 px-1 sm:px-4 font-medium text-[9px] sm:text-sm">Date</th>
+                            <th className="py-3 px-1 sm:px-4 font-medium text-[9px] sm:text-sm">Description</th>
+                            <th className="py-3 px-1 sm:px-4 font-medium hidden md:table-cell">Account</th>
+                            <th className="py-3 px-1 sm:px-4 font-medium text-right text-[9px] sm:text-sm">Amount</th>
+                            <th className="py-3 px-1 sm:px-4 font-medium hidden md:table-cell">Category</th>
+                            <th className="py-3 px-1 sm:px-4 w-16 sm:w-24 text-center text-slate-500 font-bold text-[9px] sm:text-sm">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="text-[11px] sm:text-sm">
@@ -283,23 +283,23 @@ export function TransactionTable({
                                     `}
                                     onClick={() => setViewTransaction(tx)}
                                 >
-                                    <td className="py-2 px-2 sm:px-4" onClick={(e) => e.stopPropagation()}>
+                                    <td className="py-2 px-1 sm:px-4" onClick={(e) => e.stopPropagation()}>
                                         {isLinkingMode ? (
-                                            <div className="w-4 h-4 rounded border border-emerald-500/50 bg-emerald-500/10" />
+                                            <div className="w-3.5 h-3.5 rounded border border-emerald-500/50 bg-emerald-500/10" />
                                         ) : (
                                             <button onClick={() => handleSelectOne(tx.id)}>
                                                 {isSelected ?
-                                                    <CheckSquare size={18} className="text-emerald-500" /> :
-                                                    <Square size={18} className="text-slate-600" />
+                                                    <CheckSquare size={16} className="text-emerald-500 sm:w-[18px]" /> :
+                                                    <Square size={16} className="text-slate-600 sm:w-[18px]" />
                                                 }
                                             </button>
                                         )}
                                     </td>
                                     {isLinkingMode && (
-                                        <td className="py-2 px-2 sm:px-4" onClick={(e) => e.stopPropagation()}>
+                                        <td className="py-2 px-1 sm:px-4" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => handleLinkDirect(tx.id)}
-                                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[8px] sm:text-[10px] font-bold uppercase transition-all"
+                                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[7px] sm:text-[10px] font-bold uppercase transition-all"
                                             >
                                                 Link
                                             </button>
@@ -308,33 +308,33 @@ export function TransactionTable({
                                     <td className="py-2 px-1 sm:px-4 text-slate-500 font-mono text-[9px] sm:text-[10px] hidden sm:table-cell">
                                         {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
                                     </td>
-                                    <td className="py-2 px-2 sm:px-4 text-slate-300">
+                                    <td className="py-2 px-1 sm:px-4 text-slate-300">
                                         {format(new Date(tx.date), 'MMM d, yy')}
                                     </td>
-                                    <td className="py-2 px-2 sm:px-4 text-white font-medium truncate max-w-[100px] sm:max-w-none">
+                                    <td className="py-2 px-1 sm:px-4 text-white font-medium truncate max-w-[80px] sm:max-w-none">
                                         {tx.description}
-                                        {tx.reference && <span className="block text-[9px] sm:text-xs text-slate-500 mt-0.5 truncate">{tx.reference}</span>}
+                                        {tx.reference && <span className="block text-[8px] sm:text-xs text-slate-500 mt-0.5 truncate">{tx.reference}</span>}
                                     </td>
-                                    <td className="py-2 px-4 text-slate-500 hidden md:table-cell">
+                                    <td className="py-2 px-1 sm:px-4 text-slate-500 hidden md:table-cell">
                                         <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
                                             {tx.bankAccount.bank.bankName}
                                         </span>
                                     </td>
-                                    <td className={`py-2 px-2 sm:px-4 text-right font-bold sm:font-medium whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
+                                    <td className={`py-2 px-1 sm:px-4 text-right font-bold sm:font-medium whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
                                         {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                     </td>
-                                    <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
+                                    <td className="py-3 px-1 sm:px-4 text-slate-500 hidden md:table-cell">
                                         <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
                                     </td>
                                     {/* Actions Cell */}
-                                    <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                        <div className="flex justify-center gap-2">
+                                    <td className="py-3 px-1 sm:px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex justify-center gap-1 sm:gap-2">
                                             <button
                                                 onClick={() => setViewTransaction(tx)}
-                                                className={`p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
+                                                className={`p-1.5 sm:p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
                                                 title={hasAttachments ? "View Details & Attachments" : "View Details"}
                                             >
-                                                {hasAttachments ? <Paperclip size={16} /> : <Search size={16} />}
+                                                {hasAttachments ? <Paperclip size={14} className="sm:w-[16px]" /> : <Search size={14} className="sm:w-[16px]" />}
                                             </button>
                                         </div>
                                     </td>

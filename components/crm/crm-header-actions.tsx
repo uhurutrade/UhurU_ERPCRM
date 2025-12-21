@@ -18,29 +18,29 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
     const closeModal = () => setActiveModal(null);
 
     return (
-        <div className="relative flex gap-3 flex-wrap md:flex-nowrap">
+        <div className="relative flex flex-wrap lg:flex-nowrap justify-center lg:justify-end gap-2 sm:gap-3 w-full lg:w-auto">
             {/* Quick Action: New Deal */}
             <button
                 onClick={() => setActiveModal('deal')}
-                className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95 whitespace-nowrap"
+                className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-[11px] sm:text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95 whitespace-nowrap"
             >
-                <Plus size={18} /> New Deal
+                <Plus size={16} className="sm:w-[18px]" /> New Deal
             </button>
 
             {/* Quick Action: New Contact */}
             <button
                 onClick={() => setActiveModal('contact')}
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-600/20 transition-all active:scale-95 whitespace-nowrap"
+                className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-[11px] sm:text-sm shadow-lg shadow-blue-600/20 transition-all active:scale-95 whitespace-nowrap"
             >
-                <Users size={18} /> New Contact
+                <Users size={16} className="sm:w-[18px]" /> New Contact
             </button>
 
             {/* Quick Action: New Organization */}
             <button
                 onClick={() => setActiveModal('org')}
-                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 whitespace-nowrap"
+                className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-[11px] sm:text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 whitespace-nowrap"
             >
-                <Building2 size={18} /> Organization
+                <Building2 size={16} className="sm:w-[18px]" /> Org
             </button>
 
             {/* Dropdown for other actions */}
