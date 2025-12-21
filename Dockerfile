@@ -28,6 +28,8 @@ COPY prisma ./prisma/
 
 # Instalar dependencias de producción (sin Husky)
 ENV HUSKY=0
+# Forzar sharp a usar binarios precompilados en lugar de compilar desde fuente
+ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
 RUN npm ci --only=production --legacy-peer-deps
 
 # ----------------------------------------------------
@@ -41,6 +43,8 @@ COPY . .
 
 # Instalar TODAS las dependencias (incluyendo dev) para tener Prisma CLI
 ENV HUSKY=0
+# Forzar sharp a usar binarios precompilados en lugar de compilar desde fuente
+ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
 RUN npm ci --legacy-peer-deps
 
 # Generar el cliente Prisma
