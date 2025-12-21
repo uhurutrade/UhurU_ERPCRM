@@ -74,16 +74,48 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         // 1. Extraer texto basado en extensión
         let text = "";
-        if (filePath.endsWith('.pdf')) {
-            const pdf = require('pdf-parse');
-            const data = await pdf(dataBuffer);
+        const ext = filePath.split('.').pop()?.toLowerCase();
+
+        if (ext === 'pdf') {
+            const pdfExtract = require('pdf-parse');
+            const parse = typeof pdfExtract === 'function' ? pdfExtract : pdfExtract.default;
+            const data = await parse(dataBuffer);
             text = data.text;
-        } else {
-            text = dataBuffer.toString();
+        }
+        else if (ext === 'docx') {
+            const mammoth = require('mammoth');
+            const result = await mammoth.extractRawText({ buffer: dataBuffer });
+            text = result.value;
+        }
+        else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext || '')) {
+            // IA VISION PARA OCR: "Leemos" la imagen usando OpenAI
+            const response = await openai.chat.completions.create({
+                model: "gpt-4o-mini",
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: "Extract all the text from this image perfectly. Just return the text, no comments." },
+                            {
+                                type: "image_url",
+                                image_url: {
+                                    url: `data:image/${ext};base64,${dataBuffer.toString('base64')}`
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+            text = response.choices[0].message.content || "";
+            console.log(`[RAG] OCR completado para imagen: ${filePath}`);
+        }
+        else {
+            // Fallback universal para archivos de texto (csv, txt, md, etc)
+            text = dataBuffer.toString('utf-8').replace(/\u0000/g, '');
         }
 
         if (!text || text.trim().length === 0) {
-            throw new Error("No text found in document");
+            return { success: false, reason: "No text content extractable" };
         }
 
         // 2. Crear Chunks

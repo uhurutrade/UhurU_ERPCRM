@@ -12,7 +12,11 @@ async function main() {
         console.log(`\n[+] Analizando: ${doc.filename}`);
         try {
             const result = await ingestDocument(doc.id, doc.path);
-            console.log(`    ✅ Éxito: ${result.chunksProcessed} fragmentos vectorizados.`);
+            if (result.success) {
+                console.log(`    ✅ Éxito: ${result.chunksProcessed} fragmentos vectorizados.`);
+            } else {
+                console.log(`    ℹ️  Omitido: ${result.reason}`);
+            }
         } catch (error: any) {
             if (error.code === 'ENOENT') {
                 console.warn(`    ⚠️  Omitido: El archivo físico no existe en el VPS (${doc.path})`);
