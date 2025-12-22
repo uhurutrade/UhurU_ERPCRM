@@ -106,7 +106,18 @@ export async function ingestDocument(docId: string, filePath: string) {
                 try {
                     const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js');
 
-                    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
+                    // FIX: Convert Buffer to Uint8Array as required by pdfjs-dist
+                    const uint8Array = new Uint8Array(dataBuffer);
+
+                    // FIX: Set cMapUrl to avoid 'BCMAP' warnings and font errors
+                    // Assuming standard deployment path, or using local defaults if possible
+                    // For Node.js environments without DOM, we might need to skip some font logic
+                    const loadingTask = pdfjsLib.getDocument({
+                        data: uint8Array,
+                        cMapUrl: 'node_modules/pdfjs-dist/cmaps/',
+                        cMapPacked: true,
+                    });
+
                     const pdf = await loadingTask.promise;
 
                     let fullText = '';
