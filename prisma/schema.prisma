@@ -451,6 +451,7 @@ model ComplianceDocument {
   userNotes         String?
   supersededById    String?
   chunks            DocumentChunk[]
+  updatedAt         DateTime        @updatedAt @default(now())
 }
 
 model DocumentChunk {
