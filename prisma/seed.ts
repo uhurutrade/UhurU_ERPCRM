@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-22T17:28:46.726Z');
+  console.log('Generated at: 2025-12-22T17:29:43.172Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -498,71 +498,7 @@ async function main() {
 
   // --- 7. Crypto Wallets ---
   console.log('Seeding Crypto Wallets...');
-  for (const wallet of [
-  {
-    "id": "cmj4oiyf7000ia47oqj0ofpgp",
-    "walletName": "Corporate USDC - Polygon",
-    "walletType": "HOT_WALLET",
-    "blockchain": "POLYGON",
-    "network": "MAINNET",
-    "asset": "USDC",
-    "assetType": "ERC20",
-    "contractAddress": null,
-    "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0",
-    "provider": "MetaMask",
-    "currentBalance": "50000",
-    "balanceUSD": "50000",
-    "lastBalanceUpdate": null,
-    "isMultiSig": false,
-    "requiredSignatures": null,
-    "isActive": true,
-    "notes": null,
-    "createdAt": "2025-12-14T08:39:19.622Z",
-    "updatedAt": "2025-12-14T08:39:19.622Z"
-  },
-  {
-    "id": "cmj5ixe7j00033sv84eiyfwao",
-    "walletName": "hhhhhhhhhhhhhhhhhhhh",
-    "walletType": "HOT_WALLET",
-    "blockchain": "ETHEREUM",
-    "network": "MAINNET",
-    "asset": "USDC",
-    "assetType": "ERC20",
-    "contractAddress": null,
-    "walletAddress": "das",
-    "provider": null,
-    "currentBalance": null,
-    "balanceUSD": null,
-    "lastBalanceUpdate": null,
-    "isMultiSig": false,
-    "requiredSignatures": 1,
-    "isActive": true,
-    "notes": null,
-    "createdAt": "2025-12-14T09:29:56.527Z",
-    "updatedAt": "2025-12-14T09:29:56.527Z"
-  },
-  {
-    "id": "cmj5jc9cw0001ua0cyhdqrd3i",
-    "walletName": "yyyyyyyyyyyyyyyyyyyyyyyyy",
-    "walletType": "HOT_WALLET",
-    "blockchain": "ETHEREUM",
-    "network": "MAINNET",
-    "asset": "USDC",
-    "assetType": "ERC20",
-    "contractAddress": null,
-    "walletAddress": "ll",
-    "provider": null,
-    "currentBalance": null,
-    "balanceUSD": null,
-    "lastBalanceUpdate": null,
-    "isMultiSig": false,
-    "requiredSignatures": 1,
-    "isActive": true,
-    "notes": null,
-    "createdAt": "2025-12-14T09:41:30.081Z",
-    "updatedAt": "2025-12-14T09:41:30.081Z"
-  }
-] as any[]) {
+  for (const wallet of [] as any[]) {
     await prisma.cryptoWallet.create({
       data: {
         ...wallet,
@@ -5919,47 +5855,7 @@ async function main() {
 
   // --- 20. Tax Obligations ---
   console.log('Seeding Tax Obligations...');
-  for (const tax of [
-  {
-    "id": "cmj5h4ax9001kqxyjcmi4qnsx",
-    "type": "CORPORATION_TAX",
-    "status": "PENDING",
-    "periodStart": "2024-09-01T00:00:00.000Z",
-    "periodEnd": "2025-08-31T00:00:00.000Z",
-    "dueDate": "2026-06-01T00:00:00.000Z",
-    "amountEstimated": "0",
-    "amountActual": null,
-    "fiscalYearId": null,
-    "createdAt": "2025-12-14T08:39:19.630Z",
-    "updatedAt": "2025-12-14T08:39:19.630Z"
-  },
-  {
-    "id": "cmj5h4ax9001lqxyje57osnst",
-    "type": "CONFIRMATION_STATEMENT",
-    "status": "PENDING",
-    "periodStart": "2025-08-08T00:00:00.000Z",
-    "periodEnd": "2026-08-07T00:00:00.000Z",
-    "dueDate": "2026-08-09T00:00:00.000Z",
-    "amountEstimated": "13",
-    "amountActual": null,
-    "fiscalYearId": null,
-    "createdAt": "2025-12-14T08:39:19.630Z",
-    "updatedAt": "2025-12-14T08:39:19.630Z"
-  },
-  {
-    "id": "cmj5h4ax9001mqxyj7y94tofc",
-    "type": "ACCOUNTS",
-    "status": "PENDING",
-    "periodStart": "2025-09-01T00:00:00.000Z",
-    "periodEnd": "2026-08-31T00:00:00.000Z",
-    "dueDate": "2027-05-31T00:00:00.000Z",
-    "amountEstimated": "0",
-    "amountActual": null,
-    "fiscalYearId": null,
-    "createdAt": "2025-12-14T08:39:19.630Z",
-    "updatedAt": "2025-12-14T08:39:19.630Z"
-  }
-] as any[]) {
+  for (const tax of [] as any[]) {
     await prisma.taxObligation.create({
         data: {
             ...tax,
@@ -5976,108 +5872,7 @@ async function main() {
   
   // --- 21. Compliance Events ---
   console.log('Seeding Compliance Events...');
-  for (const evt of [
-  {
-    "id": "cmjcvaysz000113qlbrmmfqql",
-    "title": "VAT Return Submission",
-    "description": "Deadline for submitting VAT Return to HMRC for the VAT quarter ending September 2023.",
-    "date": "2023-11-07T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T12:50:48.371Z",
-    "updatedAt": "2025-12-19T12:50:48.371Z"
-  },
-  {
-    "id": "cmjcw7nfp0001dxeo78m92wg8",
-    "title": "Data Protection Fee Payment",
-    "description": "Deadline to register and pay the data protection fee to avoid a fine.",
-    "date": "2024-12-05T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:16:13.285Z",
-    "updatedAt": "2025-12-19T13:16:13.285Z"
-  },
-  {
-    "id": "cmjcw7tqt0003dxeodiv5q196",
-    "title": "Corporation Tax Information Submission",
-    "description": "Submit information within 3 months of starting or restarting business activity.",
-    "date": "2024-11-01T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:16:21.461Z",
-    "updatedAt": "2025-12-19T13:16:21.461Z"
-  },
-  {
-    "id": "cmjcwkc1g0005dxeokoot3pw9",
-    "title": "Company Registration Completion",
-    "description": "Expect an email with the company registration number and certificate within 2 working days from submission.",
-    "date": "2024-08-08T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:26:05.044Z",
-    "updatedAt": "2025-12-19T13:26:05.044Z"
-  },
-  {
-    "id": "cmjcwmhgz000bdxeo5ulxdrrm",
-    "title": "Outcome Email",
-    "description": "Receive an email notifying the outcome of your application within 2 working days.",
-    "date": "2024-06-10T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:27:45.395Z",
-    "updatedAt": "2025-12-19T13:27:45.395Z"
-  },
-  {
-    "id": "cmjcwmhh2000cdxeo4huolzgz",
-    "title": "Receive UTR",
-    "description": "Receive a letter with the company’s Unique Taxpayer Reference (UTR) within 15 working days.",
-    "date": "2024-06-29T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:27:45.399Z",
-    "updatedAt": "2025-12-19T13:27:45.399Z"
-  },
-  {
-    "id": "cmjcwna2p000fdxeok84h9cl3",
-    "title": "Corporation Tax Information Submission Deadline",
-    "description": "Submit required information to HMRC within 3 months of starting business activities.",
-    "date": "2024-11-01T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:28:22.465Z",
-    "updatedAt": "2025-12-19T13:28:22.465Z"
-  },
-  {
-    "id": "cmjcwnuhd000jdxeozhko05jd",
-    "title": "Activation Code Expiry",
-    "description": "Expiration of the provided activation code for Corporation Tax online services.",
-    "date": "2024-09-14T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:28:48.913Z",
-    "updatedAt": "2025-12-19T13:28:48.913Z"
-  },
-  {
-    "id": "cmjcwzrhn000ndxeouqr5o6kk",
-    "title": "Corporation Tax Filing Deadline",
-    "description": "The company's Corporation Tax return must be filed by this date.",
-    "date": "2024-02-28T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:38:04.908Z",
-    "updatedAt": "2025-12-19T13:38:04.908Z"
-  },
-  {
-    "id": "cmjcx1x9d000rdxeog3pop7it",
-    "title": "Filing Corporation Tax Return",
-    "description": "Deadline to file the Corporation Tax Return for accounting period ending on 2023-04-01.",
-    "date": "2024-04-01T00:00:00.000Z",
-    "type": "DEADLINE",
-    "isCompleted": false,
-    "createdAt": "2025-12-19T13:39:45.697Z",
-    "updatedAt": "2025-12-19T13:39:45.697Z"
-  }
-] as any[]) {
+  for (const evt of [] as any[]) {
       await prisma.complianceEvent.create({
           data: {
               ...evt,
@@ -6090,28 +5885,7 @@ async function main() {
   
   // --- 22. Tasks ---
   console.log('Seeding Tasks...');
-  for (const task of [
-  {
-    "id": "cmjbubqc7000aha2lz6owzjr9",
-    "title": "Initial Discovery Call with Quantum Systems",
-    "description": "Pre-meeting research on their current tech stack.",
-    "dueDate": "2025-12-19T19:35:38.262Z",
-    "completed": true,
-    "assignedToId": null,
-    "createdAt": "2025-12-18T19:35:38.264Z",
-    "updatedAt": "2025-12-18T19:44:16.465Z"
-  },
-  {
-    "id": "cmjbubqc70009ha2l1hlh93g8",
-    "title": "Follow up with Alice Thompson",
-    "description": "Send the updated proposal for the tech upgrade.",
-    "dueDate": "2025-12-20T19:35:38.262Z",
-    "completed": true,
-    "assignedToId": null,
-    "createdAt": "2025-12-18T19:35:38.264Z",
-    "updatedAt": "2025-12-18T19:44:20.716Z"
-  }
-] as any[]) {
+  for (const task of [] as any[]) {
       await prisma.task.create({
           data: {
               ...task,
@@ -6124,128 +5898,7 @@ async function main() {
 
   // --- 23. Compliance Documents ---
   console.log('Seeding Compliance Documents (RAG Knowledge Base)...');
-  for (const doc of [
-  {
-    "id": "cmjboy09w000011r14wuutg4h",
-    "filename": "CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
-    "fileType": "application/pdf",
-    "documentType": "TAX_UPLOAD",
-    "path": "uploads/CompaniesHouse_Webfilling_UhuruTrade_MicroEntityAccounts_2025 (1).pdf",
-    "size": 3028,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-18T17:04:59.876Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  },
-  {
-    "id": "sys_company_settings",
-    "filename": "Company Settings & Legal.txt",
-    "fileType": null,
-    "documentType": "SYSTEM",
-    "path": "system://sys_company_settings",
-    "size": 684,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-22T16:20:46.883Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  },
-  {
-    "id": "sys_banking_overview",
-    "filename": "Banking Overview.txt",
-    "fileType": null,
-    "documentType": "SYSTEM",
-    "path": "system://sys_banking_overview",
-    "size": 1691,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-22T16:20:48.390Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  },
-  {
-    "id": "sys_tax_obligations",
-    "filename": "Pending Tax Obligations.txt",
-    "fileType": null,
-    "documentType": "SYSTEM",
-    "path": "system://sys_tax_obligations",
-    "size": 256,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-22T16:20:51.214Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  },
-  {
-    "id": "sys_recent_transactions",
-    "filename": "Recent Bank Transactions.txt",
-    "fileType": null,
-    "documentType": "SYSTEM",
-    "path": "system://sys_recent_transactions",
-    "size": 4561,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-22T16:20:52.654Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  },
-  {
-    "id": "sys_crm_organizations",
-    "filename": "CRM Organizations Overview.txt",
-    "fileType": null,
-    "documentType": "SYSTEM",
-    "path": "system://sys_crm_organizations",
-    "size": 191,
-    "isProcessed": true,
-    "vectorId": null,
-    "fiscalYear": null,
-    "uploadedBy": null,
-    "uploadedAt": "2025-12-22T16:20:55.418Z",
-    "documentDate": null,
-    "extractedData": null,
-    "fileHash": null,
-    "isSuperseded": false,
-    "strategicInsights": null,
-    "userNotes": null,
-    "supersededById": null
-  }
-] as any[]) {
+  for (const doc of [] as any[]) {
       await prisma.complianceDocument.create({
           data: {
               ...doc,
