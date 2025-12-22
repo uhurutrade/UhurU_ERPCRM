@@ -8,4 +8,7 @@
 CREATE EXTENSION IF NOT EXISTS "vector";
 
 -- AlterTable
-ALTER TABLE "DocumentChunk" ALTER COLUMN "embedding" SET DATA TYPE vector(1536) USING embedding::vector(1536);
+ALTER TABLE "ComplianceDocument" ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "DocumentChunk" ALTER COLUMN "embedding" SET DATA TYPE vector(1536);
