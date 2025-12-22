@@ -172,37 +172,34 @@ export async function createBankAccount(formData: FormData) {
             }
         });
 
-    }
-        });
+        // Trigger RAG Update for Banking Overview
+        try {
+            const { ingestText } = await import('@/lib/ai/rag-engine');
+            const banks = await prisma.bank.findMany({ include: { accounts: true } });
+            let bankContent = "BANKING INTELLIGENCE\n--------------------\n";
+            for (const bank of banks) {
+                bankContent += `BANK: ${bank.bankName} (${bank.bankType})\n`;
+                for (const acc of bank.accounts) {
+                    bankContent += `  - Account: ${acc.accountName} (${acc.currency}) - ${acc.currentBalance}\n`;
+                }
+            }
+            ingestText('sys_banking_overview', 'Banking Overview', bankContent)
+                .catch(err => console.error("RAG Banking Index Error:", err));
+        } catch (e) { console.error("RAG Import Error:", e); }
 
-// Trigger RAG Update for Banking Overview
-try {
-    const { ingestText } = await import('@/lib/ai/rag-engine');
-    const banks = await prisma.bank.findMany({ include: { accounts: true } });
-    let bankContent = "BANKING INTELLIGENCE\n--------------------\n";
-    for (const bank of banks) {
-        bankContent += `BANK: ${bank.bankName} (${bank.bankType})\n`;
-        for (const acc of bank.accounts) {
-            bankContent += `  - Account: ${acc.accountName} (${acc.currency}) - ${acc.currentBalance}\n`;
-        }
-    }
-    ingestText('sys_banking_overview', 'Banking Overview', bankContent)
-        .catch(err => console.error("RAG Banking Index Error:", err));
-} catch (e) { console.error("RAG Import Error:", e); }
+        revalidatePath('/dashboard/banking');
+        revalidatePath('/dashboard/banking/upload');
 
-revalidatePath('/dashboard/banking');
-revalidatePath('/dashboard/banking/upload');
-
-return {
-    success: true,
-    message: 'Bank account created successfully',
-    accountId: account.id
-};
+        return {
+            success: true,
+            message: 'Bank account created successfully',
+            accountId: account.id
+        };
 
     } catch (error) {
-    console.error('Create bank account error:', error);
-    return { success: false, error: 'Failed to create bank account' };
-}
+        console.error('Create bank account error:', error);
+        return { success: false, error: 'Failed to create bank account' };
+    }
 }
 
 export async function uploadTransactionAttachment(formData: FormData, transactionId: string) {
