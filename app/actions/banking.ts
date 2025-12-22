@@ -115,21 +115,11 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
             importedCount++;
         }
 
-        // Trigger RAG Update for Recent Transactions
+        // Trigger RAG Auto-Sync (Async - No bloqueante)
         try {
-            const { ingestText } = await import('@/lib/ai/rag-engine');
-            const recentTx = await prisma.bankTransaction.findMany({
-                take: 50,
-                orderBy: { date: 'desc' },
-                include: { bankAccount: true }
-            });
-            let txContent = "RECENT BANK TRANSACTIONS (LAST 50)\n----------------------------------\n";
-            for (const tx of recentTx) {
-                txContent += `${tx.date.toISOString().split('T')[0]} | ${tx.description} | ${tx.amount} ${tx.currency} | Account: ${tx.bankAccount.accountName}\n`;
-            }
-            ingestText('sys_recent_transactions', 'Recent Bank Transactions', txContent)
-                .catch(err => console.error("RAG Transaction Index Error:", err));
-        } catch (e) { console.error("RAG Import Error:", e); }
+            const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
+            syncRecentTransactions(); // Fire and forget
+        } catch (e) { /* Silent fail */ }
 
         revalidatePath('/dashboard/banking');
 
@@ -172,20 +162,11 @@ export async function createBankAccount(formData: FormData) {
             }
         });
 
-        // Trigger RAG Update for Banking Overview
+        // Trigger RAG Auto-Sync (Async - No bloqueante)
         try {
-            const { ingestText } = await import('@/lib/ai/rag-engine');
-            const banks = await prisma.bank.findMany({ include: { accounts: true } });
-            let bankContent = "BANKING INTELLIGENCE\n--------------------\n";
-            for (const bank of banks) {
-                bankContent += `BANK: ${bank.bankName} (${bank.bankType})\n`;
-                for (const acc of bank.accounts) {
-                    bankContent += `  - Account: ${acc.accountName} (${acc.currency}) - ${acc.currentBalance}\n`;
-                }
-            }
-            ingestText('sys_banking_overview', 'Banking Overview', bankContent)
-                .catch(err => console.error("RAG Banking Index Error:", err));
-        } catch (e) { console.error("RAG Import Error:", e); }
+            const { syncBankingOverview } = await import('@/lib/ai/auto-sync-rag');
+            syncBankingOverview(); // Fire and forget
+        } catch (e) { /* Silent fail */ }
 
         revalidatePath('/dashboard/banking');
         revalidatePath('/dashboard/banking/upload');

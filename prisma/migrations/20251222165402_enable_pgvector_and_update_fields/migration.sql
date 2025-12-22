@@ -1,14 +1,2 @@
-/*
-  Warnings:
-
-  - You are about to alter the column `embedding` on the `DocumentChunk` table. The data in that column could be lost. The data in that column will be cast from `Text` to `Unsupported("vector(1536)")`.
-
-*/
--- CreateExtension
-CREATE EXTENSION IF NOT EXISTS "vector";
-
 -- AlterTable
-ALTER TABLE "ComplianceDocument" ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
-
--- AlterTable
-ALTER TABLE "DocumentChunk" ALTER COLUMN "embedding" SET DATA TYPE vector(1536);
+ALTER TABLE "ComplianceDocument" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

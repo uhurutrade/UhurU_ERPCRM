@@ -27,12 +27,10 @@ export async function POST(req: NextRequest) {
             data: processedData,
         });
 
-        // Trigger RAG Vectorization (Async)
+        // Trigger RAG Auto-Sync (Async)
         try {
-            const { ingestText } = await import("@/lib/ai/rag-engine");
-            const content = `COMPANY SETTINGS (NEW):\n${JSON.stringify(companySettings, null, 2)}`;
-            ingestText('sys_company_settings', 'Company Settings & Legal', content)
-                .catch(err => console.error("RAG Create Error:", err));
+            const { syncCompanySettings } = await import("@/lib/ai/auto-sync-rag");
+            syncCompanySettings().catch(err => console.error("RAG Auto-Sync Error:", err));
         } catch (e) { console.error("RAG Import Error:", e); }
 
         return NextResponse.json(companySettings);
@@ -80,14 +78,11 @@ export async function PUT(req: NextRequest) {
             data: processedData,
         });
 
-        // Trigger RAG Vectorization (Async)
+        // Trigger RAG Auto-Sync (Async - No bloqueante)
         try {
-            const { ingestText } = await import("@/lib/ai/rag-engine");
-            const content = `COMPANY SETTINGS UPDATE:\n${JSON.stringify(companySettings, null, 2)}`;
-            // We don't await this to keep UI snappy
-            ingestText('sys_company_settings', 'Company Settings & Legal', content)
-                .catch(err => console.error("RAG Update Error:", err));
-        } catch (e) { console.error("RAG Import Error:", e); }
+            const { syncCompanySettings } = await import("@/lib/ai/auto-sync-rag");
+            syncCompanySettings(); // Fire and forget
+        } catch (e) { /* Silent fail - no afecta al usuario */ }
 
         return NextResponse.json(companySettings);
     } catch (error) {
