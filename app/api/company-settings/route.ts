@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
             data: processedData,
         });
 
+        // Trigger RAG Vectorization (Async)
+        try {
+            const { ingestText } = await import("@/lib/ai/rag-engine");
+            const content = `COMPANY SETTINGS (NEW):\n${JSON.stringify(companySettings, null, 2)}`;
+            ingestText('sys_company_settings', 'Company Settings & Legal', content)
+                .catch(err => console.error("RAG Create Error:", err));
+        } catch (e) { console.error("RAG Import Error:", e); }
+
         return NextResponse.json(companySettings);
     } catch (error) {
         console.error("Error creating company settings:", error);
@@ -71,6 +79,15 @@ export async function PUT(req: NextRequest) {
             where: { id },
             data: processedData,
         });
+
+        // Trigger RAG Vectorization (Async)
+        try {
+            const { ingestText } = await import("@/lib/ai/rag-engine");
+            const content = `COMPANY SETTINGS UPDATE:\n${JSON.stringify(companySettings, null, 2)}`;
+            // We don't await this to keep UI snappy
+            ingestText('sys_company_settings', 'Company Settings & Legal', content)
+                .catch(err => console.error("RAG Update Error:", err));
+        } catch (e) { console.error("RAG Import Error:", e); }
 
         return NextResponse.json(companySettings);
     } catch (error) {

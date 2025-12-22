@@ -269,6 +269,71 @@ export async function ingestDocument(docId: string, filePath: string) {
 }
 
 /**
+ * Ingesta texto directo (para datos del sistema: Company Settings, Bancos, etc.)
+ */
+export async function ingestText(docId: string, title: string, text: string) {
+    try {
+        console.log(`[RAG] 🧠 Memorizando datos del sistema: "${title}" (ID: ${docId})`);
+
+        // 1. Asegurar registro en ComplianceDocument (Virtual)
+        const existing = await prisma.complianceDocument.findUnique({ where: { id: docId } });
+        if (!existing) {
+            await prisma.complianceDocument.create({
+                data: {
+                    id: docId,
+                    filename: title + '.txt', // Virtual filename
+                    path: 'system://' + docId, // Virtual path
+                    documentType: 'SYSTEM',   // We might need to add this enum or just use 'OTHER'/'BASKET' if strict
+                    isProcessed: true,
+                    size: text.length
+                }
+            });
+        } else {
+            // Update timestamp
+            await prisma.complianceDocument.update({
+                where: { id: docId },
+                data: { updatedAt: new Date(), isProcessed: true }
+            });
+        }
+
+        // 2. Crear Chunks
+        const chunks = chunkText(text);
+        if (chunks.length === 0) return { success: false, reason: "Empty text" };
+
+        // 3. Limpiar chunks antiguos
+        await prisma.documentChunk.deleteMany({ where: { documentId: docId } });
+
+        // 4. Insertar nuevos
+        let inserted = 0;
+        for (const chunk of chunks) {
+            try {
+                const vector = await generateEmbedding(chunk.content);
+                const vectorSql = `[${vector.join(',')}]`;
+
+                await prisma.$executeRawUnsafe(
+                    `INSERT INTO "DocumentChunk" ("id", "documentId", "content", "tokenCount", "embedding", "createdAt") 
+                     VALUES ($1, $2, $3, $4, $5::vector, NOW())`,
+                    randomUUID(),
+                    docId,
+                    chunk.content,
+                    chunk.tokenCount,
+                    vectorSql
+                );
+                inserted++;
+            } catch (err: any) {
+                console.error(`[RAG] Error en chunk de ${title}:`, err.message);
+            }
+        }
+
+        return { success: true, chunksProcessed: inserted };
+
+    } catch (error) {
+        console.error("RAG Text Ingestion Error:", error);
+        throw error;
+    }
+}
+
+/**
  * Búsqueda de Chunks similares usando Cosine Similarity nativo de pgvector
  */
 export async function retrieveContext(query: string, maxResults = 3) {
