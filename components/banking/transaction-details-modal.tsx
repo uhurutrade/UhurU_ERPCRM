@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { uploadTransactionAttachment } from '@/app/actions/banking';
 import { CategoryBadge } from './category-badge';
 
-type Attachment = {
+export type Attachment = {
     id: string;
     path: string;
     originalName: string | null;
@@ -16,7 +16,7 @@ type Attachment = {
     uploadedAt: Date;
 };
 
-type Transaction = {
+export type Transaction = {
     id: string;
     date: Date;
     description: string;

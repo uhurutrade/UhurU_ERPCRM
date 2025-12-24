@@ -6,29 +6,9 @@ import { format } from 'date-fns';
 import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip, Search } from 'lucide-react';
 import { useConfirm } from '@/components/providers/modal-provider';
 import { toast } from 'sonner';
-import { TransactionDetailsModal } from './transaction-details-modal';
+import { TransactionDetailsModal, type Transaction, type Attachment } from './transaction-details-modal';
 import { CategoryBadge } from './category-badge';
 
-type Transaction = {
-    id: string;
-    date: Date;
-    description: string;
-    amount: number;
-    currency: string;
-    category: string | null;
-    status: string | null;
-    reference: string | null;
-    counterparty: string | null;
-    merchant: string | null;
-    bankAccount: {
-        bank: {
-            bankName: string;
-        };
-        accountName: string;
-        currency: string;
-    };
-    attachments: any[]; // Extended via include
-};
 
 export function TransactionTable({
     transactions,
