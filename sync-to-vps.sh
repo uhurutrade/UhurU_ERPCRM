@@ -71,34 +71,41 @@ cd /clients/UhurU/ERPCRM
 
 echo "🚀 Iniciando deployment..."
 
-# Stop containers
-echo "🛑 Deteniendo contenedores..."
+# 1. Limpieza profunda de red Docker (Fix para 'endpoint already exists')
+echo "🧹 Limpiando red Docker..."
 docker-compose down || true
+docker network disconnect -f uhuru-network uhuru-erp-web 2>/dev/null || true
 
-# Pull latest changes from git (if it's a git repo)
+# 2. Actualizar desde Git (si es un repo)
 if [ -d ".git" ]; then
     echo "📥 Actualizando desde Git..."
     git pull origin main || echo "⚠️  No se pudo actualizar desde Git"
 fi
 
-# Build and start
+# 3. Build and start
 echo "🔨 Construyendo y levantando contenedores..."
 docker-compose up -d --build
 
-# Wait for DB
+# 4. Esperar a DB y Aplicar Migraciones
 echo "⏳ Esperando a que PostgreSQL esté listo..."
 sleep 10
 
-# Apply migrations
-echo "🔄 Aplicando migraciones..."
+echo "🔄 Aplicando migraciones Prisma..."
 docker-compose exec -T web npx prisma migrate deploy
+
+# 5. Ejecutar Seed para sincronizar datos
+echo "🌱 Sincronizando datos (Seeding)..."
+docker-compose exec -T web npx prisma db seed
+
+# 6. Vectorización (RAG)
+echo "🤖 Ejecutando vectorización de datos del sistema..."
+docker-compose exec -T web npx tsx scripts/vectorize-system-data.ts || true
 
 echo "✅ Deploy completado"
 
 # Show logs
 echo "📋 Últimos logs:"
 docker-compose logs --tail=50 web
-
 ENDSSH
 
 echo -e "${GREEN}========================================${NC}"
