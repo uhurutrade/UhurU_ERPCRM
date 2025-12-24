@@ -151,15 +151,15 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
 
                     {/* Bank Details - Streamlined Layout */}
                     {invoice.bankAccount && (
-                        <div className="w-full text-sm text-slate-800 font-mono space-y-1">
-                            {/* Bank Name - Separate Line */}
-                            <p className="text-base"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
+                        <div className="w-full text-xs text-slate-800 font-mono space-y-0.5">
+                            {/* Bank Name */}
+                            <p><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
 
-                            {/* Account Name - Separate Line */}
-                            <p className="text-base"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
+                            {/* Account Name */}
+                            <p><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
 
                             {/* BIC/SWIFT and Full Address - Single Line */}
-                            <div className="flex flex-wrap items-baseline gap-x-4 text-xs text-slate-600 leading-snug">
+                            <div className="flex flex-wrap items-baseline gap-x-4 leading-snug">
                                 {invoice.bankAccount.swiftBic && (
                                     <span><span className="font-bold text-slate-800">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
                                 )}
@@ -171,7 +171,7 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                                             .join(' ')}, {invoice.bankAccount.bank.bankCity
                                                 ?.split(' ')
                                                 .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                                .join(' ')}, {invoice.bankAccount.bank.country || 'United Kingdom'}
+                                                .join(' ')}, {invoice.bankAccount.bank.bankCountry || 'United Kingdom'}
                                     </span>
                                 )}
                                 {invoice.bankAccount.iban && <span><span className="font-bold text-slate-800">IBAN:</span> {invoice.bankAccount.iban}</span>}
@@ -179,7 +179,7 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
 
                             {/* Sort Code / Account Number - Inline if present */}
                             {(invoice.bankAccount.sortCode || invoice.bankAccount.accountNumberUK || invoice.bankAccount.routingNumber) && (
-                                <div className="flex gap-4 text-xs text-slate-600">
+                                <div className="flex gap-4">
                                     {invoice.bankAccount.sortCode && <span><span className="font-bold text-slate-800">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
                                     {invoice.bankAccount.accountNumberUK && <span><span className="font-bold text-slate-800">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
                                     {invoice.bankAccount.routingNumber && <span><span className="font-bold text-slate-800">Routing:</span> {invoice.bankAccount.routingNumber}</span>}

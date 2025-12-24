@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-24T12:07:24.811Z');
+  console.log('Generated at: 2025-12-24T12:15:29.120Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -972,6 +972,44 @@ async function main() {
         "unitPrice": "0",
         "total": "0",
         "invoiceId": "cmjjyload000bbv8u6brsb3yu"
+      }
+    ]
+  },
+  {
+    "id": "cmjjz2179000fbv8u0ztab10m",
+    "number": "REV001",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-01T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "2850",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "2850",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbo0001ha2l5skvvqm9",
+    "notes": "Test notes",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj61fe840007rjaqfor334p5",
+    "cryptoWalletId": null,
+    "deletedAt": null,
+    "createdAt": "2025-12-24T12:10:13.269Z",
+    "updatedAt": "2025-12-24T12:10:13.269Z",
+    "items": [
+      {
+        "id": "cmjjz2179000gbv8udqqnec9z",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "1250",
+        "total": "1250",
+        "invoiceId": "cmjjz2179000fbv8u0ztab10m"
+      },
+      {
+        "id": "cmjjz2179000hbv8u996rboi3",
+        "description": "Oracle Cloud Services",
+        "quantity": "40",
+        "unitPrice": "40",
+        "total": "1600",
+        "invoiceId": "cmjjz2179000fbv8u0ztab10m"
       }
     ]
   }

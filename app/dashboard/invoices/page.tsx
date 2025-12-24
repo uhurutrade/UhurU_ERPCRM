@@ -332,8 +332,7 @@ export default async function InvoicesPage({
                 <StandardPagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    baseUrl="/dashboard/invoices"
-                    additionalParams={showTrash ? { showTrash: 'true' } : undefined}
+                    baseUrl={showTrash ? "/dashboard/invoices?showTrash=true" : "/dashboard/invoices"}
                 />
             </div>
         </div >
