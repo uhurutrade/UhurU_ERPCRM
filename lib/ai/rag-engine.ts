@@ -4,10 +4,18 @@ import path from 'path';
 import OpenAI from 'openai';
 import { randomUUID } from 'crypto';
 
-const openai = new OpenAI();
+// Lazy initialization to avoid build-time errors when OPENAI_API_KEY is not available
+let openaiInstance: OpenAI | null = null;
 
-if (!process.env.OPENAI_API_KEY) {
-    console.warn("[RAG] CRITICAL: OPENAI_API_KEY is missing from environment!");
+function getOpenAIClient(): OpenAI {
+    if (!openaiInstance) {
+        if (!process.env.OPENAI_API_KEY) {
+            throw new Error("[RAG] CRITICAL: OPENAI_API_KEY is missing from environment!");
+        }
+        openaiInstance = new OpenAI();
+        console.log("[RAG] ✅ OpenAI client initialized");
+    }
+    return openaiInstance;
 }
 
 /**
@@ -50,6 +58,7 @@ export function chunkText(text: string, chunkSize = 1000, overlap = 200): Chunk[
  * Genera un vector (Embedding) real usando OpenAI
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+    const openai = getOpenAIClient();
     const response = await openai.embeddings.create({
         model: "text-embedding-3-small",
         input: text,
@@ -171,6 +180,7 @@ export async function ingestDocument(docId: string, filePath: string) {
             }
             else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext || '')) {
                 console.log(`[RAG] 👁️ Iniciando Vision OCR para "${originalFilename}"...`);
+                const openai = getOpenAIClient();
                 const response = await openai.chat.completions.create({
                     model: "gpt-4o-mini",
                     messages: [
