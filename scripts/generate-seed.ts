@@ -28,7 +28,11 @@ async function main() {
     const activities = await prisma.activity.findMany();
 
     // 6. Invoices
-    const invoices = await prisma.invoice.findMany({ include: { items: true } });
+    const invoicesData = await prisma.invoice.findMany({ include: { items: true } });
+    const invoices = invoicesData.map(inv => ({
+        ...inv,
+        bankTransactionId: inv.bankTransactionId || null
+    }));
 
     // 7. Transactions & Compliance & Logs
     console.log('categories extraction...');
@@ -45,6 +49,7 @@ async function main() {
     const tasks = await prisma.task.findMany();
     const assets = await prisma.asset.findMany();
     const complianceDocuments = await prisma.complianceDocument.findMany();
+    const documentChunks = await prisma.documentChunk.findMany();
 
     const seedContent = `
 import { PrismaClient } from '@prisma/client';
@@ -55,10 +60,10 @@ async function main() {
   console.log('🌱 Start seeding...');
   console.log('Generated at: ${new Date().toISOString()}');
 
-  // --- CLEANUP (Delete existing data to enforce strict sync) ---
+  // --- CLEANUP (Delete existing data) ---
   console.log('🧹 Cleaning up existing data...');
   
-  // Order matters due to Foreign Keys
+  await prisma.documentChunk.deleteMany().catch(() => {});
   await prisma.attachment.deleteMany().catch(() => {});
   await prisma.complianceDocument.deleteMany().catch(() => {});
   await prisma.bankTransaction.deleteMany().catch(() => {});
@@ -272,7 +277,35 @@ async function main() {
       }).catch(e => console.log('Activity error:', e.message));
   }
 
-  // --- 14. Invoices ---
+  // --- 14. Bank Statements ---
+  console.log('Seeding Bank Statements...');
+  for (const stmt of ${JSON.stringify(bankStatements, null, 2)} as any[]) {
+      await prisma.bankStatement.create({
+          data: {
+              ...stmt,
+              uploadedAt: new Date(stmt.uploadedAt),
+          } as any
+      }).catch(e => console.log('Bank Statement error:', e.message));
+  }
+
+  // --- 15. Bank Transactions ---
+  console.log('Seeding Bank Transactions...');
+  for (const tx of ${JSON.stringify(bankTransactions, null, 2)} as any[]) {
+      await prisma.bankTransaction.create({
+          data: {
+              ...tx,
+              date: new Date(tx.date),
+              amount: Number(tx.amount),
+              fee: tx.fee ? Number(tx.fee) : null,
+              balanceAfter: tx.balanceAfter ? Number(tx.balanceAfter) : null,
+              exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null,
+              createdAt: new Date(tx.createdAt),
+              updatedAt: new Date(tx.updatedAt),
+          } as any
+      }).catch(e => console.log('Bank Tx error:', e.message));
+  }
+
+  // --- 16. Invoices ---
   console.log('Seeding Invoices...');
   for (const inv of ${JSON.stringify(invoices, null, 2)} as any[]) {
     await prisma.invoice.create({
@@ -297,34 +330,6 @@ async function main() {
             }
         } as any
     }).catch(e => console.log('Invoice error:', e.message));
-  }
-
-  // --- 15. Bank Statements ---
-  console.log('Seeding Bank Statements...');
-  for (const stmt of ${JSON.stringify(bankStatements, null, 2)} as any[]) {
-      await prisma.bankStatement.create({
-          data: {
-              ...stmt,
-              uploadedAt: new Date(stmt.uploadedAt),
-          } as any
-      }).catch(e => console.log('Bank Statement error:', e.message));
-  }
-
-  // --- 16. Bank Transactions ---
-  console.log('Seeding Bank Transactions...');
-  for (const tx of ${JSON.stringify(bankTransactions, null, 2)} as any[]) {
-      await prisma.bankTransaction.create({
-          data: {
-              ...tx,
-              date: new Date(tx.date),
-              amount: Number(tx.amount),
-              fee: tx.fee ? Number(tx.fee) : null,
-              balanceAfter: tx.balanceAfter ? Number(tx.balanceAfter) : null,
-              exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null,
-              createdAt: new Date(tx.createdAt),
-              updatedAt: new Date(tx.updatedAt),
-          } as any
-      }).catch(e => console.log('Bank Tx error:', e.message));
   }
   
   // --- 17. Attachments ---
@@ -415,6 +420,16 @@ async function main() {
               uploadedAt: new Date(doc.uploadedAt),
           } as any
       }).catch(e => console.log('Compliance Doc error:', e.message));
+  }
+
+  // --- 24. Document Chunks (Embeddings) ---
+  console.log('Seeding Document Chunks...');
+  for (const chunk of ${JSON.stringify(documentChunks, null, 2)} as any[]) {
+      await prisma.$executeRawUnsafe(\`
+          INSERT INTO "DocumentChunk" (id, "documentId", content, "tokenCount", embedding)
+          VALUES ('\${chunk.id}', '\${chunk.documentId}', \${JSON.stringify(chunk.content)}, \${chunk.tokenCount || 'NULL'}, \${chunk.embedding ? \`'\${chunk.embedding}'\` : 'NULL'})
+          ON CONFLICT (id) DO NOTHING
+      \`).catch(e => console.log('Chunk error:', e.message));
   }
 
   console.log('✅ Seeding finished.');
