@@ -146,7 +146,7 @@ export async function createInvoice(formData: FormData) {
             // Let's leave global settings alone for custom prefixes to avoid confusion.
 
             // 4. Create Invoice
-            await prisma.invoice.create({
+            await tx.invoice.create({
                 data: {
                     number,
                     date,
