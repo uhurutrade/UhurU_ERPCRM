@@ -7,6 +7,7 @@ import { TaskList } from '@/components/crm/task-list';
 import { CRMHeaderActions } from '@/components/crm/crm-header-actions';
 import { CRMToolbar } from '@/components/crm/crm-toolbar';
 import { Users, Wallet, ClipboardList, Target, TrendingUp, MoreVertical, Phone, Mail, Video, MessageSquare } from 'lucide-react';
+import { serializeData } from '@/lib/serialization';
 
 export default async function CRMPage({
     searchParams
@@ -19,26 +20,26 @@ export default async function CRMPage({
     const leadsCount = await prisma.lead.count({ where: { status: 'NEW' } });
     const pendingTasksCount = await prisma.task.count({ where: { completed: false } });
 
-    const deals = await prisma.deal.findMany({
+    const rawDeals = await prisma.deal.findMany({
         where: query ? { title: { contains: query, mode: 'insensitive' } } : {},
         include: { organization: true }
     });
 
-    const organizations = await prisma.organization.findMany({
+    const rawOrganizations = await prisma.organization.findMany({
         where: query ? { name: { contains: query, mode: 'insensitive' } } : {},
     });
 
-    const contacts = await prisma.contact.findMany({
+    const rawContacts = await prisma.contact.findMany({
         where: query ? { name: { contains: query, mode: 'insensitive' } } : {},
         include: { organization: true }
     });
 
-    const leads = await prisma.lead.findMany({
+    const rawLeads = await prisma.lead.findMany({
         where: query ? { name: { contains: query, mode: 'insensitive' } } : {},
         orderBy: { createdAt: 'desc' }
     });
 
-    const tasks = await prisma.task.findMany({
+    const rawTasks = await prisma.task.findMany({
         where: {
             completed: false,
             ...(query ? { title: { contains: query, mode: 'insensitive' } } : {})
@@ -47,15 +48,23 @@ export default async function CRMPage({
         orderBy: { dueDate: 'asc' }
     });
 
-    const activities = await prisma.activity.findMany({
+    const rawActivities = await prisma.activity.findMany({
         include: { contact: true },
         orderBy: { date: 'desc' },
         take: 5
     });
 
-    // Calculate Pipeline Total Value
-    const pipelineValue = deals.reduce((sum, d) => sum + Number(d.amount || 0), 0);
-    const wonDealsValue = deals.filter(d => d.stage === 'WON').reduce((sum, d) => sum + Number(d.amount || 0), 0);
+    // Calculate Pipeline Totals (using raw numbers)
+    const pipelineValue = rawDeals.reduce((sum, d) => sum + Number(d.amount || 0), 0);
+    const wonDealsValue = rawDeals.filter(d => d.stage === 'WON').reduce((sum, d) => sum + Number(d.amount || 0), 0);
+
+    // CRITICAL: Serialize EVERYTHING for RSC production stability
+    const deals = serializeData(rawDeals);
+    const organizations = serializeData(rawOrganizations);
+    const contacts = serializeData(rawContacts);
+    const leads = serializeData(rawLeads);
+    const tasks = serializeData(rawTasks);
+    const activities = serializeData(rawActivities);
 
     return (
         <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -161,7 +170,7 @@ export default async function CRMPage({
                     </div>
 
                     <div className="space-y-4">
-                        {activities.map((act) => (
+                        {activities.map((act: any) => (
                             <div key={act.id} className="bg-uhuru-card/50 p-5 rounded-2xl border border-uhuru-border flex items-start gap-4 hover:bg-uhuru-card transition-all group">
                                 <div className={`p-2.5 rounded-xl border ${act.type === 'CALL' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                     act.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
@@ -180,7 +189,7 @@ export default async function CRMPage({
                                             <p className="text-uhuru-text-dim text-xs mt-0.5">{act.notes}</p>
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-full uppercase">
-                                            {new Date(act.date).toLocaleDateString()}
+                                            {act.date ? new Date(act.date).toLocaleDateString() : '---'}
                                         </span>
                                     </div>
                                 </div>
@@ -222,7 +231,7 @@ export default async function CRMPage({
                     </div>
 
                     <div className="p-5 bg-uhuru-card border border-uhuru-border rounded-2xl">
-                        <p className="text-xs text-uhuru-text-dim  font-medium">"Efficiency is doing things right; effectiveness is doing the right things."</p>
+                        <p className="text-xs text-uhuru-text-dim  font-medium italic">Efficiency is doing things right; effectiveness is doing the right things.</p>
                     </div>
                 </div>
             </div>

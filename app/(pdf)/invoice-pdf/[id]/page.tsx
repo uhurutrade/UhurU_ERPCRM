@@ -63,14 +63,15 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                     * {
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
+                        color-adjust: exact !important;
                     }
                 `}
             </style>
 
             {/* Invoice Page - A4 size 210mm x 297mm */}
-            <div className="w-[210mm] min-h-[297mm] mx-auto bg-white p-[15mm] relative shadow-2xl print:shadow-none print:w-[210mm] print:h-[297mm] print:m-0 print:overflow-hidden flex flex-col">
+            <div className="w-[210mm] min-h-[297mm] mx-auto bg-white p-[15mm] pt-[10mm] relative shadow-2xl print:shadow-none print:w-[210mm] print:h-[297mm] print:m-0 print:overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-12">
+                <div className="flex justify-between items-start mb-8">
                     {/* Logo Area */}
                     <div className="w-48 h-auto">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -82,47 +83,44 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                     </div>
                     <div className="text-right">
                         <h1 className="text-4xl font-black text-black tracking-tight uppercase">Invoice</h1>
-                        <p className="text-sm font-mono text-slate-500 mt-1">{invoice.number}</p>
+                        <p className="text-sm font-mono text-black mt-1">{invoice.number}</p>
                     </div>
                 </div>
 
                 {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-12 mb-12 border-b border-slate-100 pb-8">
+                <div className="grid grid-cols-2 gap-12 mb-8 border-b border-black pb-6">
                     <div className="space-y-1">
                         <div className="grid grid-cols-[140px_1fr] text-sm">
-                            <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider">Invoice Number</span>
+                            <span className="font-bold text-black uppercase text-[10px] tracking-wider">Invoice Number</span>
                             <span className="font-mono font-bold">{invoice.number}</span>
                         </div>
                         <div className="grid grid-cols-[140px_1fr] text-sm">
-                            <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider">Issued Date</span>
-                            <span className="font-bold">{format(new Date(invoice.date), 'd MMMM yyyy')}</span>
+                            <span className="font-bold text-black uppercase text-[10px] tracking-wider">Issued Date</span>
+                            <span className="font-bold text-black">{format(new Date(invoice.date), 'd MMMM yyyy')}</span>
                         </div>
                         <div className="grid grid-cols-[140px_1fr] text-sm">
-                            <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider">Due Date</span>
-                            <span className="font-bold text-indigo-600">{format(new Date(invoice.dueDate), 'd MMMM yyyy')}</span>
+                            <span className="font-bold text-black uppercase text-[10px] tracking-wider">Due Date</span>
+                            <span className="font-bold text-black">{format(new Date(invoice.dueDate), 'd MMMM yyyy')}</span>
                         </div>
-                    </div>
-                    <div className="text-right flex flex-col justify-end">
-                        {/* Space for additional info if needed */}
                     </div>
                 </div>
 
                 {/* Addresses */}
-                <div className="grid grid-cols-2 gap-12 mb-12">
+                <div className="grid grid-cols-2 gap-12 mb-8">
                     <div>
-                        <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-4">Billed to</h3>
-                        <div className="text-sm space-y-1 text-slate-700">
+                        <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-black mb-3">Billed to</h3>
+                        <div className="text-sm space-y-1 text-black">
                             <p className="font-bold text-black text-lg">{invoice.organization.name}</p>
                             {invoice.organization.email && <p>{invoice.organization.email}</p>}
                             {invoice.organization.address && <p>{invoice.organization.address}</p>}
                             <p>{invoice.organization.city} {invoice.organization.postcode}</p>
                             <p>{invoice.organization.country || 'United Kingdom'}</p>
-                            {invoice.organization.taxId && <p className="mt-2 text-[10px] font-bold text-slate-400 uppercase">VAT/Tax ID: {invoice.organization.taxId}</p>}
+                            {invoice.organization.taxId && <p className="mt-2 text-[10px] font-bold text-black uppercase">VAT/Tax ID: {invoice.organization.taxId}</p>}
                         </div>
                     </div>
                     <div>
-                        <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-4 text-right">From</h3>
-                        <div className="text-sm space-y-1 text-slate-700 text-right">
+                        <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-black mb-3 text-right">From</h3>
+                        <div className="text-sm space-y-1 text-black text-right">
                             <p className="font-bold text-black uppercase text-lg">{settings?.companyName || 'Uhuru Trade Ltd'}</p>
                             <p>{settings?.registeredAddress}</p>
                             <p>{settings?.registeredCity}, {settings?.registeredPostcode}</p>
@@ -133,31 +131,26 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
 
                 {/* Items Table */}
                 <div className="flex-1">
-                    <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-6">Line Items</h3>
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b-2 border-black">
-                                <th className="text-left py-3 font-bold uppercase text-[10px] tracking-wider w-1/2">Name / description</th>
-                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider">Price</th>
-                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider">Quantity</th>
-                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider">Tax rate</th>
-                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider">Amount</th>
+                                <th className="text-left py-3 font-bold uppercase text-[10px] tracking-wider w-1/2 text-black">Name / description</th>
+                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider text-black">Price</th>
+                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider text-black">Quantity</th>
+                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider text-black">Tax rate</th>
+                                <th className="text-right py-3 font-bold uppercase text-[10px] tracking-wider text-black">Amount</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-black">
                             {invoice.items.map((item) => (
                                 <tr key={item.id}>
-                                    <td className="py-4 pr-4">
+                                    <td className="py-3 pr-4">
                                         <div className="font-bold text-black">{item.description}</div>
-                                        {/* Adjusting for potential long descriptions or multiple lines */}
-                                        <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-4 leading-normal">
-                                            {/* If we had extra description fields, they would go here */}
-                                        </div>
                                     </td>
-                                    <td className="py-4 text-right font-medium">{formatCurrency(Number(item.unitPrice), invoice.currency)}</td>
-                                    <td className="py-4 text-right font-mono">{Number(item.quantity)}</td>
-                                    <td className="py-4 text-right text-slate-400 text-xs">-</td>
-                                    <td className="py-4 text-right font-bold text-black">{formatCurrency(Number(item.total), invoice.currency)}</td>
+                                    <td className="py-3 text-right font-medium text-black">{formatCurrency(Number(item.unitPrice), invoice.currency)}</td>
+                                    <td className="py-3 text-right font-mono text-black">{Number(item.quantity)}</td>
+                                    <td className="py-3 text-right text-black text-xs">-</td>
+                                    <td className="py-3 text-right font-bold text-black">{formatCurrency(Number(item.total), invoice.currency)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -165,44 +158,44 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                 </div>
 
                 {/* Summary Section */}
-                <div className="mb-12 flex justify-end">
-                    <div className="w-1/2 space-y-3">
+                <div className="mb-10 flex justify-end">
+                    <div className="w-1/2 space-y-2">
                         <div className="flex justify-between items-center py-2 border-t-2 border-black">
-                            <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-slate-400">Subtotal</span>
-                            <span className="font-bold">{formatCurrency(Number(invoice.subtotal), invoice.currency)}</span>
+                            <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-black">Subtotal</span>
+                            <span className="font-bold text-black">{formatCurrency(Number(invoice.subtotal), invoice.currency)}</span>
                         </div>
-                        <div className="flex justify-between items-center py-4 bg-slate-50 px-4 rounded-lg">
-                            <span className="font-black uppercase text-xs tracking-[0.2em]">Total</span>
-                            <span className="text-2xl font-black">{formatCurrency(Number(invoice.total), invoice.currency)}</span>
+                        <div className="flex justify-between items-center py-4 bg-slate-50 px-4">
+                            <span className="font-black uppercase text-xs tracking-[0.2em] text-black">Total</span>
+                            <span className="text-2xl font-black text-black">{formatCurrency(Number(invoice.total), invoice.currency)}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Compact Footer - Half Height */}
-                <div className="mt-auto bg-white -mx-[15mm] -mb-[15mm] p-[10mm] pt-6 border-t border-slate-200 flex flex-col gap-6 print:absolute print:bottom-0 print:left-0 print:right-0">
+                {/* Compact Footer */}
+                <div className="mt-auto bg-white -mx-[15mm] -mb-[15mm] p-[15mm] pt-6 border-t border-black flex flex-col gap-6 print:absolute print:bottom-0 print:left-0 print:right-0">
 
                     {/* Bank Details & QR - Split Layout */}
                     <div className="grid grid-cols-[1fr_auto] gap-8 items-start">
                         {/* Bank Details */}
                         {invoice.bankAccount && (
-                            <div className="text-[10px] text-slate-600 font-mono space-y-1">
+                            <div className="text-[10px] text-black font-mono space-y-1">
                                 <p className="font-bold text-black uppercase tracking-wider mb-2 text-xs">Payment Information</p>
-                                <p><span className="font-bold text-slate-900">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
-                                <p><span className="font-bold text-slate-900">Account Name:</span> Uhuru Trade Ltd</p>
+                                <p className="text-black"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
+                                <p className="text-black"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
 
-                                <div className="leading-relaxed">
+                                <div className="leading-relaxed text-black">
                                     {invoice.bankAccount.swiftBic && (
-                                        <span className="mr-4"><span className="font-bold text-slate-900">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
+                                        <span className="mr-4"><span className="font-bold">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
                                     )}
-                                    {invoice.bankAccount.iban && <span><span className="font-bold text-slate-900">IBAN:</span> {invoice.bankAccount.iban}</span>}
+                                    {invoice.bankAccount.iban && <span><span className="font-bold">IBAN:</span> {invoice.bankAccount.iban}</span>}
                                 </div>
 
-                                <div className="flex gap-4">
-                                    {invoice.bankAccount.sortCode && <span><span className="font-bold text-slate-900">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
-                                    {invoice.bankAccount.accountNumberUK && <span><span className="font-bold text-slate-900">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
-                                    {invoice.bankAccount.routingNumber && <span><span className="font-bold text-slate-900">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
+                                <div className="flex gap-4 text-black">
+                                    {invoice.bankAccount.sortCode && <span><span className="font-bold">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
+                                    {invoice.bankAccount.accountNumberUK && <span><span className="font-bold">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
+                                    {invoice.bankAccount.routingNumber && <span><span className="font-bold">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
                                 </div>
-                                <p className="text-[9px] text-slate-400 mt-2">
+                                <p className="text-[9px] text-black mt-2">
                                     {(invoice.bankAccount.bank.bankAddress || '') + ', ' + (invoice.bankAccount.bank.bankCity || '') + ', ' + (invoice.bankAccount.bank.bankCountry || 'UK')}
                                 </p>
                             </div>
@@ -210,27 +203,27 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
 
                         {/* QR Code & Pay Link */}
                         <div className="flex flex-col items-end gap-2">
-                            <div className="bg-white p-2 rounded border border-slate-200 shadow-sm print:border">
+                            <div className="bg-white p-1 rounded border border-black print:border">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://crypto.uhurutrade.com"
                                     alt="Crypto QR"
-                                    className="w-20 h-20"
+                                    className="w-16 h-16"
                                 />
                             </div>
                             <div className="text-right">
-                                <p className="font-bold text-black text-[10px] uppercase tracking-wider leading-none">Pay Online</p>
-                                <p className="text-[9px] text-indigo-600 font-bold mt-1">crypto.uhurutrade.com</p>
+                                <p className="font-black text-black text-[10px] uppercase tracking-wider leading-none">Pay Online</p>
+                                <p className="text-[9px] text-black font-bold mt-1">crypto.uhurutrade.com</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Bottom Legal - Very Compact */}
-                    <div className="pt-4 border-t border-slate-100">
-                        <p className="text-center text-[8px] font-bold text-slate-400 tracking-[0.1em] leading-tight">
+                    <div className="pt-4 border-t border-black">
+                        <p className="text-center text-[8px] font-bold text-black tracking-[0.1em] leading-tight">
                             Uhuru Trade Ltd. Co. 15883242 – Unit 13 Freeland Park Wareham Road – Lytchett Matravers – BH16 6FA Poole – UK
                         </p>
-                        <p className="text-center text-[7px] text-slate-300 mt-1 uppercase tracking-widest font-medium">
+                        <p className="text-center text-[7px] text-black mt-1 uppercase tracking-widest font-bold">
                             Powered by Uhuru Invoice Engine
                         </p>
                     </div>

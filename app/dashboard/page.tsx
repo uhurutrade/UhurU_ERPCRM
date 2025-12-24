@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 import {
     Wallet,
@@ -16,44 +15,50 @@ import {
     Banknote
 } from "lucide-react";
 import Link from 'next/link';
+import { serializeData } from "@/lib/serialization";
 
 export default async function DashboardPage() {
-    // 1. Fetch recent transactions for activity feed & rough balance calc
-    const transactions = await prisma.bankTransaction.findMany({
+    // 1. Fetch recent transactions
+    const rawTransactions = await prisma.bankTransaction.findMany({
         orderBy: { date: 'desc' },
         take: 5
     });
 
-    // 2. Fetch Active Accounts & Recalculate Balances from Live Ledger
     const leads = await prisma.lead.count({ where: { status: 'NEW' } });
     const tasks = await prisma.task.count({ where: { completed: false } });
 
-    const allAccounts = await prisma.bankAccount.findMany({
+    const allAccountsRaw = await prisma.bankAccount.findMany({
         include: {
             bank: true
         }
     });
 
-    // Recalculate balances
-    for (const account of allAccounts) {
+    // Recalculate balances and build serializable objects
+    const accountsData = [];
+    let totalBalance = 0;
+
+    for (const account of allAccountsRaw) {
         const balanceCtx = await prisma.bankTransaction.aggregate({
             where: { bankAccountId: account.id },
             _sum: { amount: true }
         });
-        // Convert to Number safely for display and sorting
         const sum = balanceCtx._sum.amount ? Number(balanceCtx._sum.amount) : 0;
-        (account as any).currentBalance = sum;
+        totalBalance += sum;
+
+        accountsData.push({
+            ...account,
+            currentBalance: sum
+        });
     }
 
-    // Sort by balance desc and take top 12 for display
-    const accounts = allAccounts
+    // Sort and take top 12
+    const sortedAccounts = accountsData
         .sort((a, b) => Number(b.currentBalance) - Number(a.currentBalance))
         .slice(0, 12);
 
-    // Calculate Global Balance (Sum of all active account balances)
-    // Note: This sums mixed currencies simply as a number, effectively assuming 1:1 for a rough overview 
-    // or relying on the user to interpret the mixed value. Ideally this should be currency normalized.
-    const totalBalance = allAccounts.reduce((sum, acc) => sum + Number(acc.currentBalance), 0);
+    // CRITICAL: Serialize EVERYTHING for RSC production stability
+    const transactions = serializeData(rawTransactions);
+    const accounts = serializeData(sortedAccounts);
 
     return (
         <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
@@ -86,7 +91,7 @@ export default async function DashboardPage() {
                     </p>
                     <div className="mt-4 flex items-center text-[10px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-2 py-1 rounded-full uppercase tracking-tighter">
                         <TrendingUp size={12} className="mr-1" />
-                        <span>+12.5% vs last month</span>
+                        <span>Tracking active treasury</span>
                     </div>
                 </div>
 
@@ -144,18 +149,18 @@ export default async function DashboardPage() {
                                     <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-700 transition-all font-bold">
                                         £
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform">{tx.description}</p>
-                                        <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tighter mt-0.5">{new Date(tx.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                                    <div className="overflow-hidden">
+                                        <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform truncate max-w-[200px]">{tx.description}</p>
+                                        <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-tighter mt-0.5">{tx.date ? new Date(tx.date).toLocaleDateString() : '---'}</p>
                                     </div>
                                 </div>
-                                <span className={`font-mono font-bold text-sm ${Number(tx.amount) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                <span className={`font-mono font-bold text-xs sm:text-sm shrink-0 ${Number(tx.amount) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                     {Number(tx.amount) >= 0 ? '+' : ''}{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {tx.currency}
                                 </span>
                             </div>
                         ))}
                         {transactions.length === 0 && (
-                            <div className="py-12 text-center text-uhuru-text-dim  text-sm">No recent interactions detected.</div>
+                            <div className="py-12 text-center text-uhuru-text-dim text-xs italic">No digital audit trail detected.</div>
                         )}
                     </div>
                 </div>
@@ -175,7 +180,7 @@ export default async function DashboardPage() {
                     {accounts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-48 py-8 text-center bg-slate-900/40 rounded-2xl border border-dashed border-uhuru-border">
                             <CreditCard className="text-slate-700 mb-3" size={32} />
-                            <p className="text-uhuru-text-dim text-xs ">No active accounts registered.</p>
+                            <p className="text-uhuru-text-dim text-xs">No active treasury nodes registered.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -198,10 +203,10 @@ export default async function DashboardPage() {
                                                 {acc.currency}
                                             </span>
                                         </div>
-                                        <p className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-[0.1em] truncate mb-1">{acc.bank.bankName}</p>
+                                        <p className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-[0.1em] truncate mb-1">{acc.bank?.bankName || 'Unknown Institution'}</p>
                                         <p className={`font-black tracking-tighter text-2xl group-hover:scale-[1.02] transition-transform origin-left ${Number(acc.currentBalance) >= 0 ? 'text-white' : 'text-rose-400'}`}>
                                             {acc.currency === 'GBP' ? '£' : acc.currency === 'EUR' ? '€' : acc.currency === 'USD' ? '$' : ''}
-                                            {Number(acc.currentBalance).toLocaleString()}
+                                            {Number(acc.currentBalance || 0).toLocaleString()}
                                         </p>
                                         <p className="text-[10px] text-uhuru-text-dim font-bold mt-2 truncate bg-white/5 w-fit px-2 py-0.5 rounded uppercase tracking-widest">{acc.accountName}</p>
                                     </div>
