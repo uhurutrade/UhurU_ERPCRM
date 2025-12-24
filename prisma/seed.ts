@@ -1,11 +1,11 @@
-
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-24T18:46:27.228Z');
+  console.log('Generated at: 2025-12-24T18:48:30.084Z');
 
   // --- CLEANUP (Delete existing data) ---
   console.log('🧹 Cleaning up existing data...');

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 
@@ -51,7 +52,7 @@ async function main() {
     const complianceDocuments = await prisma.complianceDocument.findMany();
     const documentChunks = await prisma.documentChunk.findMany();
 
-    const seedContent = `
+    const seedContent = `// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
