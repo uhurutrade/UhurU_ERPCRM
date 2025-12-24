@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-24T11:55:08.119Z');
+  console.log('Generated at: 2025-12-24T12:07:24.811Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -942,6 +942,36 @@ async function main() {
         "unitPrice": "22",
         "total": "22",
         "invoiceId": "cmjjy5wyo0006bv8u9jfmrkdi"
+      }
+    ]
+  },
+  {
+    "id": "cmjjyload000bbv8u6brsb3yu",
+    "number": "INV-005",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-01T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "0",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "0",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj4oiydv0002a47o3h33cgnc",
+    "cryptoWalletId": null,
+    "deletedAt": null,
+    "createdAt": "2025-12-24T11:57:30.038Z",
+    "updatedAt": "2025-12-24T11:57:30.038Z",
+    "items": [
+      {
+        "id": "cmjjyload000cbv8u3d7j9m4j",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "0",
+        "total": "0",
+        "invoiceId": "cmjjyload000bbv8u6brsb3yu"
       }
     ]
   }

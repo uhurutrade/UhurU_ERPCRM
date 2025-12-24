@@ -146,34 +146,40 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                     </table>
                 </div>
 
-                {/* Unified Compact Footer */}
-                <div className="mt-auto bg-slate-50 -mx-[15mm] -mb-[15mm] p-[10mm] pt-6 border-t border-gray-100 flex flex-col gap-6 print:absolute print:bottom-0 print:left-0 print:right-0 print:bg-slate-50">
+                {/* Compact Footer - Half Height */}
+                <div className="mt-auto bg-slate-50 -mx-[15mm] -mb-[15mm] p-[8mm] pt-4 border-t border-gray-100 flex flex-col gap-4 print:absolute print:bottom-0 print:left-0 print:right-0 print:bg-slate-50">
 
-                    {/* Bank Details - Full Width & Streamlined */}
+                    {/* Bank Details - Streamlined Layout */}
                     {invoice.bankAccount && (
                         <div className="w-full text-sm text-slate-800 font-mono space-y-1">
-                            <div className="flex flex-col gap-1">
-                                <p><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
-                                <p><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
-                            </div>
+                            {/* Bank Name - Separate Line */}
+                            <p className="text-base"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
 
-                            {/* Full width line for IBAN/BIC/Address */}
-                            <div className="flex flex-wrap items-baseline gap-x-6 text-xs text-slate-600">
-                                {invoice.bankAccount.iban && <span><span className="font-bold text-slate-800">IBAN:</span> {invoice.bankAccount.iban}</span>}
-                                {invoice.bankAccount.swiftBic && <span><span className="font-bold text-slate-800">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>}
+                            {/* Account Name - Separate Line */}
+                            <p className="text-base"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
 
+                            {/* BIC/SWIFT and Full Address - Single Line */}
+                            <div className="flex flex-wrap items-baseline gap-x-4 text-xs text-slate-600 leading-snug">
+                                {invoice.bankAccount.swiftBic && (
+                                    <span><span className="font-bold text-slate-800">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
+                                )}
                                 {invoice.bankAccount.bank.bankAddress && (
-                                    <span className="capitalize">
-                                        <span className="font-bold text-slate-800 normal-case"> Bank Address:</span>{' '}
-                                        {/* Simple lowercase transform with capitalize class above, or JS manipulation */}
-                                        {invoice.bankAccount.bank.bankAddress.toLowerCase()}, {invoice.bankAccount.bank.bankCity?.toLowerCase()}, {invoice.bankAccount.bank.country || 'United Kingdom'}
+                                    <span>
+                                        {invoice.bankAccount.bank.bankAddress
+                                            .split(' ')
+                                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                            .join(' ')}, {invoice.bankAccount.bank.bankCity
+                                                ?.split(' ')
+                                                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                                .join(' ')}, {invoice.bankAccount.bank.country || 'United Kingdom'}
                                     </span>
                                 )}
+                                {invoice.bankAccount.iban && <span><span className="font-bold text-slate-800">IBAN:</span> {invoice.bankAccount.iban}</span>}
                             </div>
 
-                            {/* Sort Code / Routing separately if needed, or inline if space */}
+                            {/* Sort Code / Account Number - Inline if present */}
                             {(invoice.bankAccount.sortCode || invoice.bankAccount.accountNumberUK || invoice.bankAccount.routingNumber) && (
-                                <div className="flex gap-6 text-xs text-slate-600">
+                                <div className="flex gap-4 text-xs text-slate-600">
                                     {invoice.bankAccount.sortCode && <span><span className="font-bold text-slate-800">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
                                     {invoice.bankAccount.accountNumberUK && <span><span className="font-bold text-slate-800">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
                                     {invoice.bankAccount.routingNumber && <span><span className="font-bold text-slate-800">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
@@ -183,43 +189,41 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                         </div>
                     )}
 
-                    {/* Crypto & Powered By - Compact Alignment */}
-                    <div className="flex items-center gap-6 border-t border-slate-200 pt-4 mt-auto">
-                        {/* QR */}
-                        <div className="shrink-0 bg-white p-1.5 rounded-lg border border-gray-200 shadow-sm">
+                    {/* Crypto Payment - Centered Vertically */}
+                    <div className="flex items-center justify-between gap-6 border-t border-slate-200 pt-4">
+                        {/* QR Code - Bigger */}
+                        <div className="shrink-0 bg-white p-2 rounded border border-gray-200 shadow-sm">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://crypto.uhurutrade.com"
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://crypto.uhurutrade.com"
                                 alt="Crypto QR"
-                                className="w-16 h-16"
+                                className="w-20 h-20"
                             />
                         </div>
 
-                        {/* Text Block */}
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3">
-                                <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg>
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-900 text-sm">Pay with Crypto</p>
-                                    <p className="text-xs text-slate-500 leading-tight">
-                                        We accept cross-chain payments. Scan the QR or visit <a href="https://crypto.uhurutrade.com" target="_blank" className="text-indigo-600 font-bold hover:underline">crypto.uhurutrade.com</a>
-                                    </p>
-                                </div>
+                        {/* Crypto Text - Larger Fonts */}
+                        <div className="flex-1 flex items-center gap-3">
+                            <div className="p-2 bg-indigo-50 rounded text-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg>
+                            </div>
+                            <div>
+                                <p className="font-bold text-slate-900 text-sm leading-tight">Pay with Crypto</p>
+                                <p className="text-xs text-slate-500 leading-snug">
+                                    We accept cross-chain payments. Scan QR or visit <a href="https://crypto.uhurutrade.com" target="_blank" className="text-indigo-600 font-semibold hover:underline">crypto.uhurutrade.com</a>
+                                </p>
                             </div>
                         </div>
 
-                        {/* Powered By - Vertically aligned with content now */}
-                        <div className="text-right">
-                            <p className="text-[8px] text-slate-300 font-medium">Powered by</p>
-                            <p className="text-[10px] text-slate-400 font-semibold tracking-wide">Uhuru Invoice Engine</p>
+                        {/* Powered By - Slightly Larger */}
+                        <div className="text-right shrink-0">
+                            <p className="text-[8px] text-slate-300 font-medium leading-tight">Powered by</p>
+                            <p className="text-[9px] text-slate-400 font-semibold tracking-wide">Uhuru Invoice Engine</p>
                         </div>
                     </div>
 
-                    {/* Bottom: Legal */}
-                    <div className="text-center pt-6 border-t border-slate-200">
-                        <p className="text-[8px] font-bold text-slate-400 tracking-widest">
+                    {/* Bottom Legal - Compact */}
+                    <div className="text-center pt-2 border-t border-slate-200">
+                        <p className="text-[8px] font-bold text-slate-400 tracking-widest leading-tight">
                             Uhuru Trade Ltd. Company no. 15883242 – Unit 13 Freeland Park Wareham Road. Lytchett Matravers – BH16 6FA Poole – UK
                         </p>
                     </div>

@@ -3,6 +3,7 @@ import { Plus, FileText, ArrowUpRight, ArrowDownLeft, Upload, Check, AlertCircle
 import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
 import { DeleteAttachmentButton, LinkAttachmentButton } from '@/components/invoices/invoice-actions';
+import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 
 import { StandardPagination } from '@/components/invoices/invoices-pagination';
 
@@ -262,12 +263,10 @@ export default async function InvoicesPage({
                                     <td className="px-6 py-4 text-uhuru-text-dim text-xs hidden md:table-cell">{inv.date.toLocaleDateString()}</td>
                                     <td className="px-6 py-4 font-bold text-white">{inv.currency} {Number(inv.total).toFixed(2)}</td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${inv.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                            inv.status === 'OVERDUE' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                'bg-slate-800 text-slate-400 border border-white/5'
-                                            }`}>
-                                            {inv.status}
-                                        </span>
+                                        <InvoiceStatusBadge
+                                            invoiceId={inv.id}
+                                            currentStatus={inv.status}
+                                        />
                                     </td>
                                     <td className="px-6 py-4 text-right flex justify-end gap-2 items-center">
                                         <Link
