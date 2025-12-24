@@ -38,7 +38,7 @@ export type Transaction = {
         number: string;
         total: number;
         currency: string;
-        organization: { name: string };
+        organization?: { name: string } | null;
     }[];
 };
 
@@ -305,7 +305,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-bold text-white tracking-wide">{inv.number}</p>
-                                                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{inv.organization.name}</p>
+                                                    <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest">{inv.organization?.name || '---'}</p>
                                                 </div>
                                             </div>
                                             <div className="text-right flex items-center gap-6">

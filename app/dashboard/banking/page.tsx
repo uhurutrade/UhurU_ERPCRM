@@ -71,6 +71,9 @@ export default async function BankingPage({
     const sequences = await getTransactionSequences(transactions);
     const categories = categoriesRes.success ? categoriesRes.categories : [];
 
+    const serializedTransactions = serializeData(transactions);
+    const serializedSequences = serializeData(sequences);
+
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
@@ -112,8 +115,8 @@ export default async function BankingPage({
                         <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
                     </div>
                     <TransactionTable
-                        transactions={serializeData(transactions)}
-                        sequences={sequences}
+                        transactions={serializedTransactions}
+                        sequences={serializedSequences}
                         totalPages={totalPages}
                         currentPage={currentPage}
                         totalItems={totalItems}

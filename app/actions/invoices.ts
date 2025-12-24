@@ -6,6 +6,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { getAIClient } from '@/lib/ai/ai-service';
 import { createHash } from 'crypto';
+import { serializeData } from '@/lib/serialization';
 
 export async function uploadAndAnalyzeInvoice(formData: FormData) {
     try {
@@ -135,12 +136,12 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
 
         revalidatePath('/dashboard/invoices');
 
-        return {
+        return serializeData({
             success: true,
             attachmentId: attachment.id,
             analysis,
             potentialMatches
-        };
+        });
 
     } catch (error: any) {
         console.error('Invoice upload/analysis error:', error);
