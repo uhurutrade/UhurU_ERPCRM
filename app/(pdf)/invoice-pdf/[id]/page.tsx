@@ -178,42 +178,42 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                     <div className="grid grid-cols-[1fr_auto] gap-8 items-start">
                         {/* Bank Details */}
                         {invoice.bankAccount && (
-                            <div className="text-[10px] text-black font-mono space-y-0.5">
-                                <p className="font-bold text-black uppercase tracking-wider mb-2 text-xs">Payment Information</p>
-                                <p className="text-black"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
-                                <p className="text-black"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
+                            <div className="text-[11px] text-black font-mono space-y-1">
+                                <p className="font-bold text-black uppercase tracking-wider mb-2 text-sm underline decoration-1 underline-offset-4">Payment Information</p>
+                                <p className="text-black leading-tight"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
+                                <p className="text-black leading-tight"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
 
-                                <div className="leading-relaxed text-black">
+                                <div className="leading-tight text-black">
                                     {invoice.bankAccount.swiftBic && (
                                         <span className="mr-4"><span className="font-bold">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
                                     )}
                                     {invoice.bankAccount.iban && <span><span className="font-bold">IBAN:</span> {invoice.bankAccount.iban}</span>}
                                 </div>
 
-                                <div className="flex gap-4 text-black">
+                                <div className="flex gap-4 text-black leading-tight">
                                     {invoice.bankAccount.sortCode && <span><span className="font-bold">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
                                     {invoice.bankAccount.accountNumberUK && <span><span className="font-bold">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
                                     {invoice.bankAccount.routingNumber && <span><span className="font-bold">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
                                 </div>
-                                <p className="text-[9px] text-black mt-1">
+                                <p className="text-[10px] text-black mt-2 leading-tight">
                                     {(invoice.bankAccount.bank.bankAddress || '') + ', ' + (invoice.bankAccount.bank.bankCity || '') + ', ' + (invoice.bankAccount.bank.bankCountry || 'UK')}
                                 </p>
                             </div>
                         )}
 
                         {/* QR Code & Pay Link */}
-                        <div className="flex flex-col items-end gap-1">
-                            <div className="bg-white p-1 rounded border border-black shadow-[2px_2px_0px_black]">
+                        <div className="flex flex-col items-end gap-2 pr-2">
+                            <div className="bg-white p-1.5 rounded border-2 border-black shadow-[4px_4px_0px_black] mb-1">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://crypto.uhurutrade.com"
                                     alt="Crypto QR"
-                                    className="w-16 h-16"
+                                    className="w-20 h-20"
                                 />
                             </div>
                             <div className="text-right">
-                                <p className="font-black text-black text-[9px] uppercase tracking-wider leading-none">Pay Online</p>
-                                <p className="text-[8px] text-black font-bold mt-1">crypto.uhurutrade.com</p>
+                                <p className="font-black text-black text-[11px] uppercase tracking-[0.1em] leading-none mb-1">Pay with CRYPTO</p>
+                                <p className="text-[10px] text-black font-black">crypto.uhurutrade.com</p>
                             </div>
                         </div>
                     </div>
