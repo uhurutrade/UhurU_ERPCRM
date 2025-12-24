@@ -3,6 +3,7 @@ import { Plus, FileText, ArrowUpRight, Upload, Check, Trash2 } from 'lucide-reac
 import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
 import { DeleteAttachmentButton, LinkAttachmentButton, LinkInvoiceButton } from '@/components/invoices/invoice-actions';
+import { InvoiceDeleteButton, InvoiceRestoreButton } from '@/components/invoices/invoice-server-actions';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { StandardPagination } from '@/components/invoices/invoices-pagination';
 import { serializeData } from '@/lib/serialization';
@@ -199,11 +200,7 @@ export default async function InvoicesPage({
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {showTrash ? (
-                                                <form action={async () => { 'use server'; await restoreInvoice(inv.id); }}>
-                                                    <button className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all" title="Restore">
-                                                        <Upload className="rotate-0" size={16} />
-                                                    </button>
-                                                </form>
+                                                <InvoiceRestoreButton id={inv.id} />
                                             ) : (
                                                 <>
                                                     <Link href={`/invoice-pdf/${inv.id}`} target="_blank" className="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-all" title="View PDF">
@@ -217,11 +214,7 @@ export default async function InvoicesPage({
                                                     {inv.status === 'PAID' && (
                                                         <LinkInvoiceButton id={inv.id} amount={inv.total} hasTransaction={!!inv.bankTransactionId} />
                                                     )}
-                                                    <form action={async () => { 'use server'; await deleteInvoice(inv.id); }}>
-                                                        <button className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Move to Trash">
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </form>
+                                                    <InvoiceDeleteButton id={inv.id} />
                                                 </>
                                             )}
                                         </div>
