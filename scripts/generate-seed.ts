@@ -29,7 +29,7 @@ async function main() {
 
     // 6. Invoices
     const invoicesData = await prisma.invoice.findMany({ include: { items: true } });
-    const invoices = invoicesData.map(inv => ({
+    const invoices = invoicesData.map((inv: any) => ({
         ...inv,
         bankTransactionId: inv.bankTransactionId || null
     }));
