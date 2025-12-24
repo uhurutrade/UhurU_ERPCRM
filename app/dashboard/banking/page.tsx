@@ -45,6 +45,15 @@ export default async function BankingPage({
             skip: (currentPage - 1) * itemsPerPage,
             include: {
                 attachments: true,
+                invoices: {
+                    select: {
+                        id: true,
+                        number: true,
+                        total: true,
+                        currency: true,
+                        organization: { select: { name: true } }
+                    }
+                },
                 bankAccount: {
                     include: {
                         bank: {

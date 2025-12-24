@@ -272,6 +272,7 @@ model BankTransaction {
   exchangeRate    Decimal?       @db.Decimal(15, 8)
   type            String?
   attachments     Attachment[]
+  invoices        Invoice[]
   bankAccount     BankAccount    @relation(fields: [bankAccountId], references: [id])
   bankStatement   BankStatement? @relation(fields: [bankStatementId], references: [id])
 }
@@ -353,18 +354,20 @@ model Invoice {
   taxAmount      Decimal       @db.Decimal(15, 2)
   total          Decimal       @db.Decimal(15, 2)
   currency       String        @default("GBP")
-  organizationId String
-  notes          String?
-  footerNote     String?
-  bankAccountId  String?
-  cryptoWalletId String?
-  deletedAt      DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  items          InvoiceItem[]
-  bankAccount    BankAccount?  @relation(fields: [bankAccountId], references: [id])
-  cryptoWallet   CryptoWallet? @relation(fields: [cryptoWalletId], references: [id])
+  organizationId    String
+  bankTransactionId String?
+  notes             String?
+  footerNote        String?
+  bankAccountId     String?
+  cryptoWalletId    String?
+  deletedAt         DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items             InvoiceItem[]
+  bankAccount       BankAccount?  @relation(fields: [bankAccountId], references: [id])
+  cryptoWallet      CryptoWallet? @relation(fields: [cryptoWalletId], references: [id])
+  bankTransaction   BankTransaction? @relation(fields: [bankTransactionId], references: [id])
 }
 
 model InvoiceItem {

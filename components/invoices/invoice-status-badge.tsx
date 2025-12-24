@@ -6,10 +6,8 @@ import { Check } from 'lucide-react';
 
 const INVOICE_STATUSES = [
     { value: 'DRAFT', label: 'Draft', color: 'bg-slate-800 text-slate-400 border-white/5' },
-    { value: 'PENDING', label: 'Pending', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
     { value: 'SENT', label: 'Sent', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
     { value: 'PAID', label: 'Paid', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-    { value: 'OVERDUE', label: 'Overdue', color: 'bg-red-500/10 text-red-400 border-red-500/20' },
     { value: 'CANCELLED', label: 'Cancelled', color: 'bg-slate-500/10 text-slate-500 border-slate-500/20' },
 ];
 
@@ -74,8 +72,8 @@ export function InvoiceStatusBadge({ invoiceId, currentStatus }: InvoiceStatusBa
                                     key={statusOption.value}
                                     onClick={() => handleStatusChange(statusOption.value)}
                                     className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-between group ${status === statusOption.value
-                                            ? `${statusOption.color} border`
-                                            : 'text-slate-300 hover:bg-slate-800'
+                                        ? `${statusOption.color} border`
+                                        : 'text-slate-300 hover:bg-slate-800'
                                         }`}
                                 >
                                     <span>{statusOption.label}</span>

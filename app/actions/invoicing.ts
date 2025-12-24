@@ -202,11 +202,11 @@ export async function updateInvoice(id: string, formData: FormData) {
         const date = new Date(dateStr);
         const dueDate = new Date(dueDateStr);
 
-        // check if deleted
+        // check if deleted or not draft
         const existing = await prisma.invoice.findUnique({ where: { id } });
-        if (existing?.deletedAt) {
-            return { error: 'Cannot edit deleted invoice' };
-        }
+        if (!existing) return { error: 'Invoice not found' };
+        if (existing.deletedAt) return { error: 'Cannot edit deleted invoice' };
+        if (existing.status !== 'DRAFT') return { error: 'Only DRAFT invoices can be edited. Mark as PAID or SENT to change status, but use Draft for content changes.' };
 
         const subtotal = items.reduce((sum: number, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
         const taxRate = 0;
@@ -282,7 +282,7 @@ export async function updateInvoice(id: string, formData: FormData) {
         });
 
         revalidatePath('/dashboard/invoices');
-        revalidatePath(`/dashboard/invoices/${id}/pdf`);
+        revalidatePath(`/invoice-pdf/${id}`);
         return { success: true };
     } catch (error) {
         console.error("Invoice Update Error:", error);
@@ -329,5 +329,23 @@ export async function restoreInvoice(id: string) {
     } catch (error) {
         console.error("Restore Error:", error);
         return { error: 'Failed to restore invoice' };
+    }
+}
+export async function linkInvoiceToTransaction(invoiceId: string, transactionId: string) {
+    try {
+        await prisma.invoice.update({
+            where: { id: invoiceId },
+            data: {
+                bankTransactionId: transactionId,
+                status: 'PAID' // Automatically mark as paid if linked? User said "when marked as paid... suggest association". 
+                // Alternatively, association implies paid.
+            }
+        });
+        revalidatePath('/dashboard/invoices');
+        revalidatePath('/dashboard/banking');
+        return { success: true };
+    } catch (error) {
+        console.error("Link Error:", error);
+        return { error: 'Failed to link invoice' };
     }
 }

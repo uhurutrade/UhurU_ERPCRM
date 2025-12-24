@@ -33,6 +33,13 @@ type Transaction = {
         currency: string;
     };
     attachments: Attachment[];
+    invoices: {
+        id: string;
+        number: string;
+        total: number;
+        currency: string;
+        organization: { name: string };
+    }[];
 };
 
 interface TransactionDetailsModalProps {
@@ -202,7 +209,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                         </div>
 
                         {/* Attachments Section */}
-                        <div>
+                        <div className="pb-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                                     <Paperclip size={20} className="text-uhuru-blue" />
@@ -274,6 +281,52 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                             ) : (
                                 <div className="text-center py-8 bg-slate-900/30 rounded-xl border border-dashed border-slate-800">
                                     <p className="text-slate-500 text-sm">No attachments yet. Upload receipts, invoices, or proofs.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Linked Invoices Section */}
+                        <div className="pt-6 border-t border-white/5">
+                            <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                                <Eye size={20} className="text-indigo-400" />
+                                Linked Generated Invoices
+                            </h3>
+
+                            {transaction.invoices && transaction.invoices.length > 0 ? (
+                                <div className="space-y-3">
+                                    {transaction.invoices.map((inv) => (
+                                        <div
+                                            key={inv.id}
+                                            className="flex items-center justify-between p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl hover:bg-indigo-500/10 transition-all group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-400">
+                                                    <FileText size={20} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-white tracking-wide">{inv.number}</p>
+                                                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{inv.organization.name}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right flex items-center gap-6">
+                                                <div className="text-sm font-black text-white">
+                                                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: inv.currency }).format(inv.total)}
+                                                </div>
+                                                <a
+                                                    href={`/invoice-pdf/${inv.id}`}
+                                                    target="_blank"
+                                                    className="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-all"
+                                                    title="View PDF"
+                                                >
+                                                    <Eye size={16} />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-6 bg-slate-900/30 rounded-xl border border-dashed border-slate-800">
+                                    <p className="text-slate-500 text-sm italic">No outgoing invoices linked to this movement yet.</p>
                                 </div>
                             )}
                         </div>

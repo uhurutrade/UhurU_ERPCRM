@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Plus, FileText, ArrowUpRight, ArrowDownLeft, Upload, Check, AlertCircle, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
-import { DeleteAttachmentButton, LinkAttachmentButton } from '@/components/invoices/invoice-actions';
+import { DeleteAttachmentButton, LinkAttachmentButton, LinkInvoiceButton } from '@/components/invoices/invoice-actions';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 
 import { StandardPagination } from '@/components/invoices/invoices-pagination';
@@ -270,20 +270,28 @@ export default async function InvoicesPage({
                                     </td>
                                     <td className="px-6 py-4 text-right flex justify-end gap-2 items-center">
                                         <Link
-                                            href={`/dashboard/invoices/${inv.id}/pdf`}
+                                            href={`/invoice-pdf/${inv.id}`}
                                             target="_blank"
                                             className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg border border-white/5 transition-colors"
                                         >
                                             <Upload className="rotate-180" size={14} /> PDF
                                         </Link>
 
-                                        {!showTrash && (
+                                        {!showTrash && inv.status === 'DRAFT' && (
                                             <Link
                                                 href={`/dashboard/invoices/${inv.id}/edit`}
                                                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-indigo-500/20 transition-colors"
                                             >
                                                 Edit
                                             </Link>
+                                        )}
+
+                                        {!showTrash && inv.status === 'PAID' && (
+                                            <LinkInvoiceButton
+                                                id={inv.id}
+                                                amount={Number(inv.total)}
+                                                hasTransaction={!!(inv as any).bankTransactionId}
+                                            />
                                         )}
 
                                         {showTrash ? (

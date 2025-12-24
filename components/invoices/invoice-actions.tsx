@@ -65,3 +65,17 @@ export function LinkAttachmentButton({ id, hasTransaction }: { id: string, hasTr
         </button>
     );
 }
+
+export function LinkInvoiceButton({ id, amount, hasTransaction }: { id: string, amount: number, hasTransaction: boolean }) {
+    if (hasTransaction) return null;
+
+    return (
+        <button
+            onClick={() => window.location.href = `/dashboard/banking?action=link&invoiceId=${id}&query=${amount}`}
+            className="p-1.5 text-uhuru-text-dim hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
+            title={`Match Movement for ${amount}`}
+        >
+            <LinkIcon size={16} />
+        </button>
+    );
+}

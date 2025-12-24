@@ -117,20 +117,32 @@ export function TransactionTable({
     // --- Deletion Logic ---
     // --- Linking Logic ---
     const linkAttachmentId = searchParams.get('attachmentId');
-    const isLinkingMode = searchParams.get('action') === 'link' && linkAttachmentId;
+    const linkInvoiceId = searchParams.get('invoiceId');
+    const isLinkingMode = searchParams.get('action') === 'link' && (linkAttachmentId || linkInvoiceId);
 
     const handleLinkDirect = async (transactionId: string) => {
-        if (!linkAttachmentId) return;
+        if (!linkAttachmentId && !linkInvoiceId) return;
 
         setIsDeleting(true); // Loading state
         try {
-            const { linkAttachmentToTransaction } = await import('@/app/actions/invoices');
-            const res = await linkAttachmentToTransaction(linkAttachmentId, transactionId);
-            if (res.success) {
-                toast.success('Attached successfully');
-                router.push('/dashboard/invoices');
-            } else {
-                toast.error('Failed: ' + res.error);
+            if (linkAttachmentId) {
+                const { linkAttachmentToTransaction } = await import('@/app/actions/invoices');
+                const res = await linkAttachmentToTransaction(linkAttachmentId, transactionId);
+                if (res.success) {
+                    toast.success('Attached successfully');
+                    router.push('/dashboard/invoices');
+                } else {
+                    toast.error('Failed: ' + res.error);
+                }
+            } else if (linkInvoiceId) {
+                const { linkInvoiceToTransaction } = await import('@/app/actions/invoicing');
+                const res = await linkInvoiceToTransaction(linkInvoiceId, transactionId);
+                if (res.success) {
+                    toast.success('Invoice linked successfully');
+                    router.push('/dashboard/invoices');
+                } else {
+                    toast.error('Failed: ' + res.error);
+                }
             }
         } catch (err) {
             toast.error('Error linking');
