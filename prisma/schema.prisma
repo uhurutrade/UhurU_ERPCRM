@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [vector]
+  // extensions = [vector]
 }
 
 model User {
@@ -187,6 +187,7 @@ model BankAccount {
   order             Int               @default(0)
   wireRoutingNumber String?
   bank              Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  invoices          Invoice[]
   transactions      BankTransaction[]
 
   @@index([bankId])
@@ -214,6 +215,7 @@ model CryptoWallet {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   transactions       CryptoTransaction[]
+  invoices           Invoice[]
 
   @@index([blockchain])
   @@index([asset])
@@ -352,10 +354,17 @@ model Invoice {
   total          Decimal       @db.Decimal(15, 2)
   currency       String        @default("GBP")
   organizationId String
+  notes          String?
+  footerNote     String?
+  bankAccountId  String?
+  cryptoWalletId String?
+  deletedAt      DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   items          InvoiceItem[]
+  bankAccount    BankAccount?  @relation(fields: [bankAccountId], references: [id])
+  cryptoWallet   CryptoWallet? @relation(fields: [cryptoWalletId], references: [id])
 }
 
 model InvoiceItem {
@@ -403,6 +412,8 @@ model CompanySettings {
   contactPhone            String?
   website                 String?
   notes                   String?
+  invoicePrefix           String    @default("INV-")
+  nextInvoiceNumber       Int       @default(1)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
   aiProvider              String    @default("openai")
@@ -459,7 +470,7 @@ model DocumentChunk {
   documentId String
   content    String
   tokenCount Int?
-  embedding  Unsupported("vector(1536)")?
+  // embedding  Unsupported("vector(1536)")?
   createdAt  DateTime           @default(now())
   document   ComplianceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
 

@@ -9,16 +9,20 @@ import { StandardPagination } from '@/components/invoices/invoices-pagination';
 export default async function InvoicesPage({
     searchParams
 }: {
-    searchParams: { page?: string, docPage?: string }
+    searchParams: { page?: string, docPage?: string, showTrash?: string }
 }) {
     const currentPage = Number(searchParams.page) || 1;
     const docPage = Number(searchParams.docPage) || 1;
+    const showTrash = searchParams.showTrash === 'true';
     const invoicesPerPage = 5;
     const docItemsPerPage = 20;
 
     const [totalInvoices, invoices, totalAttachments, allRecentAttachments, unassignedAttachments] = await Promise.all([
-        prisma.invoice.count(),
+        prisma.invoice.count({ where: { deletedAt: showTrash ? { not: null } : null } }),
         prisma.invoice.findMany({
+            where: {
+                deletedAt: showTrash ? { not: null } : null
+            },
             orderBy: { date: 'desc' },
             take: invoicesPerPage,
             skip: (currentPage - 1) * invoicesPerPage,
@@ -51,7 +55,7 @@ export default async function InvoicesPage({
 
     return (
         <div className="p-0 sm:p-8 max-w-[1920px] mx-auto space-y-8 animate-in fade-in duration-500">
-            {/* ... header and stats remain same ... */}
+            {/* Header */}
             <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 shrink-0">
                 <div className="text-center lg:text-left">
                     <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Invoice Management</h1>
@@ -70,10 +74,10 @@ export default async function InvoicesPage({
                 </div>
             </header>
 
-            {/* Stats Cards */}
+            {/* Stats Cards (Keep existing ones) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card backdrop-blur-sm group hover:border-indigo-500/30 transition-all duration-300">
-                    <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Outgoing Invoices</div>
+                    <div className="text-uhuru-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Outgoing Invoices {showTrash && '(Trash)'}</div>
                     <div className="text-3xl font-bold text-white tracking-tight">{totalInvoices}</div>
                     <div className="mt-4 flex items-center text-[11px] text-emerald-400 font-bold bg-emerald-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-tight">
                         <span>Total Records</span>
@@ -96,7 +100,7 @@ export default async function InvoicesPage({
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                {/* Recent Document Feed (Matched & Unmatched) */}
+                {/* Recent Document Feed (Matched & Unmatched) - Existing logic ... */}
                 <div className="xl:col-span-2 bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[1200px] flex flex-col">
                     <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                         <div>
@@ -221,12 +225,22 @@ export default async function InvoicesPage({
             </div>
 
             {/* Outgoing Invoices Section (5 records) */}
-            <div className="bg-uhuru-card rounded-2xl border border-uhuru-border shadow-card overflow-hidden min-h-[400px] flex flex-col">
+            <div className={`bg-uhuru-card rounded-2xl border ${showTrash ? 'border-red-500/30' : 'border-uhuru-border'} shadow-card overflow-hidden min-h-[400px] flex flex-col transition-colors`}>
                 <div className="p-6 border-b border-uhuru-border flex justify-between items-center bg-slate-900/40">
                     <div>
-                        <h2 className="text-lg font-bold text-white tracking-tight">Outgoing Invoices Record</h2>
+                        <h2 className="text-lg font-bold text-white tracking-tight">Outgoing Invoices Record {showTrash && '(Trash)'}</h2>
                         <p className="text-[10px] text-uhuru-text-dim uppercase font-bold tracking-widest mt-1">Legally binding invoices issued by your company</p>
                     </div>
+                    <Link
+                        href={showTrash ? "/dashboard/invoices" : "/dashboard/invoices?showTrash=true"}
+                        className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 ${showTrash ? 'text-emerald-400 hover:text-emerald-300' : 'text-red-400 hover:text-red-300'} transition-colors`}
+                    >
+                        {showTrash ? (
+                            <> <Check size={14} /> Show Active Invoices</>
+                        ) : (
+                            <> <Trash2 size={14} /> Show Trash</>
+                        )}
+                    </Link>
                 </div>
                 <div className="flex-1">
                     <table className="w-full text-left">
@@ -237,6 +251,7 @@ export default async function InvoicesPage({
                                 <th className="px-6 py-4 hidden md:table-cell">Date</th>
                                 <th className="px-6 py-4">Amount</th>
                                 <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-uhuru-border">
@@ -254,6 +269,46 @@ export default async function InvoicesPage({
                                             {inv.status}
                                         </span>
                                     </td>
+                                    <td className="px-6 py-4 text-right flex justify-end gap-2 items-center">
+                                        <Link
+                                            href={`/dashboard/invoices/${inv.id}/pdf`}
+                                            target="_blank"
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg border border-white/5 transition-colors"
+                                        >
+                                            <Upload className="rotate-180" size={14} /> PDF
+                                        </Link>
+
+                                        {!showTrash && (
+                                            <Link
+                                                href={`/dashboard/invoices/${inv.id}/edit`}
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-indigo-500/20 transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                        )}
+
+                                        {showTrash ? (
+                                            <form action={async () => {
+                                                'use server';
+                                                const { restoreInvoice } = await import('@/app/actions/invoicing');
+                                                await restoreInvoice(inv.id);
+                                            }}>
+                                                <button className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all" title="Restore">
+                                                    <Upload className="rotate-0" size={16} />
+                                                </button>
+                                            </form>
+                                        ) : (
+                                            <form action={async () => {
+                                                'use server';
+                                                const { deleteInvoice } = await import('@/app/actions/invoicing');
+                                                await deleteInvoice(inv.id);
+                                            }}>
+                                                <button className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Move to Trash">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </form>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                             {/* Dummy Rows to fill 5 slots */}
@@ -261,12 +316,13 @@ export default async function InvoicesPage({
                                 <tr key={`dummy-${i}`} className="h-[60px]">
                                     <td className="px-6 py-4">
                                         {invoices.length === 0 && i === 2 && (
-                                            <div className="text-center text-uhuru-text-dim ">No issued invoices found.</div>
+                                            <div className="text-center text-uhuru-text-dim ">No invoices found in {showTrash ? 'trash' : 'active list'}.</div>
                                         )}
                                         &nbsp;
                                     </td>
                                     <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
                                     <td className="px-6 py-4 hidden md:table-cell">&nbsp;</td>
+                                    <td className="px-6 py-4">&nbsp;</td>
                                     <td className="px-6 py-4">&nbsp;</td>
                                     <td className="px-6 py-4">&nbsp;</td>
                                 </tr>
@@ -278,6 +334,7 @@ export default async function InvoicesPage({
                     currentPage={currentPage}
                     totalPages={totalPages}
                     baseUrl="/dashboard/invoices"
+                    additionalParams={showTrash ? { showTrash: 'true' } : undefined}
                 />
             </div>
         </div >

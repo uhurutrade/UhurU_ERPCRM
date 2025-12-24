@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding...');
-  console.log('Generated at: 2025-12-22T17:49:59.458Z');
+  console.log('Generated at: 2025-12-24T11:55:08.119Z');
 
   // --- CLEANUP (Delete existing data to enforce strict sync) ---
   console.log('🧹 Cleaning up existing data...');
@@ -116,8 +116,10 @@ async function main() {
     "contactPhone": null,
     "website": "https://uhurutrade.com",
     "notes": "Imported data of Companies House at 12/12/2025",
+    "invoicePrefix": "INV-",
+    "nextInvoiceNumber": 4,
     "createdAt": "2025-12-14T08:39:19.479Z",
-    "updatedAt": "2025-12-16T18:49:50.652Z",
+    "updatedAt": "2025-12-24T11:21:10.624Z",
     "aiProvider": "openai"
   }
 ] as any[]) {
@@ -776,7 +778,174 @@ async function main() {
 
   // --- 14. Invoices ---
   console.log('Seeding Invoices...');
-  for (const inv of [] as any[]) {
+  for (const inv of [
+  {
+    "id": "cmjjw6ga00002izajp3fllydh",
+    "number": "INV-1",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-12T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "100",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "100",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj8xdaot0006e43o1e3rdk2r",
+    "cryptoWalletId": null,
+    "deletedAt": "2025-12-24T11:20:25.105Z",
+    "createdAt": "2025-12-24T10:49:40.584Z",
+    "updatedAt": "2025-12-24T11:20:25.106Z",
+    "items": [
+      {
+        "id": "cmjjw6ga00003izajk3uddfuh",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "100",
+        "total": "100",
+        "invoiceId": "cmjjw6ga00002izajp3fllydh"
+      }
+    ]
+  },
+  {
+    "id": "cmjjwt0c30002hfb8zavj16kf",
+    "number": "INV-2",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-12T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "0",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "0",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "hola test",
+    "footerNote": "test pieImported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj5yc6zc001bozg6maj5oz0p",
+    "cryptoWalletId": null,
+    "deletedAt": "2025-12-24T11:20:25.872Z",
+    "createdAt": "2025-12-24T11:07:13.011Z",
+    "updatedAt": "2025-12-24T11:20:25.873Z",
+    "items": [
+      {
+        "id": "cmjjwt0c30003hfb8ogy0ilvp",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "0",
+        "total": "0",
+        "invoiceId": "cmjjwt0c30002hfb8zavj16kf"
+      }
+    ]
+  },
+  {
+    "id": "cmjjxaynf0006hfb8tfuwwxad",
+    "number": "INV-3",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-12T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "118",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "118",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj8xgrzg000ae43o2x8g7e53",
+    "cryptoWalletId": null,
+    "deletedAt": "2025-12-24T11:36:48.681Z",
+    "createdAt": "2025-12-24T11:21:10.635Z",
+    "updatedAt": "2025-12-24T11:36:48.682Z",
+    "items": [
+      {
+        "id": "cmjjxaynf0007hfb8j96dlo8q",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "88",
+        "total": "88",
+        "invoiceId": "cmjjxaynf0006hfb8tfuwwxad"
+      },
+      {
+        "id": "cmjjxaynf0008hfb8n05rsb55",
+        "description": "test",
+        "quantity": "1",
+        "unitPrice": "30",
+        "total": "30",
+        "invoiceId": "cmjjxaynf0006hfb8tfuwwxad"
+      }
+    ]
+  },
+  {
+    "id": "cmjjxs5tf0002bv8us8wg990u",
+    "number": "INV-004",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-06-06T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "0",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "0",
+    "currency": "GBP",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj8xgrzg000ae43o2x8g7e53",
+    "cryptoWalletId": null,
+    "deletedAt": "2025-12-24T11:36:50.141Z",
+    "createdAt": "2025-12-24T11:34:33.076Z",
+    "updatedAt": "2025-12-24T11:36:50.143Z",
+    "items": [
+      {
+        "id": "cmjjxs5tf0003bv8usq1p0o1i",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "0",
+        "total": "0",
+        "invoiceId": "cmjjxs5tf0002bv8us8wg990u"
+      }
+    ]
+  },
+  {
+    "id": "cmjjy5wyo0006bv8u9jfmrkdi",
+    "number": "T-ST001",
+    "date": "2025-12-24T00:00:00.000Z",
+    "dueDate": "2026-01-12T00:00:00.000Z",
+    "status": "DRAFT",
+    "subtotal": "122",
+    "taxRate": "0",
+    "taxAmount": "0",
+    "total": "122",
+    "currency": "EUR",
+    "organizationId": "cmjbubqbd0000ha2lp9ftb957",
+    "notes": "",
+    "footerNote": "Imported data of Companies House at 12/12/2025",
+    "bankAccountId": "cmj8xgrzg000ae43o2x8g7e53",
+    "cryptoWalletId": null,
+    "deletedAt": "2025-12-24T11:52:57.021Z",
+    "createdAt": "2025-12-24T11:45:14.784Z",
+    "updatedAt": "2025-12-24T11:52:57.022Z",
+    "items": [
+      {
+        "id": "cmjjy5wyo0007bv8ug7nthef6",
+        "description": "Service",
+        "quantity": "1",
+        "unitPrice": "100",
+        "total": "100",
+        "invoiceId": "cmjjy5wyo0006bv8u9jfmrkdi"
+      },
+      {
+        "id": "cmjjy5wyo0008bv8uodnsmg1h",
+        "description": "test",
+        "quantity": "1",
+        "unitPrice": "22",
+        "total": "22",
+        "invoiceId": "cmjjy5wyo0006bv8u9jfmrkdi"
+      }
+    ]
+  }
+] as any[]) {
     await prisma.invoice.create({
         data: {
             ...inv,
