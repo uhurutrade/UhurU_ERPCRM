@@ -69,11 +69,11 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
             </style>
 
             {/* Invoice Page - A4 size 210mm x 297mm */}
-            <div className="w-[210mm] h-[297mm] mx-auto bg-white p-[20mm] pt-[15mm] pb-[10mm] relative shadow-2xl print:shadow-none print:w-[210mm] print:h-[297mm] print:m-0 flex flex-col">
+            <div className="w-[210mm] h-[297mm] mx-auto bg-white p-[18mm] pt-[12mm] pb-[8mm] relative shadow-2xl print:shadow-none print:w-[210mm] print:h-[297mm] print:m-0 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex justify-between items-start mb-4">
                     {/* Logo Area */}
-                    <div className="w-40 h-auto">
+                    <div className="w-36 h-auto">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/images/invoice-logo.png"
@@ -83,22 +83,22 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                     </div>
                     <div className="text-right">
                         <h1 className="text-4xl font-black text-black tracking-tight uppercase leading-none">Invoice</h1>
-                        <p className="text-xs font-mono text-black mt-2">{invoice.number}</p>
+                        <p className="text-[10px] font-mono text-black mt-2">{invoice.number}</p>
                     </div>
                 </div>
 
                 {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-8 mb-6 border-b border-black pb-4">
-                    <div className="space-y-1">
-                        <div className="grid grid-cols-[120px_1fr] text-[11px]">
+                <div className="grid grid-cols-2 gap-8 mb-4 border-b border-black pb-3">
+                    <div className="space-y-0.5">
+                        <div className="grid grid-cols-[110px_1fr] text-[10px]">
                             <span className="font-bold text-black uppercase tracking-wider">Invoice Number</span>
                             <span className="font-mono font-bold">{invoice.number}</span>
                         </div>
-                        <div className="grid grid-cols-[120px_1fr] text-[11px]">
+                        <div className="grid grid-cols-[110px_1fr] text-[10px]">
                             <span className="font-bold text-black uppercase tracking-wider">Issued Date</span>
                             <span className="font-bold text-black">{format(new Date(invoice.date), 'd MMMM yyyy')}</span>
                         </div>
-                        <div className="grid grid-cols-[120px_1fr] text-[11px]">
+                        <div className="grid grid-cols-[110px_1fr] text-[10px]">
                             <span className="font-bold text-black uppercase tracking-wider">Due Date</span>
                             <span className="font-bold text-black">{format(new Date(invoice.dueDate), 'd MMMM yyyy')}</span>
                         </div>
@@ -106,22 +106,22 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                 </div>
 
                 {/* Addresses */}
-                <div className="grid grid-cols-2 gap-12 mb-6">
+                <div className="grid grid-cols-2 gap-12 mb-4">
                     <div>
-                        <h3 className="font-bold text-[9px] uppercase tracking-[0.2em] text-black mb-2">Billed to</h3>
-                        <div className="text-[12px] space-y-0.5 text-black">
-                            <p className="font-bold text-black text-base">{invoice.organization.name}</p>
+                        <h3 className="font-bold text-[8px] uppercase tracking-[0.2em] text-black mb-1.5">Billed to</h3>
+                        <div className="text-[11px] space-y-0 text-black leading-normal">
+                            <p className="font-bold text-black text-sm">{invoice.organization.name}</p>
                             {invoice.organization.email && <p>{invoice.organization.email}</p>}
                             {invoice.organization.address && <p>{invoice.organization.address}</p>}
                             <p>{invoice.organization.city} {invoice.organization.postcode}</p>
                             <p>{invoice.organization.country || 'United Kingdom'}</p>
-                            {invoice.organization.taxId && <p className="mt-1 text-[9px] font-bold text-black uppercase">VAT/Tax ID: {invoice.organization.taxId}</p>}
+                            {invoice.organization.taxId && <p className="mt-1 text-[8px] font-bold text-black uppercase tracking-tighter">VAT/Tax ID: {invoice.organization.taxId}</p>}
                         </div>
                     </div>
                     <div>
-                        <h3 className="font-bold text-[9px] uppercase tracking-[0.2em] text-black mb-2 text-right">From</h3>
-                        <div className="text-[12px] space-y-0.5 text-black text-right">
-                            <p className="font-bold text-black uppercase text-base">{settings?.companyName || 'Uhuru Trade Ltd'}</p>
+                        <h3 className="font-bold text-[8px] uppercase tracking-[0.2em] text-black mb-1.5 text-right">From</h3>
+                        <div className="text-[11px] space-y-0 text-black text-right leading-normal">
+                            <p className="font-bold text-black uppercase text-sm">{settings?.companyName || 'Uhuru Trade Ltd'}</p>
                             <p>{settings?.registeredAddress}</p>
                             <p>{settings?.registeredCity}, {settings?.registeredPostcode}</p>
                             <p>{settings?.registeredCountry}</p>
