@@ -199,7 +199,7 @@ export default async function InvoicesPage({
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {showTrash ? (
-                                                <form action={restoreInvoice.bind(null, inv.id)}>
+                                                <form action={async () => { await restoreInvoice(inv.id); }}>
                                                     <button className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all" title="Restore">
                                                         <Upload className="rotate-0" size={16} />
                                                     </button>
@@ -217,7 +217,7 @@ export default async function InvoicesPage({
                                                     {inv.status === 'PAID' && (
                                                         <LinkInvoiceButton id={inv.id} amount={inv.total} hasTransaction={!!inv.bankTransactionId} />
                                                     )}
-                                                    <form action={deleteInvoice.bind(null, inv.id)}>
+                                                    <form action={async () => { await deleteInvoice(inv.id); }}>
                                                         <button className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" title="Move to Trash">
                                                             <Trash2 size={16} />
                                                         </button>
