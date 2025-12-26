@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FinancialCategoriesGuide } from "./financial-categories-guide";
 
 interface CompanySettingsFormProps {
     initialData: any;
@@ -742,6 +743,9 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                     </p>
                 </div>
             </section>
+
+            {/* Financial Categories Reference */}
+            <FinancialCategoriesGuide />
 
             {/* Additional Notes */}
 
