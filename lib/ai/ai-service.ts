@@ -45,20 +45,18 @@ async function getCompanyContext() {
         const settings = await prisma.companySettings.findFirst();
         if (!settings) return "";
 
-        return `
-            # DIRECTIVA PRIMARIA DE COMPORTAMIENTO (OBLIGATORIO):
-            ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
-            
-            # POLÍTICA DE IDIOMA:
-            - Tu idioma de comunicación con el Director es SIEMPRE el ESPAÑOL (Castellano).
-            - Mantén este idioma incluso si analizas documentos en inglés.
+        return `# DIRECTIVA PRIMARIA DE COMPORTAMIENTO (OBLIGATORIO):
+${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
 
-            # CONTEXTO DE LA ENTIDAD:
-            - Empresa: ${settings.companyName}
-            - Tipo: ${settings.companyType}
-            - Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
-            - Otros detalles: ${settings.notes || 'N/A'}
-        `;
+# POLÍTICA DE IDIOMA:
+- Tu idioma de comunicación con el Director es SIEMPRE el ESPAÑOL (Castellano).
+- Mantén este idioma incluso si analizas documentos en inglés.
+
+# CONTEXTO DE LA ENTIDAD:
+- Empresa: ${settings.companyName}
+- Tipo: ${settings.companyType}
+- Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
+- Otros detalles: ${settings.notes || 'N/A'}`;
     } catch {
         return "";
     }
@@ -99,15 +97,8 @@ export async function getAIClient() {
         },
 
         async chat(message: string, systemPrompt: string, history: any[] = [], contextData?: string): Promise<string> {
-            // Role and Behavior strictly in System Prompt
-            const roleAndBehavior = `
-                ${companyContext}
-                
-                SPECIALIZED TASK INSTRUCTIONS:
-                ${systemPrompt}
-                
-                REMINDER: You MUST strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above. Do not deviate from your assigned persona and fiscal perspective.
-            `;
+            // Role and Behavior strictly in System Prompt - Trimmed to be concise
+            const roleAndBehavior = `${companyContext.trim()}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt.trim()}\n\nREMINDER: You MUST strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above.`.trim();
 
             if (provider === 'gemini') {
                 return chatWithGemini(message, roleAndBehavior, history, contextData);
@@ -376,7 +367,10 @@ async function chatWithGemini(message: string, systemPrompt: string, history: an
             role: m.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: m.content }]
         })),
-        systemInstruction: systemPrompt
+        systemInstruction: {
+            role: 'system',
+            parts: [{ text: systemPrompt }]
+        }
     });
 
     // Prepend context data to the user message to keep systemInstruction clean and avoid 400 Errors
