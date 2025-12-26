@@ -162,14 +162,22 @@ export async function commitSmartLeadImport(data: any) {
             });
         }
 
-        // 3. Create Lead (Always create a new lead for tracking the opportunity)
-        await prisma.lead.create({
-            data: {
+        // 3. Create or Update Lead
+        await prisma.lead.upsert({
+            where: { gmailThreadId: data.gmailThreadId || 'NO_THREAD_ID' },
+            update: {
                 name: data.contactName,
                 email: data.email,
-                source: "AI_IMPORT",
                 notes: `[AI Tracking] ${data.summary}`,
-                status: "NEW"
+                status: "NEW" // Could be dynamic based on stage
+            },
+            create: {
+                name: data.contactName,
+                email: data.email,
+                source: data.gmailThreadId ? "GMAIL_SYNC" : "AI_IMPORT",
+                notes: `[AI Tracking] ${data.summary}`,
+                status: "NEW",
+                gmailThreadId: data.gmailThreadId || null
             }
         });
 
@@ -186,22 +194,40 @@ export async function syncGmailLeads() {
         const session = await auth();
         if (!session?.user?.id) throw new Error("Unauthorized");
 
-        const emails = await fetchLabeledEmails(session.user.id, 'UhurU-Lead');
-        if (emails.length === 0) return { success: true, results: [] };
+        const threads = await fetchLabeledEmails(session.user.id, 'UhurU-Lead');
+        if (threads.length === 0) return { success: true, results: [] };
+
+        // 1. Get all existing leads that came from Gmail to check for updates
+        const existingLeads = await prisma.lead.findMany({
+            where: { gmailThreadId: { not: null } }
+        });
 
         const ai = await getAIClient();
         const results = [];
 
-        for (const email of emails) {
-            const data = await ai.analyzeLeadImport(`Subject: ${email.subject}\n\n${email.body}`);
-            results.push({
-                ...data,
-                emailId: email.id,
-                rawText: `Subject: ${email.subject}\n\n${email.body}`
-            });
+        for (const thread of threads) {
+            const existingLead = existingLeads.find(l => l.gmailThreadId === thread.id);
+
+            // Logic: 
+            // - If it doesn't exist: It's NEW.
+            // - If it exists but the new body is significantly longer (new messages): It's an UPDATE.
+            // - Otherwise: SKIP (already processed and no new info).
+
+            const isNew = !existingLead;
+            const hasNewInfo = existingLead && thread.body.length > (existingLead.notes?.length || 0) + 50;
+
+            if (isNew || hasNewInfo) {
+                const data = await ai.analyzeLeadImport(`Subject: ${thread.subject}\n\n${thread.body}`);
+                results.push({
+                    ...data,
+                    gmailThreadId: thread.id,
+                    importType: isNew ? "NEW" : "UPDATE",
+                    rawText: `Subject: ${thread.subject}\n\n${thread.body}`
+                });
+            }
         }
 
-        return { success: true, results };
+        return { success: true, results, totalFound: threads.length };
     } catch (error: any) {
         console.error("Gmail Sync Error:", error);
         return { success: false, error: error.message };

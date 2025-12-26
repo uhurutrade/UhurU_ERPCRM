@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding (Lossless Sync: CRM and System data)...');
-  console.log('Generated at: 2025-12-26T16:38:33.605Z');
+  console.log('Generated at: 2025-12-26T16:44:52.235Z');
 
   // --- 1. Transaction Categories ---
   console.log('Upserting Categories...');
@@ -268,6 +268,7 @@ async function main() {
     "source": "LinkedIn",
     "status": "QUALIFIED",
     "notes": "Interested in fleet management software.",
+    "gmailThreadId": null,
     "createdAt": "2025-12-18T19:35:38.254Z",
     "updatedAt": "2025-12-18T19:44:54.320Z"
   },
@@ -278,6 +279,7 @@ async function main() {
     "source": "Website",
     "status": "QUALIFIED",
     "notes": "Looking for a custom ERP solution.",
+    "gmailThreadId": null,
     "createdAt": "2025-12-18T19:35:38.254Z",
     "updatedAt": "2025-12-18T19:44:56.427Z"
   }

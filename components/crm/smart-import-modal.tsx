@@ -148,18 +148,35 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
 
                 {step === "review" && extractedData && (
                     <div className="space-y-6">
-                        {/* duplicate warning */}
-                        {(currentMatch?.contact || currentMatch?.organization) && (
-                            <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex gap-4 animate-in fade-in slide-in-from-top duration-300">
-                                <div className="p-2 bg-amber-500/20 rounded-xl h-fit">
-                                    <AlertCircle className="text-amber-500" size={20} />
+                        {/* Status Badges */}
+                        <div className="flex gap-2 mb-2">
+                            {queue[queueIndex]?.importType === "UPDATE" && (
+                                <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-blue-500/30">
+                                    Actualización Detectada
+                                </span>
+                            )}
+                            {currentMatch?.contact && (
+                                <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-amber-500/30">
+                                    Contacto en CRM
+                                </span>
+                            )}
+                        </div>
+
+                        {/* duplicate warning / update warning */}
+                        {(currentMatch?.contact || currentMatch?.organization || queue[queueIndex]?.importType === "UPDATE") && (
+                            <div className={`p-4 ${queue[queueIndex]?.importType === "UPDATE" ? 'bg-blue-500/10 border-blue-500/30' : 'bg-amber-500/10 border-amber-500/30'} border rounded-2xl flex gap-4 animate-in fade-in slide-in-from-top duration-300`}>
+                                <div className={`p-2 ${queue[queueIndex]?.importType === "UPDATE" ? 'bg-blue-500/20' : 'bg-amber-500/20'} rounded-xl h-fit`}>
+                                    <AlertCircle className={queue[queueIndex]?.importType === "UPDATE" ? 'text-blue-400' : 'text-amber-500'} size={20} />
                                 </div>
                                 <div className="text-sm">
-                                    <p className="text-amber-200 font-bold mb-1">Registro Existente Detectado</p>
-                                    <p className="text-amber-400/80 leading-relaxed">
-                                        {currentMatch.contact ? `Ya existe un contacto con el email ${extractedData.email}. ` : ''}
-                                        {currentMatch.organization ? `La organización ${extractedData.organizationName} ya está registrada. ` : ''}
-                                        Al guardar, se <b>actualizarán</b> los datos actuales con la nueva información.
+                                    <p className={`font-bold mb-1 ${queue[queueIndex]?.importType === "UPDATE" ? 'text-blue-200' : 'text-amber-200'}`}>
+                                        {queue[queueIndex]?.importType === "UPDATE" ? "Actualización de Conversación Detectada" : "Registro Existente Detectado"}
+                                    </p>
+                                    <p className={`leading-relaxed ${queue[queueIndex]?.importType === "UPDATE" ? 'text-blue-400/80' : 'text-amber-400/80'}`}>
+                                        {queue[queueIndex]?.importType === "UPDATE"
+                                            ? "Este hilo de Gmail ya estaba registrado, pero hay nuevos mensajes. Al guardar, se actualizará el resumen y la información del lead."
+                                            : `Email: ${extractedData.email || 'N/A'}. Al guardar, se actualizarán los datos actuales.`
+                                        }
                                     </p>
                                 </div>
                             </div>
@@ -246,10 +263,13 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className={`px-6 py-2.5 ${currentMatch?.contact ? 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'} disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center gap-2`}
+                                    className={`px-6 py-2.5 ${currentMatch?.contact || queue[queueIndex]?.importType === "UPDATE" ? 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'} disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center gap-2`}
                                 >
                                     {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                                    {currentMatch?.contact ? "Actualizar y Guardar" : "Aprobar y Guardar"}
+                                    {queue.length > 1 && queueIndex < queue.length - 1
+                                        ? "Guardar y Siguiente"
+                                        : (currentMatch?.contact || queue[queueIndex]?.importType === "UPDATE" ? "Actualizar y Finalizar" : "Aprobar y Finalizar")
+                                    }
                                 </button>
                             </div>
                         </div>
@@ -257,24 +277,24 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                 )}
 
                 {step === "success" && (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-6 text-center">
+                    <div className="flex flex-col items-center justify-center py-12 space-y-6 text-center animate-in zoom-in duration-500">
                         <div className="relative">
                             <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full" />
-                            <div className="relative p-6 bg-emerald-500/10 rounded-full text-emerald-400">
+                            <div className="relative p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400">
                                 <CheckCircle2 size={64} />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-2xl font-bold text-white">¡Proceso Finalizado!</h3>
-                            <p className="text-slate-400 max-w-[300px] mx-auto">
-                                Has importado {importedCount} leads correctamente al CRM.
+                            <h3 className="text-3xl font-black text-white tracking-tight">¡Proceso Finalizado!</h3>
+                            <p className="text-slate-400 text-lg">
+                                Has gestionado <span className="text-white font-bold">{importedCount}</span> leads correctamente.
                             </p>
                         </div>
                         <button
                             onClick={reset}
-                            className="w-full max-w-[200px] h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                            className="w-full max-w-[200px] h-12 bg-white text-slate-900 hover:bg-slate-100 rounded-2xl font-black text-sm shadow-xl hover:shadow-white/10 transition-all active:scale-95"
                         >
-                            Cerrar
+                            Volver al CRM
                         </button>
                     </div>
                 )}
