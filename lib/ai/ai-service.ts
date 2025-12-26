@@ -40,6 +40,24 @@ export interface AIExtractionResult {
     reason?: string;
 }
 
+async function getCompanyContext() {
+    try {
+        const settings = await prisma.companySettings.findFirst();
+        if (!settings) return "";
+
+        return `
+            CONTEXTO DE LA EMPRESA:
+            Nombre: ${settings.companyName}
+            Sector: ${settings.companyType}
+            Misión/Notas: ${settings.notes || 'N/A'}
+            Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
+            Actúas como el asistente de IA oficial de ${settings.companyName}. Tu tono debe ser profesional, eficiente y conocedor del contexto de esta empresa.
+        `;
+    } catch {
+        return "";
+    }
+}
+
 /**
  * AI Service Manager
  * Handles switching between OpenAI and Google Gemini based on Company Settings.
@@ -47,42 +65,45 @@ export interface AIExtractionResult {
 export async function getAIClient() {
     const settings = await prisma.companySettings.findFirst();
     const provider = (settings as any)?.aiProvider || 'openai';
+    const companyContext = await getCompanyContext();
 
     return {
         provider,
+        companyContext,
 
         async analyzeInvoice(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
             if (provider === 'gemini') {
-                return analyzeWithGemini(filename, text, buffer, mimeType);
+                return analyzeWithGemini(filename, text, companyContext, buffer, mimeType);
             }
-            return analyzeWithOpenAI(filename, text, buffer, mimeType);
+            return analyzeWithOpenAI(filename, text, companyContext, buffer, mimeType);
         },
 
         async analyzeStrategicDoc(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
             if (provider === 'gemini') {
-                return analyzeStrategicWithGemini(filename, text, buffer, mimeType, userNotes);
+                return analyzeStrategicWithGemini(filename, text, companyContext, buffer, mimeType, userNotes);
             }
-            return analyzeStrategicWithOpenAI(filename, text, buffer, mimeType, userNotes);
+            return analyzeStrategicWithOpenAI(filename, text, companyContext, buffer, mimeType, userNotes);
         },
 
         async analyzeLeadImport(text: string): Promise<any> {
             if (provider === 'gemini') {
-                return analyzeLeadWithGemini(text);
+                return analyzeLeadWithGemini(text, companyContext);
             }
-            return analyzeLeadWithOpenAI(text);
+            return analyzeLeadWithOpenAI(text, companyContext);
         },
 
         async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
+            const enrichedPrompt = `${systemPrompt}\n\n${companyContext}`;
             if (provider === 'gemini') {
-                return chatWithGemini(message, systemPrompt, history);
+                return chatWithGemini(message, enrichedPrompt, history);
             }
-            return chatWithOpenAI(message, systemPrompt, history);
+            return chatWithOpenAI(message, enrichedPrompt, history);
         }
     };
 }
 
 // --- OpenAI Implementation ---
-async function analyzeWithOpenAI(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
+async function analyzeWithOpenAI(filename: string, text: string, companyContext: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
@@ -91,7 +112,7 @@ async function analyzeWithOpenAI(filename: string, text: string, buffer?: Buffer
     const messages: any[] = [
         {
             role: "system",
-            content: `You are an expert accountant. Analyze the provided invoice.
+            content: `You are an expert accountant at ${companyContext}. Analyze the provided invoice.
             Return a JSON object with:
             {
                 "isInvoice": boolean,
@@ -141,7 +162,7 @@ async function analyzeWithOpenAI(filename: string, text: string, buffer?: Buffer
     return JSON.parse(response.choices[0].message.content || '{}');
 }
 
-async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
+async function analyzeStrategicWithOpenAI(filename: string, text: string, companyContext: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
@@ -150,7 +171,7 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
     const messages: any[] = [
         {
             role: "system",
-            content: `You are a UK Corporate Law & Tax expert. Analyze the provided document for a UK LTD company.
+            content: `You are a UK Corporate Law & Tax expert representing ${companyContext}. Analyze the provided document for a UK LTD company.
             ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
             Extract details for: relevance, documentDate (YYYY-MM-DD), docTopic, deadlines, vatLiability, and a strategicInsight.
             
@@ -217,7 +238,7 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
     return JSON.parse(response.choices[0].message.content || '{}');
 }
 
-async function analyzeLeadWithOpenAI(text: string): Promise<any> {
+async function analyzeLeadWithOpenAI(text: string, companyContext: string): Promise<any> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
@@ -226,7 +247,7 @@ async function analyzeLeadWithOpenAI(text: string): Promise<any> {
     const messages: any[] = [
         {
             role: "system",
-            content: `You are an expert sales and CRM assistant. Extract structured lead/contact data from the provided raw text (LinkedIn chats, profile summaries, emails, or call transcripts).
+            content: `You are an expert sales and CRM assistant for ${companyContext}. Extract structured lead/contact data from the provided raw text (LinkedIn chats, profile summaries, emails, or call transcripts).
             
             KEY INSTRUCTIONS:
             1. BILINGUAL SUPPORT: You must handle both English and Spanish inputs. The output "summary" and "organizationSector" should match the language of the input unless specified otherwise.
@@ -280,7 +301,7 @@ async function chatWithOpenAI(message: string, systemPrompt: string, history: an
 }
 
 // --- Gemini Implementation ---
-async function analyzeWithGemini(filename: string, text: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
+async function analyzeWithGemini(filename: string, text: string, companyContext: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key (GEMINI_API_KEY) is not configured.");
 
@@ -290,7 +311,7 @@ async function analyzeWithGemini(filename: string, text: string, buffer?: Buffer
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `You are an expert accountant. Analyze the following invoice and return a JSON object with:
+    const prompt = `You are an expert accountant for ${companyContext}. Analyze the following invoice and return a JSON object with:
     {
         "isInvoice": boolean,
         "issuer": string,
@@ -340,7 +361,7 @@ async function chatWithGemini(message: string, systemPrompt: string, history: an
     return response.text();
 }
 
-async function analyzeStrategicWithGemini(filename: string, text: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
+async function analyzeStrategicWithGemini(filename: string, text: string, companyContext: string, buffer?: Buffer, mimeType?: string, userNotes?: string): Promise<any> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key is not configured.");
 
@@ -350,7 +371,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Analyze this document as a UK LTD corporate expert. Filename: ${filename}.
+    const prompt = `Analyze this document as a UK LTD corporate expert for ${companyContext}. Filename: ${filename}.
     ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
     Determine if it is relevant to business/tax/legal management (isRelevant).
     Extract the effective date (documentDate) and a specific topic name (docTopic) used for versioning.
@@ -398,7 +419,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
     return JSON.parse(response.text());
 }
 
-async function analyzeLeadWithGemini(text: string): Promise<any> {
+async function analyzeLeadWithGemini(text: string, companyContext: string): Promise<any> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key is not configured.");
 
@@ -408,7 +429,7 @@ async function analyzeLeadWithGemini(text: string): Promise<any> {
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Analyze this text (LinkedIn chat, email, or profile) and extract structured lead/contact data.
+    const prompt = `Analyze this text (LinkedIn chat, email, or profile) and extract structured lead/contact data as the sales assistant for ${companyContext}.
     
     INSTRUCTIONS:
     - BILINGUAL: Support Spanish and English.

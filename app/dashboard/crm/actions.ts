@@ -87,7 +87,31 @@ export async function importLeadFromText(text: string) {
     try {
         const ai = await getAIClient();
         const data = await ai.analyzeLeadImport(text);
-        return { success: true, data };
+
+        // Check for existing entities
+        let existingContact = null;
+        if (data.email) {
+            existingContact = await prisma.contact.findFirst({
+                where: { email: { equals: data.email, mode: 'insensitive' } },
+                include: { organization: true }
+            });
+        }
+
+        let existingOrg = null;
+        if (data.organizationName) {
+            existingOrg = await prisma.organization.findFirst({
+                where: { name: { equals: data.organizationName, mode: 'insensitive' } }
+            });
+        }
+
+        return {
+            success: true,
+            data,
+            match: {
+                contact: existingContact,
+                organization: existingOrg
+            }
+        };
     } catch (error: any) {
         console.error("AI Lead Import Error:", error);
         return { success: false, error: error.message };
@@ -96,12 +120,14 @@ export async function importLeadFromText(text: string) {
 
 export async function commitSmartLeadImport(data: any) {
     try {
-        // 1. Resolve Organization
+        // 1. Resolve Organization (Update or Create)
         let organizationId = null;
         if (data.organizationName) {
             const org = await prisma.organization.upsert({
-                where: { id: `org_${data.organizationName.toLowerCase().replace(/\s+/g, '_')}` }, // Simplified ID generation for demo, ideally search by name
-                update: {},
+                where: { id: data.organizationId || `org_${data.organizationName.toLowerCase().replace(/\s+/g, '_')}` },
+                update: {
+                    sector: data.organizationSector || undefined,
+                },
                 create: {
                     name: data.organizationName,
                     sector: data.organizationSector || "Generic",
@@ -110,24 +136,39 @@ export async function commitSmartLeadImport(data: any) {
             organizationId = org.id;
         }
 
-        // 2. Create Contact
-        const contact = await prisma.contact.create({
-            data: {
-                name: data.contactName,
-                email: data.email,
-                phone: data.phone,
-                role: data.role,
-                organizationId: organizationId
-            }
-        });
+        // 2. Create or Update Contact
+        if (data.contactId) {
+            await prisma.contact.update({
+                where: { id: data.contactId },
+                data: {
+                    name: data.contactName,
+                    email: data.email,
+                    phone: data.phone,
+                    role: data.role,
+                    linkedin: data.linkedin,
+                    organizationId: organizationId || undefined
+                }
+            });
+        } else {
+            await prisma.contact.create({
+                data: {
+                    name: data.contactName,
+                    email: data.email,
+                    phone: data.phone,
+                    role: `${data.role || 'Contact'} (BASE_AI)`,
+                    linkedin: data.linkedin,
+                    organizationId: organizationId
+                }
+            });
+        }
 
-        // 3. Create Lead
+        // 3. Create Lead (Always create a new lead for tracking the opportunity)
         await prisma.lead.create({
             data: {
                 name: data.contactName,
                 email: data.email,
                 source: "AI_IMPORT",
-                notes: data.summary,
+                notes: `[AI Tracking] ${data.summary}`,
                 status: "NEW"
             }
         });

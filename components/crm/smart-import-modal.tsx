@@ -17,21 +17,23 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
     const [rawText, setRawText] = useState("");
     const [extractedData, setExtractedData] = useState<any>(null);
     const [queue, setQueue] = useState<any[]>(initialQueue);
+    const [matches, setMatches] = useState<any[]>([]);
     const [queueIndex, setQueueIndex] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
     const [importedCount, setImportedCount] = useState(0);
 
-    // Sync queue when initialQueue changes or modal opens
+    // Sync queue and matches when initialQueue changes or modal opens
     useEffect(() => {
         if (isOpen && initialQueue && initialQueue.length > 0) {
             setQueue(initialQueue);
+            setMatches(new Array(initialQueue.length).fill(null));
             setQueueIndex(0);
             setExtractedData(initialQueue[0]);
             setStep("review");
         } else if (isOpen && (!initialQueue || initialQueue.length === 0)) {
-            // Reset to paste mode if no queue
             setStep("paste");
             setQueue([]);
+            setMatches([]);
         }
     }, [initialQueue, isOpen]);
 
@@ -41,6 +43,8 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
         const result = await importLeadFromText(rawText);
         if (result.success) {
             setExtractedData(result.data);
+            setQueue([result.data]);
+            setMatches([result.match]);
             setStep("review");
         } else {
             toast.error("Error en el análisis de IA: " + result.error);
@@ -50,22 +54,27 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
 
     const handleSave = async () => {
         setIsSaving(true);
-        const result = await commitSmartLeadImport(extractedData);
+        const currentMatch = matches[queueIndex];
+        const dataToCommit = {
+            ...extractedData,
+            contactId: currentMatch?.contact?.id,
+            organizationId: currentMatch?.organization?.id,
+        };
+
+        const result = await commitSmartLeadImport(dataToCommit);
         setIsSaving(false);
         if (result.success) {
             setImportedCount(prev => prev + 1);
             if (queue.length > 0 && queueIndex < queue.length - 1) {
-                // Move to next in queue
                 const nextIndex = queueIndex + 1;
                 setQueueIndex(nextIndex);
                 setExtractedData(queue[nextIndex]);
-                toast.success("Lead importado. Siguiente...");
+                toast.success("Lead guardado correctamente.");
             } else {
                 setStep("success");
-                toast.success("¡Importación finalizada!");
             }
         } else {
-            toast.error("Error al guardar el lead: " + result.error);
+            toast.error("Error al guardar: " + result.error);
         }
     };
 
@@ -75,11 +84,8 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
             setQueueIndex(nextIndex);
             setExtractedData(queue[nextIndex]);
         } else {
-            if (queue.length > 0) {
-                setStep("success");
-            } else {
-                reset();
-            }
+            if (importedCount > 0) setStep("success");
+            else reset();
         }
     };
 
@@ -88,10 +94,13 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
         setRawText("");
         setExtractedData(null);
         setQueue([]);
+        setMatches([]);
         setQueueIndex(0);
         setImportedCount(0);
         onClose();
     };
+
+    const currentMatch = matches[queueIndex];
 
     return (
         <Modal
@@ -139,6 +148,23 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
 
                 {step === "review" && extractedData && (
                     <div className="space-y-6">
+                        {/* duplicate warning */}
+                        {(currentMatch?.contact || currentMatch?.organization) && (
+                            <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex gap-4 animate-in fade-in slide-in-from-top duration-300">
+                                <div className="p-2 bg-amber-500/20 rounded-xl h-fit">
+                                    <AlertCircle className="text-amber-500" size={20} />
+                                </div>
+                                <div className="text-sm">
+                                    <p className="text-amber-200 font-bold mb-1">Registro Existente Detectado</p>
+                                    <p className="text-amber-400/80 leading-relaxed">
+                                        {currentMatch.contact ? `Ya existe un contacto con el email ${extractedData.email}. ` : ''}
+                                        {currentMatch.organization ? `La organización ${extractedData.organizationName} ya está registrada. ` : ''}
+                                        Al guardar, se <b>actualizarán</b> los datos actuales con la nueva información.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 gap-4">
@@ -203,14 +229,12 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
 
                         <div className="flex items-center justify-between pt-4 border-t border-white/5">
                             <div className="flex gap-2">
-                                {queue.length > 0 && (
-                                    <button
-                                        onClick={handleDiscard}
-                                        className="px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
-                                    >
-                                        Descartar
-                                    </button>
-                                )}
+                                <button
+                                    onClick={handleDiscard}
+                                    className="px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                                >
+                                    Descartar
+                                </button>
                             </div>
                             <div className="flex gap-3">
                                 <button
@@ -222,10 +246,10 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center gap-2"
+                                    className={`px-6 py-2.5 ${currentMatch?.contact ? 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/20' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'} disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg transition-all active:scale-95 flex items-center gap-2`}
                                 >
                                     {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                                    Aprobar y Guardar
+                                    {currentMatch?.contact ? "Actualizar y Guardar" : "Aprobar y Guardar"}
                                 </button>
                             </div>
                         </div>
