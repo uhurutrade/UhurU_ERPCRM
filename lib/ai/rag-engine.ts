@@ -346,20 +346,41 @@ export async function ingestText(docId: string, title: string, text: string) {
 
 /**
  * Búsqueda de Chunks similares (DESACTIVADA POR COMPATIBILIDAD VPS)
- * Retorna solo los últimos chunks por ahora como fallback.
+ * Retorna los fragmentos más recientes enriquecidos con metadata de descarga.
  */
-export async function retrieveContext(query: string, maxResults = 3) {
+export async function retrieveContext(query: string, maxResults = 5) {
     try {
         const chunks = await prisma.documentChunk.findMany({
             take: maxResults,
             orderBy: { createdAt: 'desc' },
-            include: { document: true }
+            include: {
+                document: {
+                    select: {
+                        id: true,
+                        filename: true,
+                        path: true,
+                        documentType: true,
+                        userNotes: true
+                    }
+                }
+            }
         });
 
         if (chunks.length === 0) return "No hay contexto disponible en la base de datos.";
 
-        return chunks.map((c: any) => `[Fuente: ${c.document?.filename || 'Sistema'}]\n${c.content}`).join('\n\n---\n\n');
+        // Formateamos el contexto incluyendo el LINK DE DESCARGA para que la IA pueda proponerlo
+        return chunks.map((c: any) => {
+            const doc = c.document;
+            const downloadUrl = doc?.path ? (doc.path.startsWith('/') ? doc.path : `/${doc.path}`) : null;
+
+            return `[FUENTE: ${doc?.filename || 'Sistema'}]
+[DOWNLOAD_URL: ${downloadUrl || 'N/A'}]
+[TIPO: ${doc?.documentType || 'N/A'}]
+[NOTAS_USUARIO: ${doc?.userNotes || 'N/A'}]
+CONTENIDO: ${c.content}`;
+        }).join('\n\n---\n\n');
     } catch (err) {
+        console.error("[RAG] Retrieval error:", err);
         return "Error al recuperar contexto (IA en modo básico).";
     }
 }
