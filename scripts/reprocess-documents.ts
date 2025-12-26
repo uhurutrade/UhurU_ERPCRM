@@ -4,11 +4,21 @@ import { ingestDocument } from '../lib/ai/rag-engine';
 async function main() {
     console.log('--- Resonancia Vectorial: Re-procesando Documentos ---');
 
-    const docs = await prisma.complianceDocument.findMany();
+    // Solo procesar documentos físicos (omitir los virtuales de sistema)
+    const docs = await prisma.complianceDocument.findMany({
+        where: {
+            NOT: [
+                { path: { startsWith: 'system://' } },
+                { documentType: 'SYSTEM' }
+            ]
+        }
+    });
 
-    console.log(`Encontrados ${docs.length} documentos para re-vectorizar.`);
+    console.log(`Encontrados ${docs.length} documentos físicos para re-vectorizar.`);
 
     for (const doc of docs) {
+        if (!doc.path) continue;
+
         console.log(`\n[+] Analizando: ${doc.filename}`);
         try {
             const result = await ingestDocument(doc.id, doc.path);

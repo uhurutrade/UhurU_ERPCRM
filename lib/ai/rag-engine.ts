@@ -89,15 +89,26 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         console.log(`[RAG] 📄 Procesando: "${originalFilename}" (ID: ${docId})`);
 
-        // Resolución de ruta para Docker/Producción
-        const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
-        let fullPath = path.join(process.cwd(), cleanPath);
+        // Manejar rutas virtuales de sistema
+        if (filePath.startsWith('system://')) {
+            return { success: false, reason: "Virtual system path - use ingestText instead" };
+        }
 
-        // Si no existe, buscar en public/
+        // Resolución de ruta para Docker/Producción
+        // Evitar unir si la ruta ya es absoluta y existe
+        let fullPath = filePath;
+
         try {
             await fs.access(fullPath);
         } catch {
-            fullPath = path.join(process.cwd(), 'public', cleanPath);
+            const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+            fullPath = path.join(process.cwd(), cleanPath);
+
+            try {
+                await fs.access(fullPath);
+            } catch {
+                fullPath = path.join(process.cwd(), 'public', cleanPath);
+            }
         }
 
         const dataBuffer = await fs.readFile(fullPath);
@@ -283,8 +294,12 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         console.log(`[RAG] ✅ FINALIZADO: "${originalFilename}" - ${inserted}/${chunks.length} fragmentos vectorizados`);
         return { success: true, chunksProcessed: inserted };
-    } catch (error) {
-        console.error("RAG Ingestion Error:", error);
+    } catch (error: any) {
+        if (error.code === 'ENOENT') {
+            console.error(`[RAG] ❌ Archivo no encontrado: ${error.path}`);
+        } else {
+            console.error("RAG Ingestion Error:", error.message || error);
+        }
         throw error;
     }
 }
