@@ -20,7 +20,7 @@ export const authConfig = {
             const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard');
             const isOnApiRoute = request.nextUrl.pathname.startsWith('/api');
 
-            // Allow API routes to handle their own auth
+            // Allow API routes to handle their own internal auth or check session
             if (isOnApiRoute) return true;
 
             // If trying to access dashboard without login (either OAuth or Password cookie)

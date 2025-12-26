@@ -18,6 +18,7 @@ export const viewport: Viewport = {
 };
 
 import { ModalProvider } from "@/components/providers/modal-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { Toaster } from 'sonner';
 
 export default function RootLayout({
@@ -28,9 +29,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className="antialiased min-h-screen bg-slate-950 text-slate-100">
-                <ModalProvider>
-                    {children}
-                </ModalProvider>
+                <AuthProvider>
+                    <ModalProvider>
+                        {children}
+                    </ModalProvider>
+                </AuthProvider>
                 <Toaster richColors position="top-right" theme="dark" />
             </body>
         </html>

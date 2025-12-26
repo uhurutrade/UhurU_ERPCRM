@@ -72,7 +72,13 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                             toast.success("No se encontraron nuevos leads en Gmail.");
                         }
                     } else {
-                        toast.error("Error al sincronizar Gmail: " + res.error);
+                        if (res.error === "Unauthorized") {
+                            toast.error("Para sincronizar Gmail, primero debes iniciar sesión con Google en la página principal.", {
+                                duration: 5000,
+                            });
+                        } else {
+                            toast.error("Error al sincronizar Gmail: " + res.error);
+                        }
                     }
                 }}
                 disabled={isSyncing}
