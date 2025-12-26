@@ -189,6 +189,30 @@ export async function commitSmartLeadImport(data: any) {
     }
 }
 
+export async function discardLead(gmailThreadId: string, name: string) {
+    try {
+        if (!gmailThreadId) return { success: false, error: "No Thread ID" };
+
+        await prisma.lead.upsert({
+            where: { gmailThreadId },
+            update: { status: "DISCARDED" },
+            create: {
+                name: name || "Lead Descartado",
+                status: "DISCARDED",
+                gmailThreadId,
+                source: "GMAIL_SYNC",
+                notes: "Descartado manualmente por el usuario durante la revisión."
+            }
+        });
+
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Discard Lead Error:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function syncGmailLeads() {
     try {
         const session = await auth();
@@ -224,9 +248,15 @@ export async function syncGmailLeads() {
             const existingLead = existingLeads.find(l => l.gmailThreadId === thread.id);
 
             // Logic: 
+            // - If it's already DISCARDED or CONVERTED/ACTIVE: SKIP (unless it's a significant update)
             // - If it doesn't exist: It's NEW.
             // - If it exists but the new body is significantly longer (new messages): It's an UPDATE.
             // - Otherwise: SKIP (already processed and no new info).
+
+            if (existingLead && existingLead.status === "DISCARDED") {
+                console.log(`[Gmail Sync] ⏩ Skipping discarded thread: ${thread.id}`);
+                continue;
+            }
 
             const isNew = !existingLead;
             const hasNewInfo = existingLead && thread.body.length > (existingLead.notes?.length || 0) + 50;

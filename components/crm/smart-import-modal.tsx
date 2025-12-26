@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Sparkles, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-import { importLeadFromText, commitSmartLeadImport } from "@/app/dashboard/crm/actions";
+import { importLeadFromText, commitSmartLeadImport, discardLead } from "@/app/dashboard/crm/actions";
 import { toast } from "sonner";
 
 interface SmartImportModalProps {
@@ -78,7 +78,13 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
         }
     };
 
-    const handleDiscard = () => {
+    const handleDiscard = async () => {
+        // If it's a Gmail lead, persist the discard so it doesn't show up again
+        if (extractedData?.gmailThreadId) {
+            await discardLead(extractedData.gmailThreadId, extractedData.contactName);
+            toast.info("Lead descartado y omitido para futuras sincronizaciones.");
+        }
+
         if (queue.length > 0 && queueIndex < queue.length - 1) {
             const nextIndex = queueIndex + 1;
             setQueueIndex(nextIndex);

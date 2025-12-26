@@ -100,7 +100,7 @@ model Lead {
   name          String
   email         String?
   source        String?
-  status        String   @default("NEW")
+  status        String   @default("NEW") // NEW, DISCARDED, CONVERTED
   notes         String?
   gmailThreadId String?  @unique
   createdAt     DateTime @default(now())
