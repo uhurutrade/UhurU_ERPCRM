@@ -164,6 +164,7 @@ export async function syncBankingOverview() {
                     bankContent += `    Balance: ${acc.currentBalance || '0.00'} ${acc.currency}\n`;
                     bankContent += `    IBAN: ${acc.iban || acc.accountNumber || 'N/A'}\n`;
                     if (acc.sortCode) bankContent += `    Sort Code: ${acc.sortCode}\n`;
+                    if ((acc as any).paymentDetails) bankContent += `    Payment Instructions:\n    ${(acc as any).paymentDetails.replace(/\n/g, '\n    ')}\n`;
                     bankContent += `    Status: ${acc.isActive ? 'Active' : 'Inactive'} | Primary: ${acc.isPrimary ? 'Yes' : 'No'}\n`;
                 }
             }
