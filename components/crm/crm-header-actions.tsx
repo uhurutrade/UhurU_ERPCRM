@@ -6,6 +6,10 @@ import { DealModal } from './modals/deal-modal';
 import { OrganizationModal } from './modals/organization-modal';
 import { ContactModal } from './modals/contact-modal';
 import { LeadModal } from './modals/lead-modal';
+import { SmartImportModal } from './smart-import-modal';
+import { Sparkles, RefreshCw, Mail } from 'lucide-react';
+import { syncGmailLeads } from '@/app/dashboard/crm/actions';
+import { toast } from 'sonner';
 
 interface CRMHeaderActionsProps {
     organizations: any[];
@@ -14,6 +18,8 @@ interface CRMHeaderActionsProps {
 export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
     const [activeModal, setActiveModal] = useState<string | null>(null);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [gmailQueue, setGmailQueue] = useState<any[]>([]);
 
     const closeModal = () => setActiveModal(null);
 
@@ -77,6 +83,43 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                                 <span className="font-bold">New Lead</span>
                             </button>
 
+                            <button
+                                onClick={() => { setActiveModal('smart-import'); setShowDropdown(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-indigo-400 hover:text-white hover:bg-slate-800/80 transition-colors group"
+                            >
+                                <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                    <Sparkles size={14} />
+                                </div>
+                                <span className="font-bold">Smart Import (AI)</span>
+                            </button>
+
+                            <button
+                                onClick={async () => {
+                                    setIsSyncing(true);
+                                    setShowDropdown(false);
+                                    const res = await syncGmailLeads();
+                                    setIsSyncing(false);
+                                    if (res.success) {
+                                        if (res.results && res.results.length > 0) {
+                                            setGmailQueue(res.results);
+                                            setActiveModal('smart-import');
+                                            toast.success(`${res.results.length} correos encontrados para revisión.`);
+                                        } else {
+                                            toast.success("No se encontraron nuevos leads en Gmail.");
+                                        }
+                                    } else {
+                                        toast.error("Error al sincronizar Gmail: " + res.error);
+                                    }
+                                }}
+                                disabled={isSyncing}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-emerald-400 hover:text-white hover:bg-slate-800/80 transition-colors group"
+                            >
+                                <div className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                    {isSyncing ? <RefreshCw size={14} className="animate-spin" /> : <Mail size={14} />}
+                                </div>
+                                <span className="font-bold">{isSyncing ? 'Sincronizando...' : 'Sincronizar Gmail'}</span>
+                            </button>
+
                             <div className="mt-2 pt-2 border-t border-uhuru-border">
                                 <div className="px-4 py-2">
                                     <p className="text-[10px] text-uhuru-text-muted ">Capture new opportunities quickly.</p>
@@ -105,6 +148,11 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
             <LeadModal
                 isOpen={activeModal === 'lead'}
                 onClose={closeModal}
+            />
+            <SmartImportModal
+                isOpen={activeModal === 'smart-import'}
+                onClose={() => { closeModal(); setGmailQueue([]); }}
+                initialQueue={gmailQueue}
             />
         </div>
     );

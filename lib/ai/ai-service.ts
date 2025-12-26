@@ -65,6 +65,13 @@ export async function getAIClient() {
             return analyzeStrategicWithOpenAI(filename, text, buffer, mimeType, userNotes);
         },
 
+        async analyzeLeadImport(text: string): Promise<any> {
+            if (provider === 'gemini') {
+                return analyzeLeadWithGemini(text);
+            }
+            return analyzeLeadWithOpenAI(text);
+        },
+
         async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
             if (provider === 'gemini') {
                 return chatWithGemini(message, systemPrompt, history);
@@ -200,6 +207,47 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, buffer
     }
 
     messages.push({ role: "user", content: userContent });
+
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages,
+        response_format: { type: "json_object" }
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+}
+
+async function analyzeLeadWithOpenAI(text: string): Promise<any> {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OpenAI API Key is not configured.");
+
+    const openai = new OpenAI({ apiKey });
+
+    const messages: any[] = [
+        {
+            role: "system",
+            content: `You are an expert sales and CRM assistant. Extract structured lead/contact data from the provided raw text (LinkedIn chats, profile summaries, emails, or call transcripts).
+            
+            KEY INSTRUCTIONS:
+            1. BILINGUAL SUPPORT: You must handle both English and Spanish inputs. The output "summary" and "organizationSector" should match the language of the input unless specified otherwise.
+            2. CONVERSATION ANALYSIS: If the text is a thread, analyze the relationship, intent, and current stage of the conversation.
+            3. LOGICAL SUMMARY: Provide a brief but logical summary of the person and the opportunity.
+            
+            Return a JSON object with:
+            {
+                "contactName": string,
+                "email": string (null if unknown),
+                "phone": string (null if unknown),
+                "role": string,
+                "organizationName": string,
+                "organizationSector": string,
+                "summary": string,
+                "confidence": number (0-1),
+                "language": "es" | "en"
+            }`
+        },
+        { role: "user", content: `Raw Text: ${text.substring(0, 10000)}` }
+    ];
 
     const response = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -348,4 +396,39 @@ async function analyzeStrategicWithGemini(filename: string, text: string, buffer
     const result = await model.generateContent(contents);
     const response = await result.response;
     return JSON.parse(response.text());
+}
+
+async function analyzeLeadWithGemini(text: string): Promise<any> {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("Gemini API Key is not configured.");
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const prompt = `Analyze this text (LinkedIn chat, email, or profile) and extract structured lead/contact data.
+    
+    INSTRUCTIONS:
+    - BILINGUAL: Support Spanish and English.
+    - CONTEXT: Analyze the whole conversation thread for intent and relationship.
+    
+    Return JSON:
+    {
+        "contactName": string,
+        "email": string,
+        "phone": string,
+        "role": string,
+        "organizationName": string,
+        "organizationSector": string,
+        "summary": string,
+        "confidence": number,
+        "language": "es" | "en"
+    }
+    
+    Text: ${text.substring(0, 15000)}`;
+
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
 }
