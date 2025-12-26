@@ -7,8 +7,10 @@ export async function getGmailClient(userId: string) {
     });
 
     if (!account || !account.access_token) {
+        console.log(`[Gmail Client] ❌ No account found in DB for userId: ${userId}`);
         throw new Error("No Google account linked or missing tokens.");
     }
+    console.log(`[Gmail Client] ✅ Account found for userId: ${userId}`);
 
     const oauth2Client = new google.auth.OAuth2(
         process.env.AUTH_GOOGLE_ID,

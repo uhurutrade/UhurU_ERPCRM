@@ -200,21 +200,27 @@ export async function syncGmailLeads() {
         });
 
         if (!session?.user?.id) {
+            console.log("[Gmail Sync] ❌ Unauthorized: No user ID in session");
             return { success: false, error: "Unauthorized" };
         }
 
+        console.log("[Gmail Sync] 📧 Fetching emails for label: UhurU-Lead...");
         const threads = await fetchLabeledEmails(session.user.id, 'UhurU-Lead');
+        console.log(`[Gmail Sync] 📥 Found ${threads.length} threads.`);
+
         if (threads.length === 0) return { success: true, results: [] };
 
         // 1. Get all existing leads that came from Gmail to check for updates
         const existingLeads = await prisma.lead.findMany({
             where: { gmailThreadId: { not: null } }
         });
+        console.log(`[Gmail Sync] 🔍 Checking against ${existingLeads.length} existing leads in DB.`);
 
         const ai = await getAIClient();
         const results = [];
 
         for (const thread of threads) {
+            console.log(`[Gmail Sync] 🧵 Processing thread: ${thread.id} (${thread.subject})`);
             const existingLead = existingLeads.find(l => l.gmailThreadId === thread.id);
 
             // Logic: 

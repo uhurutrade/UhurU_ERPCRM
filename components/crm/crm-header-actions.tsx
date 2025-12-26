@@ -81,7 +81,6 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                             toast.info("Vinculando con Google para sincronizar Gmail...", { duration: 3000 });
                             signIn("google", {
                                 callbackUrl: window.location.href,
-                                prompt: "consent"
                             });
                         } else {
                             toast.error("Error al sincronizar Gmail: " + res.error);
