@@ -3,12 +3,22 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { format } from 'date-fns';
-import { Trash2, AlertTriangle, X, CheckSquare, Square, Paperclip, Search } from 'lucide-react';
-import { useConfirm } from '@/components/providers/modal-provider';
 import { toast } from 'sonner';
-import { TransactionDetailsModal, type Transaction, type Attachment } from './transaction-details-modal';
-import { CategoryBadge } from './category-badge';
+import {
+    Trash2,
+    AlertTriangle,
+    X,
+    CheckSquare,
+    Square,
+    Paperclip,
+    Search,
+    Tag,
+    ChevronDown
+} from 'lucide-react';
 
+import { TransactionDetailsModal, type Transaction } from './transaction-details-modal';
+import { CategoryBadge } from './category-badge';
+import { bulkUpdateTransactionCategory } from '@/app/actions/banking';
 
 export function TransactionTable({
     transactions,
@@ -30,12 +40,17 @@ export function TransactionTable({
     const searchParams = useSearchParams();
 
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-    const [isSelectAllMatching, setIsSelectAllMatching] = useState(false); // Global selection state
+    const [isSelectAllMatching, setIsSelectAllMatching] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteReason, setDeleteReason] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const [isCategorizing, setIsCategorizing] = useState(false);
+    const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+
     const [searchTerm, setSearchTerm] = useState(searchParams.get('query')?.toString() || "");
+    const currentCategoryStatus = (searchParams.get('categoryStatus') as 'all' | 'tagged' | 'untagged') || 'all';
 
     // Sync search with URL (Debounced)
     useEffect(() => {
@@ -46,28 +61,24 @@ export function TransactionTable({
             } else {
                 params.delete('query');
             }
-            params.set('page', '1'); // Reset to page 1 on search
+            params.set('page', '1');
             router.replace(`${pathname}?${params.toString()}`);
-            setIsSelectAllMatching(false); // Reset global selection on search change
+            setIsSelectAllMatching(false);
             setSelectedIds(new Set());
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, pathname, router]); // Intentionally omitting searchParams to avoid loop if possible, but strict deps needed. 
-    // Actually, searchParams changes on push, so this might loop if not careful.
-    // Better strategy: Only push if value is different from current param.
+    }, [searchTerm, pathname, router]);
 
-    // Viewing State
     const [viewTransaction, setViewTransaction] = useState<Transaction | null>(null);
 
-    // --- Selection Logic ---
+    // --- Logic ---
     const handleSelectAll = () => {
         if (isSelectAllMatching || (selectedIds.size === transactions.length && transactions.length > 0)) {
             setSelectedIds(new Set());
             setIsSelectAllMatching(false);
         } else {
             setSelectedIds(new Set(transactions.map(t => t.id)));
-            // Global selection prompt logic handled in UI render
         }
     };
 
@@ -79,7 +90,7 @@ export function TransactionTable({
         const params = new URLSearchParams(searchParams);
         params.set('page', newPage.toString());
         router.push(`${pathname}?${params.toString()}`);
-        setSelectedIds(new Set()); // Reset local selection on page change
+        setSelectedIds(new Set());
         setIsSelectAllMatching(false);
     };
 
@@ -87,23 +98,89 @@ export function TransactionTable({
         const newSelected = new Set(selectedIds);
         if (newSelected.has(id)) {
             newSelected.delete(id);
-            setIsSelectAllMatching(false); // If unselecting one, global selection is broken
+            setIsSelectAllMatching(false);
         } else {
             newSelected.add(id);
         }
         setSelectedIds(newSelected);
     };
 
-    // --- Deletion Logic ---
-    // --- Linking Logic ---
+    const handleCategoryStatusChange = (status: string) => {
+        const params = new URLSearchParams(searchParams);
+        if (status === 'all') params.delete('categoryStatus');
+        else params.set('categoryStatus', status);
+        params.set('page', '1');
+        router.push(`${pathname}?${params.toString()}`);
+        setSelectedIds(new Set());
+        setIsSelectAllMatching(false);
+    };
+
+    const handleBulkCategory = async (catName: string) => {
+        setIsCategorizing(true);
+        setIsCategoryMenuOpen(false);
+        try {
+            const res = await bulkUpdateTransactionCategory(
+                Array.from(selectedIds),
+                catName,
+                isSelectAllMatching,
+                searchTerm
+            );
+
+            if (res.success) {
+                toast.success(`Updated transactions successfully`);
+                setSelectedIds(new Set());
+                setIsSelectAllMatching(false);
+                router.refresh();
+            } else {
+                toast.error(res.error || 'Failed to update categories');
+            }
+        } catch (error) {
+            toast.error('Unexpected error during bulk update');
+        } finally {
+            setIsCategorizing(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!deleteReason.trim()) return;
+        setIsDeleting(true);
+        try {
+            const response = await fetch('/api/banking/transactions/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    transactionIds: Array.from(selectedIds),
+                    deleteAllMatching: isSelectAllMatching,
+                    query: searchTerm,
+                    reason: deleteReason
+                })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || "Failed to delete transactions");
+            }
+
+            setSelectedIds(new Set());
+            setIsSelectAllMatching(false);
+            setIsDeleteModalOpen(false);
+            setDeleteReason("");
+            router.refresh();
+            toast.success("Transactions deleted and logged.");
+        } catch (error: any) {
+            toast.error(error.message || "An unexpected error occurred.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     const linkAttachmentId = searchParams.get('attachmentId');
     const linkInvoiceId = searchParams.get('invoiceId');
     const isLinkingMode = searchParams.get('action') === 'link' && (linkAttachmentId || linkInvoiceId);
 
     const handleLinkDirect = async (transactionId: string) => {
         if (!linkAttachmentId && !linkInvoiceId) return;
-
-        setIsDeleting(true); // Loading state
+        setIsDeleting(true);
         try {
             if (linkAttachmentId) {
                 const { linkAttachmentToTransaction } = await import('@/app/actions/invoices');
@@ -131,105 +208,136 @@ export function TransactionTable({
         }
     };
 
-    const handleDelete = async () => {
-        if (!deleteReason.trim()) return;
-
-        setIsDeleting(true);
-        try {
-            const response = await fetch('/api/banking/transactions/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    transactionIds: Array.from(selectedIds),
-                    deleteAllMatching: isSelectAllMatching,
-                    query: searchTerm, // Send query for global deletion
-                    reason: deleteReason
-                })
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || "Failed to delete transactions");
-            }
-
-            // Success
-            setSelectedIds(new Set());
-            setIsSelectAllMatching(false);
-            setIsDeleteModalOpen(false);
-            setDeleteReason("");
-            router.refresh();
-        } catch (error: any) {
-            console.error(error);
-            alert(error.message || "An unexpected error occurred.");
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
     return (
         <div className="relative">
             {/* --- Action Bar (Floating) --- */}
             {selectedIds.size > 0 && (
-                <div className="absolute -top-16 left-0 right-0 z-10 bg-rose-950/90 backdrop-blur-md border border-rose-800 text-white p-4 rounded-xl flex justify-between items-center shadow-2xl animate-in slide-in-from-top-4 fade-in duration-200">
-                    <div className="flex items-center gap-3">
-                        <span className="font-bold text-lg">{selectedIds.size} Selected</span>
-                        <span className="text-rose-300 text-sm">Create Audit Log & Delete</span>
+                <div className="absolute -top-20 left-0 right-0 z-40 bg-slate-900 border border-slate-700 text-white p-4 rounded-2xl flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-top-4 fade-in duration-300">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-uhuru-blue/20 rounded-xl text-uhuru-blue">
+                            <CheckSquare size={20} />
+                        </div>
+                        <div>
+                            <span className="font-black text-lg tracking-tight block">
+                                {isSelectAllMatching ? `All ${totalItems} items selected` : `${selectedIds.size} Selected`}
+                            </span>
+                            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Bulk Management</span>
+                        </div>
                     </div>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setSelectedIds(new Set())}
-                            className="px-4 py-2 hover:bg-rose-900/50 rounded-lg text-rose-200 transition-colors"
-                        >
-                            Cancel
-                        </button>
+
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                                disabled={isCategorizing}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all border border-white/5 shadow-lg group"
+                            >
+                                <Tag size={16} className="text-uhuru-blue group-hover:scale-110 transition-transform" />
+                                {isCategorizing ? 'UPDATING...' : 'SET CATEGORY'}
+                                <ChevronDown size={14} className={`transition-transform duration-200 ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isCategoryMenuOpen && (
+                                <div className="absolute bottom-full right-0 mb-2 w-56 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                    <div className="p-2 border-b border-white/5">
+                                        <p className="px-3 py-1 text-[9px] font-black text-slate-500 uppercase tracking-widest">Choose Category</p>
+                                    </div>
+                                    <div className="max-h-60 overflow-y-auto p-1.5 custom-scrollbar">
+                                        <button
+                                            onClick={() => handleBulkCategory("")}
+                                            className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2"
+                                        >
+                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+                                            Uncategorized (Clear)
+                                        </button>
+                                        {categories.map((cat) => (
+                                            <button
+                                                key={cat.name}
+                                                onClick={() => handleBulkCategory(cat.name)}
+                                                className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 group"
+                                            >
+                                                <div className={`w-1.5 h-1.5 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
+                                                {cat.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-px h-8 bg-white/5" />
+
                         <button
                             onClick={() => setIsDeleteModalOpen(true)}
-                            className="flex items-center gap-2 px-6 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-bold shadow-lg shadow-rose-900/20 transition-all hover:scale-105"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 rounded-xl font-bold transition-all"
                         >
-                            <Trash2 size={18} />
-                            DELETE SECURELY
+                            <Trash2 size={16} />
+                            DELETE
+                        </button>
+
+                        <button
+                            onClick={() => { setSelectedIds(new Set()); setIsSelectAllMatching(false); }}
+                            className="p-2.5 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
+                        >
+                            <X size={20} />
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* --- Search Bar --- */}
-            <div className="mb-6 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                <input
-                    type="text"
-                    placeholder="Search recent transactions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-uhuru-blue text-white placeholder-slate-500 transition-all focus:bg-slate-900"
-                />
+            {/* --- Search & Filters --- */}
+            <div className="mb-6 flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input
+                        type="text"
+                        placeholder="Search recent transactions..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-uhuru-blue text-white placeholder-slate-500 transition-all focus:bg-slate-900"
+                    />
+                </div>
+
+                <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-700 h-12">
+                    <button
+                        onClick={() => handleCategoryStatusChange('all')}
+                        className={`flex-1 px-6 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${currentCategoryStatus === 'all' ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+                    >
+                        All
+                    </button>
+                    <button
+                        onClick={() => handleCategoryStatusChange('tagged')}
+                        className={`flex-1 px-6 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${currentCategoryStatus === 'tagged' ? 'bg-emerald-500/20 text-emerald-400 shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+                    >
+                        Tagged
+                    </button>
+                    <button
+                        onClick={() => handleCategoryStatusChange('untagged')}
+                        className={`flex-1 px-6 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${currentCategoryStatus === 'untagged' ? 'bg-rose-500/20 text-rose-400 shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+                    >
+                        Untagged
+                    </button>
+                </div>
             </div>
 
-            {/* --- Table --- */}
-            {/* Active Filters / Bulk Actions Warning */}
+            {/* Selection Info */}
             {selectedIds.size > 0 && transactions.length > 0 && (
-                <div className="bg-uhuru-blue/10 border-b border-uhuru-blue/20 p-2 text-center text-sm text-uhuru-blue">
+                <div className="bg-uhuru-blue/10 border-b border-uhuru-blue/20 p-2 text-center text-sm text-uhuru-blue rounded-t-xl">
                     {!isSelectAllMatching ? (
                         <span>
                             All <strong>{selectedIds.size}</strong> items on this page are selected.
                             {' '}
                             {totalItems > transactions.length && (
-                                <button
-                                    onClick={handleSelectAllMatching}
-                                    className="underline font-bold hover:text-white"
-                                >
-                                    Select all {totalItems} items matching this search
+                                <button onClick={handleSelectAllMatching} className="underline font-bold hover:text-white">
+                                    Select all {totalItems} items matching search/filter
                                 </button>
                             )}
                         </span>
                     ) : (
                         <span>
-                            All <strong>{totalItems}</strong> items matching this search are selected.
+                            All <strong>{totalItems}</strong> items are selected.
                             {' '}
-                            <button
-                                onClick={() => { setIsSelectAllMatching(false); setSelectedIds(new Set()); }}
-                                className="underline font-bold hover:text-white"
-                            >
+                            <button onClick={() => { setIsSelectAllMatching(false); setSelectedIds(new Set()); }} className="underline font-bold hover:text-white">
                                 Clear selection
                             </button>
                         </span>
@@ -240,183 +348,100 @@ export function TransactionTable({
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm">
-                            <th className="py-3 px-1 sm:px-4 w-8 sm:w-12">
-                                <button
-                                    onClick={handleSelectAll}
-                                    className="text-slate-400 hover:text-white transition-colors"
-                                >
+                        <tr className="border-b border-slate-800 text-slate-500 text-sm font-bold bg-slate-900/20">
+                            <th className="py-4 px-4 w-12 text-center">
+                                <button onClick={handleSelectAll} className="text-slate-400 hover:text-white transition-colors">
                                     {selectedIds.size === transactions.length && transactions.length > 0 ?
-                                        <CheckSquare size={16} className="text-emerald-500 sm:w-[18px]" /> :
-                                        <Square size={16} className="sm:w-[18px]" />
+                                        <CheckSquare size={18} className="text-emerald-500" /> :
+                                        <Square size={18} />
                                     }
                                 </button>
                             </th>
-                            {isLinkingMode && <th className="py-3 px-1 sm:px-4 w-16 sm:w-32 text-emerald-400 font-bold uppercase text-[8px] sm:text-[10px]">Action</th>}
-                            <th className="py-3 px-1 sm:px-4 w-8 sm:w-12 text-slate-500 font-bold hidden sm:table-cell">#</th>
-                            <th className="py-3 px-1 sm:px-4 font-medium text-[9px] sm:text-sm">Date</th>
-                            <th className="py-3 px-1 sm:px-4 font-medium text-[9px] sm:text-sm">Description</th>
-                            <th className="py-3 px-1 sm:px-4 font-medium hidden md:table-cell">Account</th>
-                            <th className="py-3 px-1 sm:px-4 font-medium text-right text-[9px] sm:text-sm">Amount</th>
-                            <th className="py-3 px-1 sm:px-4 font-medium hidden md:table-cell">Category</th>
-                            <th className="py-3 px-1 sm:px-4 w-16 sm:w-24 text-center text-slate-500 font-bold text-[9px] sm:text-sm">Actions</th>
+                            {isLinkingMode && <th className="py-4 px-4 w-32 text-emerald-400 uppercase text-[10px]">Action</th>}
+                            <th className="py-4 px-4 w-12 hidden sm:table-cell">#</th>
+                            <th className="py-4 px-4">Date</th>
+                            <th className="py-4 px-4">Description</th>
+                            <th className="py-4 px-4 hidden md:table-cell">Account</th>
+                            <th className="py-4 px-4 text-right">Amount</th>
+                            <th className="py-4 px-4 hidden md:table-cell text-center">Category</th>
+                            <th className="py-4 px-4 w-24 text-center">Link</th>
                         </tr>
                     </thead>
-                    <tbody className="text-[11px] sm:text-sm">
-                        {transactions.map((tx, index) => {
+                    <tbody className="text-sm">
+                        {transactions.map((tx) => {
                             const isSelected = selectedIds.has(tx.id);
                             const hasAttachments = tx.attachments && tx.attachments.length > 0;
                             return (
                                 <tr
                                     key={tx.id}
-                                    className={`
-                                        border-b border-slate-800 transition-colors cursor-pointer h-[50px] sm:h-[60px]
-                                        ${isSelected ? 'bg-emerald-900/20' : 'hover:bg-slate-800/50'}
-                                    `}
+                                    className={`border-b border-slate-800/50 transition-colors cursor-pointer h-16 ${isSelected ? 'bg-emerald-500/5' : 'hover:bg-slate-800/30'}`}
                                     onClick={() => setViewTransaction(tx)}
                                 >
-                                    <td className="py-2 px-1 sm:px-4" onClick={(e) => e.stopPropagation()}>
-                                        {isLinkingMode ? (
-                                            <div className="w-3.5 h-3.5 rounded border border-emerald-500/50 bg-emerald-500/10" />
-                                        ) : (
-                                            <button onClick={() => handleSelectOne(tx.id)}>
-                                                {isSelected ?
-                                                    <CheckSquare size={16} className="text-emerald-500 sm:w-[18px]" /> :
-                                                    <Square size={16} className="text-slate-600 sm:w-[18px]" />
-                                                }
-                                            </button>
-                                        )}
+                                    <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <button onClick={() => handleSelectOne(tx.id)}>
+                                            {isSelected ?
+                                                <CheckSquare size={18} className="text-emerald-500" /> :
+                                                <Square size={18} className="text-slate-700" />
+                                            }
+                                        </button>
                                     </td>
                                     {isLinkingMode && (
-                                        <td className="py-2 px-1 sm:px-4" onClick={(e) => e.stopPropagation()}>
-                                            <button
-                                                onClick={() => handleLinkDirect(tx.id)}
-                                                className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[7px] sm:text-[10px] font-bold uppercase transition-all"
-                                            >
-                                                Link
-                                            </button>
+                                        <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                                            <button onClick={() => handleLinkDirect(tx.id)} className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold uppercase transition-all">Link</button>
                                         </td>
                                     )}
-                                    <td className="py-2 px-1 sm:px-4 text-slate-500 font-mono text-[9px] sm:text-[10px] hidden sm:table-cell">
+                                    <td className="py-3 px-4 text-slate-500 font-mono text-[11px] hidden sm:table-cell">
                                         {sequences[tx.id] !== undefined ? `#${sequences[tx.id]}` : '-'}
                                     </td>
-                                    <td className="py-2 px-1 sm:px-4 text-slate-300">
-                                        {format(new Date(tx.date), 'MMM d, yy')}
+                                    <td className="py-3 px-4 text-slate-300">
+                                        {format(new Date(tx.date), 'MMM d, yyyy')}
                                     </td>
-                                    <td className="py-2 px-1 sm:px-4 text-white font-medium truncate max-w-[80px] sm:max-w-none">
-                                        {tx.description}
-                                        {tx.reference && <span className="block text-[8px] sm:text-xs text-slate-500 mt-0.5 truncate">{tx.reference}</span>}
+                                    <td className="py-3 px-4 text-white font-medium">
+                                        <div className="truncate max-w-[200px] lg:max-w-md">{tx.description}</div>
+                                        {tx.reference && <div className="text-[10px] text-slate-500 mt-0.5 truncate max-w-[200px]">{tx.reference}</div>}
                                     </td>
-                                    <td className="py-2 px-1 sm:px-4 text-slate-500 hidden md:table-cell">
-                                        <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
+                                    <td className="py-3 px-4 text-slate-500 hidden md:table-cell">
+                                        <span className="px-2 py-0.5 rounded-full bg-slate-800 text-[10px] text-slate-400 border border-slate-700">
                                             {tx.bankAccount.bank.bankName}
                                         </span>
                                     </td>
-                                    <td className={`py-2 px-1 sm:px-4 text-right font-bold sm:font-medium whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
+                                    <td className={`py-3 px-4 text-right font-bold whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-emerald-400' : (Number(tx.amount) < 0 ? 'text-rose-400' : 'text-slate-300')}`}>
                                         {new Intl.NumberFormat('en-GB', { style: 'currency', currency: tx.currency }).format(Number(tx.amount))}
                                     </td>
-                                    <td className="py-3 px-1 sm:px-4 text-slate-500 hidden md:table-cell">
+                                    <td className="py-3 px-4 hidden md:table-cell text-center" onClick={(e) => e.stopPropagation()}>
                                         <CategoryBadge transactionId={tx.id} initialCategory={tx.category} allCategories={categories} />
                                     </td>
-                                    {/* Actions Cell */}
-                                    <td className="py-3 px-1 sm:px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                        <div className="flex justify-center gap-1 sm:gap-2">
-                                            <button
-                                                onClick={() => setViewTransaction(tx)}
-                                                className={`p-1.5 sm:p-2 rounded-xl border border-slate-700 hover:border-uhuru-blue hover:bg-uhuru-blue/10 transition-all ${hasAttachments ? 'text-uhuru-blue border-uhuru-blue/30 bg-uhuru-blue/5' : 'text-slate-400'}`}
-                                                title={hasAttachments ? "View Details & Attachments" : "View Details"}
-                                            >
-                                                {hasAttachments ? <Paperclip size={14} className="sm:w-[16px]" /> : <Search size={14} className="sm:w-[16px]" />}
-                                            </button>
-                                        </div>
+                                    <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <button
+                                            onClick={() => setViewTransaction(tx)}
+                                            className={`p-2 rounded-xl transition-all ${hasAttachments ? 'bg-uhuru-blue/20 text-uhuru-blue' : 'text-slate-600 hover:text-white hover:bg-slate-800'}`}
+                                        >
+                                            {hasAttachments ? <Paperclip size={16} /> : <Search size={16} />}
+                                        </button>
                                     </td>
                                 </tr>
-                            )
+                            );
                         })}
-                        {/* Dummy Rows to fill 20 slots */}
-                        {Array.from({ length: Math.max(0, 20 - transactions.length) }).map((_, i) => (
-                            <tr key={`dummy-${i}`} className="border-b border-slate-800/10 h-[60px]">
-                                <td className="py-3 px-4">&nbsp;</td>
-                                {isLinkingMode && <td className="py-3 px-4">&nbsp;</td>}
-                                <td className="py-3 px-4">&nbsp;</td>
-                                <td className="py-3 px-4">&nbsp;</td>
-                                <td className="py-3 px-4">
-                                    {transactions.length === 0 && i === 10 && (
-                                        <div className="text-center text-slate-600 ">No transactions found</div>
-                                    )}
-                                </td>
-                                <td className="py-3 px-4 hidden md:table-cell">&nbsp;</td>
-                                <td className="py-3 px-4">&nbsp;</td>
-                                <td className="py-3 px-4 hidden md:table-cell">&nbsp;</td>
-                                <td className="py-3 px-4">&nbsp;</td>
+                        {transactions.length === 0 && (
+                            <tr>
+                                <td colSpan={10} className="py-20 text-center text-slate-600">No transactions found</td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>
 
             {/* --- Pagination --- */}
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-800">
-                <div className="flex items-center gap-4">
-                    <div className="text-sm text-slate-400">
-                        Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-800">
-                        <span>Go to:</span>
-                        <input
-                            type="number"
-                            min={1}
-                            max={totalPages || 1}
-                            defaultValue={currentPage}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    const val = parseInt((e.target as HTMLInputElement).value);
-                                    if (val >= 1 && val <= (totalPages || 1)) {
-                                        handlePageChange(val);
-                                    }
-                                }
-                            }}
-                            className="w-12 bg-transparent text-white focus:outline-none text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-b border-slate-700 focus:border-uhuru-blue"
-                        />
-                    </div>
+            <div className="flex items-center justify-between mt-8 p-4 bg-slate-900/30 rounded-2xl border border-slate-800">
+                <div className="text-sm text-slate-500">
+                    Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white font-bold">{totalPages}</span>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage <= 1}
-                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
-                        title="First Page"
-                    >
-                        &lt;&lt;
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage <= 1}
-                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
-                        title="Previous Page"
-                    >
-                        &lt;
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage >= totalPages}
-                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
-                        title="Next Page"
-                    >
-                        &gt;
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage >= totalPages}
-                        className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-20 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all border border-slate-700 w-10 flex justify-center hover:scale-105 active:scale-95 shadow-lg"
-                        title="Last Page"
-                    >
-                        &gt;&gt;
-                    </button>
+                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage <= 1} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-xl text-white font-bold transition-all border border-slate-700">&lt;</button>
+                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-xl text-white font-bold transition-all border border-slate-700">&gt;</button>
                 </div>
             </div>
 
-            {/* --- Transaction Details Modal (with Attachments) --- */}
             <TransactionDetailsModal
                 isOpen={!!viewTransaction}
                 onClose={() => setViewTransaction(null)}
@@ -424,62 +449,30 @@ export function TransactionTable({
                 allCategories={categories}
             />
 
-            {/* --- Super Confirmation Modal --- */}
+            {/* --- Delete Modal --- */}
             {isDeleteModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-slate-900 border border-rose-900/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
-                        {/* Background warning pattern */}
-                        <div className="absolute top-0 right-0 -mt-4 -mr-4 text-rose-900/20 opacity-50">
-                            <AlertTriangle size={150} />
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-8 shadow-2xl">
+                        <div className="flex items-center gap-3 mb-6 text-rose-500">
+                            <AlertTriangle size={32} />
+                            <h3 className="text-2xl font-bold text-white">Security Check</h3>
                         </div>
-
-                        <div className="relative">
-                            <div className="flex items-center gap-3 mb-4 text-rose-500">
-                                <AlertTriangle size={32} />
-                                <h3 className="text-2xl font-bold text-white">Secure Deletion</h3>
-                            </div>
-
-                            <p className="text-slate-300 mb-6">
-                                You are about to remove <strong>{selectedIds.size} transactions</strong>.
-                                <br /><br />
-                                This action will:
-                                <ul className="list-disc list-inside mt-2 text-slate-400 text-sm">
-                                    <li>Create a permanent record in the Audit Log ("Avoided Transactions").</li>
-                                    <li>Permanently remove the items from the active ledger.</li>
-                                    <li>Delete any attached files.</li>
-                                </ul>
-                            </p>
-
-                            <div className="mb-6">
-                                <label className="block text-sm font-semibold text-white mb-2">
-                                    Reason for deletion (Required)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={deleteReason}
-                                    onChange={(e) => setDeleteReason(e.target.value)}
-                                    placeholder="e.g., Duplicate entry, Error in import..."
-                                    className="w-full px-4 py-3 bg-slate-950 border border-rose-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 text-white placeholder-slate-600"
-                                    autoFocus
-                                />
-                            </div>
-
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    onClick={() => setIsDeleteModalOpen(false)}
-                                    disabled={isDeleting}
-                                    className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    disabled={!deleteReason.trim() || isDeleting}
-                                    className="flex-1 py-3 bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl font-bold shadow-lg shadow-rose-900/30 transition-all disabled:shadow-none"
-                                >
-                                    {isDeleting ? "Processing..." : "CONFIRM DELETE"}
-                                </button>
-                            </div>
+                        <p className="text-slate-400 mb-8 leading-relaxed">
+                            Deleting <strong>{isSelectAllMatching ? totalItems : selectedIds.size}</strong> records.
+                            This action logs an audit trail and is irreversible.
+                        </p>
+                        <input
+                            type="text"
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                            placeholder="Reason for deletion..."
+                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl mb-8 focus:ring-2 focus:ring-rose-500 outline-none text-white"
+                        />
+                        <div className="flex gap-4">
+                            <button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-3 bg-slate-800 text-white rounded-xl font-bold">Cancel</button>
+                            <button onClick={handleDelete} disabled={!deleteReason.trim() || isDeleting} className="flex-1 py-3 bg-rose-600 text-white rounded-xl font-bold disabled:opacity-50">
+                                {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+                            </button>
                         </div>
                     </div>
                 </div>

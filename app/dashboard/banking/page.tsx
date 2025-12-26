@@ -11,11 +11,12 @@ import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button
 export default async function BankingPage({
     searchParams
 }: {
-    searchParams: { page?: string, query?: string, accountId?: string }
+    searchParams: { page?: string, query?: string, accountId?: string, categoryStatus?: 'untagged' | 'tagged' | 'all' }
 }) {
     const currentPage = Number(searchParams.page) || 1;
     const query = searchParams.query || "";
     const accountId = searchParams.accountId;
+    const categoryStatus = searchParams.categoryStatus || 'all';
     const itemsPerPage = 20;
 
     // --- Build Where Clause ---
@@ -31,7 +32,9 @@ export default async function BankingPage({
                     { merchant: { contains: query, mode: 'insensitive' } },
                     { bankAccount: { bank: { bankName: { contains: query, mode: 'insensitive' } } } }
                 ]
-            } : {}
+            } : {},
+            categoryStatus === 'untagged' ? { OR: [{ category: null }, { category: '' }] } :
+                categoryStatus === 'tagged' ? { AND: [{ category: { not: null } }, { category: { not: '' } }] } : {}
         ]
     };
 

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding (Lossless Sync: CRM and System data)...');
-  console.log('Generated at: 2025-12-26T18:52:28.386Z');
+  console.log('Generated at: 2025-12-26T19:03:47.404Z');
 
   // --- 1. Transaction Categories ---
   console.log('Upserting Categories...');
@@ -30,6 +30,13 @@ async function main() {
     "color": "bg-yellow-400/10 text-yellow-300 border-yellow-400/20 hover:bg-yellow-400/20",
     "createdAt": "2025-12-14T18:43:15.902Z",
     "updatedAt": "2025-12-16T17:35:42.291Z"
+  },
+  {
+    "id": "cmjn8mwbl0000mlg42a0fvi2p",
+    "name": "kaka",
+    "color": "bg-purple-400/10 text-purple-300 border-purple-400/20 hover:bg-purple-400/20",
+    "createdAt": "2025-12-26T19:01:41.794Z",
+    "updatedAt": "2025-12-26T19:01:41.794Z"
   }
 ] as any[]) {
     await prisma.transactionCategory.upsert({

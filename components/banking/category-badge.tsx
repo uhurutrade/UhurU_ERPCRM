@@ -167,6 +167,23 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                     {!isCustomMode ? (
                         <>
                             <div className="max-h-60 overflow-y-auto p-1.5 grid grid-cols-1 gap-0.5 custom-scrollbar">
+                                {/* Always present Uncategorized option */}
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleSelect(''); }}
+                                    className={`
+                                        w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-3 group
+                                        ${!category ? 'bg-slate-800 text-white' : 'text-slate-500 hover:bg-slate-800 hover:text-slate-200'}
+                                    `}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-slate-700" />
+                                        Uncategorized
+                                    </div>
+                                    {!category && <Check size={12} className="ml-auto text-emerald-400" />}
+                                </button>
+
+                                <div className="h-px bg-slate-800 my-1 mx-2" />
+
                                 {categories.map((cat) => (
                                     <button
                                         key={cat.name}
@@ -180,7 +197,7 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
                                             <div className={`w-2 h-2 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
                                             {cat.name}
                                         </div>
-                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
                                             {cat.name === category && <Check size={12} className="text-emerald-400 mr-1" />}
 
                                             <div onClick={(e) => handleEditClick(cat, e)} className="p-1 text-slate-500 hover:text-uhuru-blue hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Edit Category">

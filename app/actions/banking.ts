@@ -265,3 +265,45 @@ export async function updateTransactionCategory(transactionId: string, category:
         return { success: false, error: 'Failed to update category' };
     }
 }
+
+export async function bulkUpdateTransactionCategory(
+    transactionIds: string[],
+    category: string,
+    updateAllMatching: boolean = false,
+    searchQuery: string = ""
+) {
+    try {
+        if (updateAllMatching) {
+            // Apply to all transactions matching the search criteria
+            await prisma.bankTransaction.updateMany({
+                where: {
+                    OR: [
+                        { description: { contains: searchQuery, mode: 'insensitive' } },
+                        { reference: { contains: searchQuery, mode: 'insensitive' } },
+                        { category: { contains: searchQuery, mode: 'insensitive' } },
+                        { merchant: { contains: searchQuery, mode: 'insensitive' } },
+                        { counterparty: { contains: searchQuery, mode: 'insensitive' } }
+                    ]
+                },
+                data: { category }
+            });
+        } else {
+            // Apply only to specific selected IDs
+            await prisma.bankTransaction.updateMany({
+                where: { id: { in: transactionIds } },
+                data: { category }
+            });
+        }
+
+        revalidatePath('/dashboard/banking');
+
+        // Trigger RAG Sync (Background)
+        const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
+        syncRecentTransactions();
+
+        return { success: true };
+    } catch (error) {
+        console.error('Bulk update category error:', error);
+        return { success: false, error: 'Failed to update categories' };
+    }
+}
