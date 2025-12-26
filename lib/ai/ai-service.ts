@@ -154,7 +154,7 @@ async function analyzeWithOpenAI(filename: string, text: string, companyContext:
     messages.push({ role: "user", content: userContent });
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages,
         response_format: { type: "json_object" }
     });
@@ -230,7 +230,7 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, compan
     messages.push({ role: "user", content: userContent });
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages,
         response_format: { type: "json_object" }
     });
@@ -274,7 +274,7 @@ async function analyzeLeadWithOpenAI(text: string, companyContext: string): Prom
     ];
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages,
         response_format: { type: "json_object" }
     });
@@ -310,7 +310,7 @@ async function analyzeWithGemini(filename: string, text: string, companyContext:
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-1.5-flash-8b",
         generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -348,7 +348,7 @@ async function chatWithGemini(message: string, systemPrompt: string, history: an
     if (!apiKey) throw new Error("Gemini API Key (GEMINI_API_KEY) is not configured.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
 
     // Format history for Gemini
     const chat = model.startChat({
@@ -370,7 +370,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, compan
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-1.5-flash-8b",
         generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -428,7 +428,7 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-1.5-flash-8b",
         generationConfig: { responseMimeType: "application/json" }
     });
 
