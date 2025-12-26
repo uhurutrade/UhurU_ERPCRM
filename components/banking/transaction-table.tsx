@@ -257,7 +257,7 @@ export function TransactionTable({
 
                                             categories.forEach(cat => {
                                                 if (cat.name.includes(':')) {
-                                                    const [groupName, itemName] = cat.name.split(':').map(s => s.trim());
+                                                    const [groupName, itemName] = cat.name.split(':').map((s: string) => s.trim());
                                                     if (!groups[groupName]) groups[groupName] = [];
                                                     groups[groupName].push({ ...cat, displayName: itemName });
                                                 } else {
