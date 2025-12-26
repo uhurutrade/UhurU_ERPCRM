@@ -5,22 +5,40 @@ const fs = require('fs');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🔄 Extrayendo datos de la base de datos local (filtrado por solicitud)...');
+    console.log('🔄 Extrayendo ABSOLUTAMENTE TODO de la base de datos local...');
 
-    // 1. Users
-    const users = await prisma.user.findMany();
+    // 1. Configuración & Maestros
+    const companySettings = await prisma.companySettings.findMany();
+    const transactionCategories = await prisma.transactionCategory.findMany();
+    const banks = await prisma.bank.findMany();
+    const bankAccounts = await prisma.bankAccount.findMany();
+    const cryptoWallets = await prisma.cryptoWallet.findMany();
 
     // 2. CRM
     const organizations = await prisma.organization.findMany();
     const contacts = await prisma.contact.findMany();
-    const deals = await prisma.deal.findMany();
     const leads = await prisma.lead.findMany();
+    const deals = await prisma.deal.findMany();
     const activities = await prisma.activity.findMany();
 
-    // 3. System metadata & General
-    const transactionCategories = await prisma.transactionCategory.findMany();
-    const tasks = await prisma.task.findMany();
+    // 3. Operaciones
+    const invoices = await prisma.invoice.findMany();
+    const invoiceItems = await prisma.invoiceItem.findMany();
+    const attachments = await prisma.attachment.findMany();
+    const bankTransactions = await prisma.bankTransaction.findMany();
+    const bankStatements = await prisma.bankStatement.findMany();
+    const cryptoTransactions = await prisma.cryptoTransaction.findMany();
     const assets = await prisma.asset.findMany();
+    const tasks = await prisma.task.findMany();
+
+    // 4. Compliance & Fiscal
+    const complianceDocuments = await prisma.complianceDocument.findMany();
+    const complianceEvents = await prisma.complianceEvent.findMany();
+    const fiscalYears = await prisma.fiscalYear.findMany();
+    const taxObligations = await prisma.taxObligation.findMany();
+
+    // 5. Usuarios
+    const users = await prisma.user.findMany();
 
     const seedContent = `// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
@@ -28,219 +46,136 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Start seeding (Lossless Sync: CRM and System data)...');
+  console.log('🌱 Start seeding (TOTAL SYNC: All data from local)...');
   console.log('Generated at: ${new Date().toISOString()}');
 
-  // --- 1. Transaction Categories ---
+  // --- 1. Company Settings ---
+  console.log('Upserting Company Settings...');
+  for (const item of ${JSON.stringify(companySettings, null, 2)} as any[]) {
+    await prisma.companySettings.upsert({
+      where: { id: item.id },
+      update: item,
+      create: item
+    });
+  }
+
+  // --- 2. Transaction Categories ---
   console.log('Upserting Categories...');
   for (const cat of ${JSON.stringify(transactionCategories, null, 2)} as any[]) {
     await prisma.transactionCategory.upsert({
         where: { id: cat.id },
-        update: {
-            name: cat.name,
-            color: cat.color,
-            updatedAt: new Date(cat.updatedAt),
-        },
-        create: {
-            ...cat,
-            createdAt: new Date(cat.createdAt),
-            updatedAt: new Date(cat.updatedAt),
-        }
-    }).catch(e => console.log('Category error:', e.message));
-  }
-
-  // --- 2. Users ---
-  console.log('Upserting Users...');
-  for (const user of ${JSON.stringify(users, null, 2)} as any[]) {
-    await prisma.user.upsert({
-      where: { email: user.email || '' },
-      update: {
-          name: user.name,
-          image: user.image,
-          role: user.role,
-          updatedAt: new Date(user.updatedAt),
-      },
-      create: {
-        ...user,
-        emailVerified: user.emailVerified ? new Date(user.emailVerified) : null,
-        createdAt: new Date(user.createdAt),
-        updatedAt: new Date(user.updatedAt),
-      } as any
+        update: cat,
+        create: cat
     });
   }
 
-  // --- 3. Assets ---
-  console.log('Upserting Assets...');
-  for (const asset of ${JSON.stringify(assets, null, 2)} as any[]) {
-    await prisma.asset.upsert({
-        where: { id: asset.id },
-        update: {
-            name: asset.name,
-            purchaseDate: new Date(asset.purchaseDate),
-            cost: Number(asset.cost),
-            currency: asset.currency,
-            type: asset.type,
-            updatedAt: new Date(asset.updatedAt),
-        },
-        create: {
-            ...asset,
-            purchaseDate: new Date(asset.purchaseDate),
-            cost: Number(asset.cost),
-            createdAt: new Date(asset.createdAt),
-            updatedAt: new Date(asset.updatedAt),
-        }
-    }).catch(e => console.log('Asset error:', e.message));
+  // --- 3. Banks & Accounts ---
+  console.log('Upserting Banks...');
+  for (const b of ${JSON.stringify(banks, null, 2)} as any[]) {
+    await prisma.bank.upsert({ where: { id: b.id }, update: b, create: b });
+  }
+  console.log('Upserting Bank Accounts...');
+  for (const acc of ${JSON.stringify(bankAccounts, null, 2)} as any[]) {
+    await prisma.bankAccount.upsert({ 
+        where: { id: acc.id }, 
+        update: acc, 
+        create: acc 
+    });
   }
 
-  // --- 4. CRM: Organizations ---
+  // --- 4. Crypto Wallets ---
+  console.log('Upserting Crypto Wallets...');
+  for (const w of ${JSON.stringify(cryptoWallets, null, 2)} as any[]) {
+    await prisma.cryptoWallet.upsert({ where: { id: w.id }, update: w, create: w });
+  }
+
+  // --- 5. CRM: Organizations & Contacts ---
   console.log('Upserting Organizations...');
   for (const org of ${JSON.stringify(organizations, null, 2)} as any[]) {
-    await prisma.organization.upsert({
-        where: { id: org.id },
-        update: {
-            name: org.name,
-            sector: org.sector,
-            website: org.website,
-            address: org.address,
-            bankIban: org.bankIban,
-            bankName: org.bankName,
-            bankSwift: org.bankSwift,
-            isBillable: org.isBillable,
-            legalName: org.legalName,
-            taxId: org.taxId,
-            email: org.email,
-            phone: org.phone,
-            city: org.city,
-            country: org.country,
-            postcode: org.postcode,
-            updatedAt: new Date(org.updatedAt),
-        },
-        create: {
-            ...org,
-            createdAt: new Date(org.createdAt),
-            updatedAt: new Date(org.updatedAt),
-        }
-    });
+    await prisma.organization.upsert({ where: { id: org.id }, update: org, create: org });
   }
-
-  // --- 5. CRM: Contacts ---
   console.log('Upserting Contacts...');
-  for (const contact of ${JSON.stringify(contacts, null, 2)} as any[]) {
-    await prisma.contact.upsert({
-        where: { id: contact.id },
-        update: {
-            name: contact.name,
-            email: contact.email,
-            phone: contact.phone,
-            role: contact.role,
-            organizationId: contact.organizationId,
-            isClient: contact.isClient,
-            bankIban: contact.bankIban,
-            isBillable: contact.isBillable,
-            legalName: contact.legalName,
-            taxId: contact.taxId,
-            linkedin: contact.linkedin,
-            website: contact.website,
-            address: contact.address,
-            city: contact.city,
-            country: contact.country,
-            postcode: contact.postcode,
-            updatedAt: new Date(contact.updatedAt),
-        },
-        create: {
-            ...contact,
-            createdAt: new Date(contact.createdAt),
-            updatedAt: new Date(contact.updatedAt),
-        }
-    }).catch(e => console.log('Contact error:', e.message));
+  for (const c of ${JSON.stringify(contacts, null, 2)} as any[]) {
+    await prisma.contact.upsert({ where: { id: c.id }, update: c, create: c });
   }
-  
-  // --- 6. CRM: Leads ---
+
+  // --- 6. CRM: Leads, Deals & Activities ---
   console.log('Upserting Leads...');
-  for (const lead of ${JSON.stringify(leads, null, 2)} as any[]) {
-      await prisma.lead.upsert({
-          where: { id: lead.id },
-          update: {
-            name: lead.name,
-            email: lead.email,
-            source: lead.source,
-            status: lead.status,
-            notes: lead.notes,
-            updatedAt: new Date(lead.updatedAt),
-          },
-          create: {
-              ...lead,
-              createdAt: new Date(lead.createdAt),
-              updatedAt: new Date(lead.updatedAt),
-          }
-      }).catch(e => console.log('Lead error:', e.message));
+  for (const l of ${JSON.stringify(leads, null, 2)} as any[]) {
+    await prisma.lead.upsert({ where: { id: l.id }, update: l, create: l });
   }
-
-  // --- 7. CRM: Deals ---
   console.log('Upserting Deals...');
-  for (const deal of ${JSON.stringify(deals, null, 2)} as any[]) {
-    await prisma.deal.upsert({
-        where: { id: deal.id },
-        update: {
-            title: deal.title,
-            amount: deal.amount ? Number(deal.amount) : null,
-            currency: deal.currency,
-            stage: deal.stage,
-            closeDate: deal.closeDate ? new Date(deal.closeDate) : null,
-            organizationId: deal.organizationId,
-            updatedAt: new Date(deal.updatedAt),
-        },
-        create: {
-            ...deal,
-            amount: deal.amount ? Number(deal.amount) : null,
-            closeDate: deal.closeDate ? new Date(deal.closeDate) : null,
-            createdAt: new Date(deal.createdAt),
-            updatedAt: new Date(deal.updatedAt),
-        }
-    }).catch(e => console.log('Deal error:', e.message));
+  for (const d of ${JSON.stringify(deals, null, 2)} as any[]) {
+    await prisma.deal.upsert({ where: { id: d.id }, update: d, create: d });
   }
-  
-  // --- 8. CRM: Activities ---
   console.log('Upserting Activities...');
-  for (const act of ${JSON.stringify(activities, null, 2)} as any[]) {
-      await prisma.activity.upsert({
-          where: { id: act.id },
-          update: {
-              type: act.type,
-              notes: act.notes,
-              date: new Date(act.date),
-              contactId: act.contactId,
-          },
-          create: {
-              ...act,
-              date: new Date(act.date),
-          }
-      }).catch(e => console.log('Activity error:', e.message));
+  for (const a of ${JSON.stringify(activities, null, 2)} as any[]) {
+    await prisma.activity.upsert({ where: { id: a.id }, update: a, create: a });
   }
 
-  // --- 9. Tasks ---
+  // --- 7. Invoices & Items ---
+  console.log('Upserting Invoices...');
+  for (const i of ${JSON.stringify(invoices, null, 2)} as any[]) {
+    await prisma.invoice.upsert({ where: { id: i.id }, update: i, create: i });
+  }
+  console.log('Upserting Invoice Items...');
+  for (const item of ${JSON.stringify(invoiceItems, null, 2)} as any[]) {
+    await prisma.invoiceItem.upsert({ where: { id: item.id }, update: item, create: item });
+  }
+
+  // --- 8. Banking: Statements & Transactions ---
+  console.log('Upserting Bank Statements...');
+  for (const s of ${JSON.stringify(bankStatements, null, 2)} as any[]) {
+    await prisma.bankStatement.upsert({ where: { id: s.id }, update: s, create: s });
+  }
+  console.log('Upserting Bank Transactions...');
+  for (const t of ${JSON.stringify(bankTransactions, null, 2)} as any[]) {
+    await prisma.bankTransaction.upsert({ where: { id: t.id }, update: t, create: t });
+  }
+  console.log('Upserting Attachments...');
+  for (const att of ${JSON.stringify(attachments, null, 2)} as any[]) {
+    await prisma.attachment.upsert({ where: { id: att.id }, update: att, create: att });
+  }
+  console.log('Upserting Crypto Transactions...');
+  for (const ct of ${JSON.stringify(cryptoTransactions, null, 2)} as any[]) {
+    await prisma.cryptoTransaction.upsert({ where: { id: ct.id }, update: ct, create: ct });
+  }
+
+  // --- 9. Assets & Tasks ---
+  console.log('Upserting Assets...');
+  for (const asset of ${JSON.stringify(assets, null, 2)} as any[]) {
+    await prisma.asset.upsert({ where: { id: asset.id }, update: asset, create: asset });
+  }
   console.log('Upserting Tasks...');
   for (const task of ${JSON.stringify(tasks, null, 2)} as any[]) {
-      await prisma.task.upsert({
-          where: { id: task.id },
-          update: {
-            title: task.title,
-            description: task.description,
-            dueDate: task.dueDate ? new Date(task.dueDate) : null,
-            completed: task.completed,
-            assignedToId: task.assignedToId,
-            updatedAt: new Date(task.updatedAt),
-          },
-          create: {
-              ...task,
-              dueDate: task.dueDate ? new Date(task.dueDate) : null,
-              createdAt: new Date(task.createdAt),
-              updatedAt: new Date(task.updatedAt),
-          }
-      }).catch(e => console.log('Task error:', e.message));
+    await prisma.task.upsert({ where: { id: task.id }, update: task, create: task });
   }
 
-  console.log('✅ Seeding finished.');
+  // --- 10. Compliance & Fiscal ---
+  console.log('Upserting Compliance Documents...');
+  for (const doc of ${JSON.stringify(complianceDocuments, null, 2)} as any[]) {
+    await prisma.complianceDocument.upsert({ where: { id: doc.id }, update: doc, create: doc });
+  }
+  console.log('Upserting Compliance Events...');
+  for (const ev of ${JSON.stringify(complianceEvents, null, 2)} as any[]) {
+    await prisma.complianceEvent.upsert({ where: { id: ev.id }, update: ev, create: ev });
+  }
+  console.log('Upserting Fiscal Years...');
+  for (const fy of ${JSON.stringify(fiscalYears, null, 2)} as any[]) {
+    await prisma.fiscalYear.upsert({ where: { id: fy.id }, update: fy, create: fy });
+  }
+  console.log('Upserting Tax Obligations...');
+  for (const to of ${JSON.stringify(taxObligations, null, 2)} as any[]) {
+    await prisma.taxObligation.upsert({ where: { id: to.id }, update: to, create: to });
+  }
+
+  // --- 11. Users ---
+  console.log('Upserting Users...');
+  for (const u of ${JSON.stringify(users, null, 2)} as any[]) {
+    await prisma.user.upsert({ where: { email: u.email || '' }, update: u, create: u });
+  }
+
+  console.log('✅ TOTAL SEEDING FINISHED.');
 }
 
 main()
@@ -254,7 +189,7 @@ main()
 `;
 
     fs.writeFileSync('prisma/seed.ts', seedContent);
-    console.log('✅ prisma/seed.ts generado: SIN BORRADO, solo Upsert para CRM y sistema.');
+    console.log('✅ prisma/seed.ts generado: INCLUYE ABSOLUTAMENTE TODO (Transactions, Invoices, Settings, etc.).');
 }
 
 main()

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding (TOTAL SYNC: All data from local)...');
-  console.log('Generated at: 2025-12-26T11:39:49.161Z');
+  console.log('Generated at: 2025-12-26T11:39:57.066Z');
 
   // --- 1. Company Settings ---
   console.log('Upserting Company Settings...');
