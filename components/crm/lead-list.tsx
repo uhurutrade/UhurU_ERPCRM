@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { deleteLead, convertLeadToDeal } from '@/app/actions/crm';
-import { Target, Trash2, Loader2, ArrowRight, Users } from 'lucide-react';
+import { deleteLead, convertLeadToDeal, discardLeadAction } from '@/app/actions/crm';
+import { Target, Trash2, Loader2, ArrowRight, Users, XCircle } from 'lucide-react';
 import { LeadDetailModal } from './modals/lead-detail-modal';
 import { useConfirm } from '@/components/providers/modal-provider';
 
@@ -38,7 +38,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
         e.stopPropagation();
         const ok = await confirm({
             title: "Delete Lead",
-            message: "Are you sure you want to delete this lead?",
+            message: "Are you sure you want to permanently delete this lead? It will reappear in the next Gmail sync if it's still labeled.",
             type: "danger"
         });
 
@@ -46,6 +46,21 @@ export function LeadList({ leads, organizations }: LeadListProps) {
             await deleteLead(id);
         }
     }
+
+    async function handleDiscard(e: React.MouseEvent, id: string) {
+        e.stopPropagation();
+        const ok = await confirm({
+            title: "Discard Lead",
+            message: "This will move the lead to 'Discarded' and hide it. It will NOT be proposed again in Gmail sync unless there are major updates.",
+            type: "warning"
+        });
+
+        if (ok) {
+            await discardLeadAction(id);
+        }
+    }
+
+    const activeLeads = leads.filter(l => l.status !== 'DISCARDED');
 
     return (
         <div className="bg-uhuru-card border border-uhuru-border rounded-2xl overflow-hidden shadow-card animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -60,7 +75,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-uhuru-border">
-                    {leads.map((lead) => (
+                    {activeLeads.map((lead) => (
                         <tr
                             key={lead.id}
                             onClick={() => setSelectedLead(lead)}
@@ -88,6 +103,15 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                             </td>
                             <td className="py-4 px-6 text-right">
                                 <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {lead.status === 'NEW' && (
+                                        <button
+                                            onClick={(e) => handleDiscard(e, lead.id)}
+                                            className="p-1.5 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all"
+                                            title="Discard (Mute from Sync)"
+                                        >
+                                            <XCircle size={14} />
+                                        </button>
+                                    )}
                                     {lead.status !== 'QUALIFIED' && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleConvert(lead.id); }}
@@ -101,6 +125,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                                     <button
                                         onClick={(e) => handleDelete(e, lead.id)}
                                         className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                                        title="Delete Permanently"
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -108,7 +133,7 @@ export function LeadList({ leads, organizations }: LeadListProps) {
                             </td>
                         </tr>
                     ))}
-                    {leads.length === 0 && (
+                    {activeLeads.length === 0 && (
                         <tr>
                             <td colSpan={5} className="py-20 text-center">
                                 <Users className="mx-auto mb-4 opacity-10 text-white" size={48} />

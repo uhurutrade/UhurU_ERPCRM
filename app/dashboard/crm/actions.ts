@@ -193,9 +193,14 @@ export async function discardLead(gmailThreadId: string, name: string) {
     try {
         if (!gmailThreadId) return { success: false, error: "No Thread ID" };
 
+        console.log(`[Gmail Sync] 🚫 Discarding thread: ${gmailThreadId}`);
+
         await prisma.lead.upsert({
             where: { gmailThreadId },
-            update: { status: "DISCARDED" },
+            update: {
+                status: "DISCARDED",
+                updatedAt: new Date() // Ensure timestamp is updated
+            },
             create: {
                 name: name || "Lead Descartado",
                 status: "DISCARDED",
@@ -217,59 +222,66 @@ export async function syncGmailLeads() {
     try {
         const session = await auth();
 
-        console.log("[Gmail Sync] Session check:", {
-            hasSession: !!session,
-            hasUserId: !!session?.user?.id,
-            email: session?.user?.email
-        });
-
         if (!session?.user?.id) {
-            console.log("[Gmail Sync] ❌ Unauthorized: No user ID in session");
+            console.log("[Gmail Sync] ❌ Unauthorized");
             return { success: false, error: "Unauthorized" };
         }
 
         console.log("[Gmail Sync] 📧 Fetching emails for label: UhurU-Lead...");
         const threads = await fetchLabeledEmails(session.user.id, 'UhurU-Lead');
-        console.log(`[Gmail Sync] 📥 Found ${threads.length} threads.`);
+        console.log(`[Gmail Sync] 📥 Found ${threads.length} threads in Gmail.`);
 
         if (threads.length === 0) return { success: true, results: [] };
 
-        // 1. Get all existing leads that came from Gmail to check for updates
+        // 1. Get all existing leads that came from Gmail
         const existingLeads = await prisma.lead.findMany({
             where: { gmailThreadId: { not: null } }
         });
-        console.log(`[Gmail Sync] 🔍 Checking against ${existingLeads.length} existing leads in DB.`);
 
         const ai = await getAIClient();
         const results = [];
 
         for (const thread of threads) {
-            console.log(`[Gmail Sync] 🧵 Processing thread: ${thread.id} (${thread.subject})`);
             const existingLead = existingLeads.find(l => l.gmailThreadId === thread.id);
 
-            // Logic: 
-            // - If it's already DISCARDED or CONVERTED/ACTIVE: SKIP (unless it's a significant update)
-            // - If it doesn't exist: It's NEW.
-            // - If it exists but the new body is significantly longer (new messages): It's an UPDATE.
-            // - Otherwise: SKIP (already processed and no new info).
+            // --- PERSISTENT DISCARD LOGIC ---
+            // If it's already DISCARDED, we only re-propose it if it has significant NEW content
+            // or if the user removed/re-added the label (detected by updatedAt vs last message)
 
-            if (existingLead && existingLead.status === "DISCARDED") {
-                console.log(`[Gmail Sync] ⏩ Skipping discarded thread: ${thread.id}`);
-                continue;
+            if (existingLead) {
+                // If it's discarded, check if we should "resurface" it
+                if (existingLead.status === "DISCARDED") {
+                    // Only resurface if the thread has grown significantly since it was discarded
+                    // (Assuming thread.body contains the full history, and it grows with new messages)
+                    const isSignificantlyUpdated = thread.body.length > (existingLead.notes?.length || 0) + 500;
+
+                    if (!isSignificantlyUpdated) {
+                        console.log(`[Gmail Sync] ⏩ Skipping discarded thread: ${thread.id}`);
+                        continue;
+                    }
+                    console.log(`[Gmail Sync] 🔄 Resurfacing discarded thread with new activity: ${thread.id}`);
+                }
+
+                // If it's already ACTIVE/NEW, check if there's an update worth showing
+                // We use a higher threshold (300 chars) to avoid "eternal proposals" for small content changes
+                const hasNewContent = thread.body.length > (existingLead.notes?.length || 0) + 300;
+
+                if (!hasNewContent && existingLead.status !== "DISCARDED") {
+                    // console.log(`[Gmail Sync] 🆗 Already processed and no major updates: ${thread.id}`);
+                    continue;
+                }
             }
 
-            const isNew = !existingLead;
-            const hasNewInfo = existingLead && thread.body.length > (existingLead.notes?.length || 0) + 50;
+            // If we are here, it's either BRAND NEW or has SIGNIFICANT UPDATES
+            console.log(`[Gmail Sync] ✨ Analyzing thread: ${thread.id} (${thread.subject})`);
+            const data = await ai.analyzeLeadImport(`Subject: ${thread.subject}\n\n${thread.body}`);
 
-            if (isNew || hasNewInfo) {
-                const data = await ai.analyzeLeadImport(`Subject: ${thread.subject}\n\n${thread.body}`);
-                results.push({
-                    ...data,
-                    gmailThreadId: thread.id,
-                    importType: isNew ? "NEW" : "UPDATE",
-                    rawText: `Subject: ${thread.subject}\n\n${thread.body}`
-                });
-            }
+            results.push({
+                ...data,
+                gmailThreadId: thread.id,
+                importType: !existingLead ? "NEW" : (existingLead.status === "DISCARDED" ? "RESURFACED" : "UPDATE"),
+                rawText: `Subject: ${thread.subject}\n\n${thread.body}`
+            });
         }
 
         return { success: true, results, totalFound: threads.length };

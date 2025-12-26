@@ -369,6 +369,24 @@ export async function deleteLead(id: string) {
     }
 }
 
+export async function discardLeadAction(id: string) {
+    try {
+        await prisma.lead.update({
+            where: { id },
+            data: { status: 'DISCARDED' }
+        });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+
+        revalidatePath('/dashboard/crm');
+        return { success: true };
+    } catch (error) {
+        return { error: 'Failed to discard lead' };
+    }
+}
+
 export async function convertLeadToDeal(leadId: string, orgId: string) {
     try {
         const lead = await prisma.lead.findUnique({ where: { id: leadId } });
