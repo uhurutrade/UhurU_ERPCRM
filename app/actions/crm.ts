@@ -23,6 +23,11 @@ export async function createOrganization(formData: FormData) {
         await prisma.organization.create({
             data: { name, sector, website, address, email, phone, city, country, postcode }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMOrganizations();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -68,6 +73,11 @@ export async function updateOrganization(id: string, formData: FormData) {
                 postcode
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMOrganizations();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -78,6 +88,11 @@ export async function updateOrganization(id: string, formData: FormData) {
 export async function deleteOrganization(id: string) {
     try {
         await prisma.organization.delete({ where: { id } });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMOrganizations();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -119,6 +134,11 @@ export async function createContact(formData: FormData) {
                 postcode
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMContacts();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -164,6 +184,11 @@ export async function updateContact(id: string, formData: FormData) {
                 postcode
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMContacts();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -175,6 +200,11 @@ export async function updateContact(id: string, formData: FormData) {
 export async function deleteContact(id: string) {
     try {
         await prisma.contact.delete({ where: { id } });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMContacts();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -201,6 +231,11 @@ export async function createDeal(formData: FormData) {
                 organizationId
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMDeals();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -214,6 +249,11 @@ export async function updateDealStage(dealId: string, newStage: string) {
             where: { id: dealId },
             data: { stage: newStage }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMDeals();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -237,6 +277,11 @@ export async function updateDeal(id: string, formData: FormData) {
                 organizationId
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMDeals();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -247,6 +292,11 @@ export async function updateDeal(id: string, formData: FormData) {
 export async function deleteDeal(id: string) {
     try {
         await prisma.deal.delete({ where: { id } });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMDeals();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -268,6 +318,11 @@ export async function createLead(formData: FormData) {
         await prisma.lead.create({
             data: { name, email, source, notes }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -287,6 +342,11 @@ export async function updateLead(id: string, formData: FormData) {
             where: { id },
             data: { name, email, source, notes, status }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -297,6 +357,11 @@ export async function updateLead(id: string, formData: FormData) {
 export async function deleteLead(id: string) {
     try {
         await prisma.lead.delete({ where: { id } });
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -326,6 +391,12 @@ export async function convertLeadToDeal(leadId: string, orgId: string) {
         });
 
         revalidatePath('/dashboard/crm');
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMDeals, syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMDeals();
+        syncCRMLeads();
+
         return { success: true };
     } catch (error) {
         return { error: 'Failed to convert lead to deal' };
@@ -351,6 +422,11 @@ export async function createTask(formData: FormData) {
                 assignedToId: assignedToId || null
             }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
+        syncTasks();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -364,6 +440,11 @@ export async function toggleTask(id: string, completed: boolean) {
             where: { id },
             data: { completed }
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
+        syncTasks();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {
@@ -374,6 +455,11 @@ export async function toggleTask(id: string, completed: boolean) {
 export async function deleteTask(id: string) {
     try {
         await prisma.task.delete({ where: { id } });
+
+        // Trigger RAG Sync (Background)
+        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
+        syncTasks();
+
         revalidatePath('/dashboard/crm');
         return { success: true };
     } catch (error) {

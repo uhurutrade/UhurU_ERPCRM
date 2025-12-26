@@ -9,50 +9,72 @@ import { prisma } from '../prisma';
 import { ingestText } from './rag-engine';
 
 /**
+ * Helper para disparar sincronizaciones en segundo plano de forma segura
+ */
+export function triggerSync(moduleName: string, syncFn: () => Promise<void>) {
+    // Usamos setTimeout 0 para asegurar que la respuesta principal ya se envió al cliente
+    setTimeout(async () => {
+        try {
+            console.log(`[RAG Auto-Sync] 🛰️ Iniciando sincronización de: ${moduleName}`);
+            await syncFn();
+            console.log(`[RAG Auto-Sync] ✅ Sincronización finalizada: ${moduleName}`);
+        } catch (e: any) {
+            console.error(`[RAG Auto-Sync] ❌ Error sincronizando ${moduleName}:`, e.message);
+        }
+    }, 0);
+}
+
+/**
  * Sincroniza TODA la base de datos al RAG de forma asíncrona
- * NO ESPERA a que termine - Fire and forget
  */
 export function syncAllSystemData() {
-    // Fire and forget - No bloqueamos la respuesta al usuario
-    Promise.resolve().then(async () => {
-        try {
-            console.log('[RAG Auto-Sync] 🔄 Iniciando sincronización COMPLETA (background)...');
+    triggerSync('FULL_SYSTEM_SYNC', async () => {
+        // CORE BUSINESS DATA
+        await syncCompanySettings();
+        await syncBankingOverview();
+        await syncRecentTransactions();
+        await syncCryptoWallets();
 
-            // CORE BUSINESS DATA
-            await syncCompanySettings();
-            await syncBankingOverview();
-            await syncRecentTransactions();
-            await syncCryptoWallets();
+        // TAX & COMPLIANCE
+        await syncTaxObligations();
+        await syncFiscalYears();
+        await syncComplianceEvents();
 
-            // TAX & COMPLIANCE
-            await syncTaxObligations();
-            await syncFiscalYears();
-            await syncComplianceEvents();
+        // CRM
+        await syncCRMOrganizations();
+        await syncCRMContacts();
+        await syncCRMLeads();
+        await syncCRMDeals();
 
-            // CRM
-            await syncCRMOrganizations();
-            await syncCRMContacts();
-            await syncCRMLeads();
-            await syncCRMDeals();
+        // INVOICING
+        await syncInvoices();
 
-            // INVOICING
-            await syncInvoices();
+        // TASKS & ACTIVITIES
+        await syncTasks();
+        await syncActivities();
 
-            // TASKS & ACTIVITIES
-            await syncTasks();
-            await syncActivities();
+        // ASSETS
+        await syncAssets();
 
-            // ASSETS
-            await syncAssets();
+        // AUDIT & METADATA
+        await syncDeletedTransactions();
+        await syncTransactionCategories();
 
-            // AUDIT
-            await syncDeletedTransactions();
+        /**
+         * FUTURE MODULES REGISTRY
+         * ========================
+         * 1. Create your sync function below (e.g., syncMarketing())
+         * 2. Await it here for Full Sync
+         * 3. Call it from your Server Actions in background:
+         *    const { syncMyModule } = await import('@/lib/ai/auto-sync-rag');
+         *    syncMyModule();
+         */
 
-            console.log('[RAG Auto-Sync] ✅ Sincronización COMPLETA finalizada');
-        } catch (error: any) {
-            console.error('[RAG Auto-Sync] ❌ Error:', error.message);
-        }
-    }).catch(err => console.error('[RAG Auto-Sync] Fatal Error:', err));
+        // await syncMarketing();
+        // await syncInventory();
+
+        console.log('[RAG Auto-Sync] ✅ Sincronización COMPLETA finalizada');
+    });
 }
 
 // ============================================================================
@@ -499,5 +521,29 @@ export async function syncDeletedTransactions() {
         console.log('[RAG Auto-Sync] ✓ Deleted Transactions');
     } catch (error: any) {
         console.error('[RAG Auto-Sync] Error syncing Deleted Transactions:', error.message);
+    }
+}
+
+// ============================================================================
+// METADATA & CATEGORIES
+// ============================================================================
+
+export async function syncTransactionCategories() {
+    try {
+        const categories = await prisma.transactionCategory.findMany({
+            orderBy: { name: 'asc' }
+        });
+
+        let catContent = "TRANSACTION CATEGORIES\n======================\n\n";
+        catContent += "These categories are used to classify bank transactions and expenses:\n\n";
+
+        for (const cat of categories) {
+            catContent += `• ${cat.name}\n`;
+        }
+
+        await ingestText('sys_transaction_categories', 'Transaction Categories', catContent);
+        console.log('[RAG Auto-Sync] ✓ Transaction Categories');
+    } catch (error: any) {
+        console.error('[RAG Auto-Sync] Error syncing Categories:', error.message);
     }
 }

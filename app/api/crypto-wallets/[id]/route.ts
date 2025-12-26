@@ -53,6 +53,10 @@ export async function PATCH(
             },
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncCryptoWallets } = await import('@/lib/ai/auto-sync-rag');
+        syncCryptoWallets();
+
         return NextResponse.json(cryptoWallet);
     } catch (error) {
         console.error("[CRYPTO_WALLET_PATCH]", error);
@@ -83,6 +87,10 @@ export async function DELETE(
                 id: params.id,
             },
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncCryptoWallets } = await import('@/lib/ai/auto-sync-rag');
+        syncCryptoWallets();
 
         return NextResponse.json({
             success: true,

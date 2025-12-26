@@ -31,25 +31,11 @@ export async function DELETE(req: Request) {
         const doc = await prisma.complianceDocument.findUnique({ where: { id } });
         if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-        // Try to delete file from disk
-        try {
-            // Resolve relative path to absolute depending on environment
-            const absolutePath = join(process.cwd(), doc.path);
-            await unlink(absolutePath);
-        } catch (e) {
-            console.error("File likely already deleted or path mismatch", e);
-        }
+        // 1. Eliminar archivo físico y Chunks del RAG de forma unificada
+        const { purgeDocument } = await import('@/lib/ai/rag-engine');
+        await purgeDocument(id, doc.path);
 
-        // Desvectorizar (eliminar chunks del RAG)
-        try {
-            await prisma.documentChunk.deleteMany({
-                where: { documentId: id }
-            });
-            console.log(`[RAG] 🗑️ Desvectorizado: "${doc.filename}" - Chunks eliminados`);
-        } catch (err) {
-            console.error('[RAG] Error desvectorizando:', err);
-        }
-
+        // 2. Eliminar de la base de datos
         await prisma.complianceDocument.delete({ where: { id } });
 
         return NextResponse.json({ success: true });
@@ -57,3 +43,5 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
     }
 }
+
+```

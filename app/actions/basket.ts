@@ -207,28 +207,11 @@ export async function removeFromBasket(id: string) {
 
         if (!doc) return { success: false, error: 'Document not found' };
 
-        // 1. Delete file from filesystem
-        const fs = require('fs/promises');
-        const path = require('path');
-        const fullPath = path.join(process.cwd(), 'public', doc.path);
+        // 1. Eliminar archivo físico y Chunks del RAG de forma unificada
+        const { purgeDocument } = await import('@/lib/ai/rag-engine');
+        await purgeDocument(id, doc.path);
 
-        try {
-            await fs.unlink(fullPath);
-        } catch (err) {
-            console.error('File deletion error (might already be gone):', err);
-        }
-
-        // 2. Desvectorizar (eliminar chunks del RAG)
-        try {
-            await prisma.documentChunk.deleteMany({
-                where: { documentId: id }
-            });
-            console.log(`[RAG] 🗑️ Desvectorizado: "${doc.filename}" - Chunks eliminados`);
-        } catch (err) {
-            console.error('[RAG] Error desvectorizando:', err);
-        }
-
-        // 3. Delete from DB
+        // 2. Eliminar de la base de datos
         await prisma.complianceDocument.delete({
             where: { id }
         });
@@ -299,6 +282,13 @@ export async function reprocessDocument(id: string) {
                 documentDate: analysis.documentDate ? new Date(analysis.documentDate) : doc.documentDate
             }
         });
+
+        // 5. RE-TRIGGER RAG VECTORIZATION (Background)
+        // This ensures updated insights/notes are in the RAG
+        const { ingestDocument } = await import('@/lib/ai/rag-engine');
+        ingestDocument(id, doc.path).catch(err =>
+            console.error(`[RAG] Error re-vectorizing ${id}:`, err)
+        );
 
         revalidatePath('/dashboard/doc-basket');
         return { success: true };

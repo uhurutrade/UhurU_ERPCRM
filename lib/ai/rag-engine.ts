@@ -305,6 +305,41 @@ export async function ingestDocument(docId: string, filePath: string) {
 }
 
 /**
+ * Elimina un documento físicamente y sus fragmentos vectoriales
+ */
+export async function purgeDocument(docId: string, filePath?: string) {
+    try {
+        // 1. Desvectorizar (eliminar de la base de datos de vectores)
+        const deletedChunks = await prisma.documentChunk.deleteMany({
+            where: { documentId: docId }
+        });
+        console.log(`[RAG] 🗑️ Desvectorizado: ID ${docId} (${deletedChunks.count} fragmentos eliminados)`);
+
+        // 2. Eliminar archivo físico si se proporciona ruta
+        if (filePath && !filePath.startsWith('system://')) {
+            const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+            const absolutePath = path.join(process.cwd(), 'public', cleanPath);
+
+            try {
+                await fs.unlink(absolutePath);
+                console.log(`[RAG] 🗑️ Archivo eliminado: ${absolutePath}`);
+            } catch (err: any) {
+                if (err.code === 'ENOENT') {
+                    console.log(`[RAG] ℹ️ El archivo ya no existía en disco: ${absolutePath}`);
+                } else {
+                    console.error(`[RAG] ❌ Error eliminando archivo físico:`, err.message);
+                }
+            }
+        }
+
+        return { success: true, chunksDeleted: deletedChunks.count };
+    } catch (error: any) {
+        console.error(`[RAG] ❌ Error en purgeDocument (${docId}):`, error.message);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
  * Ingesta texto directo (para datos del sistema: Company Settings, Bancos, etc.)
  */
 export async function ingestText(docId: string, title: string, text: string) {

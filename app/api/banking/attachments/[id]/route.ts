@@ -19,14 +19,9 @@ export async function DELETE(
             return NextResponse.json({ error: 'Attachment not found' }, { status: 404 });
         }
 
-        // Delete file from filesystem
-        try {
-            const filepath = join(process.cwd(), 'public', attachment.path);
-            await unlink(filepath);
-        } catch (fileError) {
-            console.error('Error deleting file:', fileError);
-            // Continue even if file deletion fails
-        }
+        // Eliminar archivo físico y Chunks del RAG de forma unificada
+        const { purgeDocument } = await import('@/lib/ai/rag-engine');
+        await purgeDocument(params.id, attachment.path);
 
         // Delete from database
         await prisma.attachment.delete({

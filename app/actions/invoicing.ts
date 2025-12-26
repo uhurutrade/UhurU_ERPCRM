@@ -174,6 +174,10 @@ export async function createInvoice(formData: FormData) {
             });
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+
         revalidatePath('/dashboard/invoices');
         return { success: true };
 
@@ -281,6 +285,10 @@ export async function updateInvoice(id: string, formData: FormData) {
             });
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+
         revalidatePath('/dashboard/invoices');
         revalidatePath(`/invoice-pdf/${id}`);
         return { success: true };
@@ -297,6 +305,11 @@ export async function updateInvoiceStatus(id: string, status: string) {
             data: { status }
         });
         revalidatePath('/dashboard/invoices');
+
+        // Trigger RAG Sync (Background)
+        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+
         return { success: true };
     } catch (error) {
         return { error: 'Failed to update status' };
@@ -311,6 +324,11 @@ export async function deleteInvoice(id: string) {
             data: { deletedAt: new Date() }
         });
         revalidatePath('/dashboard/invoices');
+
+        // Trigger RAG Sync (Background)
+        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+
         return { success: true };
     } catch (error) {
         console.error("Delete Error:", error);

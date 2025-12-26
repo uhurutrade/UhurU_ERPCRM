@@ -254,6 +254,11 @@ export async function updateTransactionCategory(transactionId: string, category:
         });
 
         revalidatePath('/dashboard/banking');
+
+        // Trigger RAG Sync (Background)
+        const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
+        syncRecentTransactions();
+
         return { success: true };
     } catch (error) {
         console.error('Update category error:', error);

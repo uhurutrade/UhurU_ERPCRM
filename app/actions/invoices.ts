@@ -301,6 +301,10 @@ export async function deleteAttachment(id: string) {
         const att = await prisma.attachment.findUnique({ where: { id } });
         if (!att) return { success: false, error: 'Not found' };
 
+        // Eliminar archivo físico y Chunks del RAG
+        const { purgeDocument } = await import('@/lib/ai/rag-engine');
+        await purgeDocument(id, att.path);
+
         // delete from db
         await prisma.attachment.delete({ where: { id } });
 

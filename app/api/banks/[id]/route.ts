@@ -46,6 +46,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             },
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncBankingOverview } = await import('@/lib/ai/auto-sync-rag');
+        syncBankingOverview();
+
         return NextResponse.json(bank);
     } catch (error) {
         console.error("Error updating bank:", error);
@@ -77,6 +81,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         await prisma.bank.delete({
             where: { id: params.id },
         });
+
+        // Trigger RAG Sync (Background)
+        const { syncBankingOverview } = await import('@/lib/ai/auto-sync-rag');
+        syncBankingOverview();
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
