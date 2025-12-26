@@ -31,9 +31,6 @@ export async function POST(req: Request) {
 
         - Maintain strategic continuity.
         
-        CURRENT BUSINESS FINANCIAL DATA (ERP):
-        ${financialContext}`;
-
         // 3. RAG RETRIEVAL (from uploaded docs)
         let ragContext = "";
         try {
@@ -42,14 +39,16 @@ export async function POST(req: Request) {
             console.error("RAG Retrieval failed:", ragError);
         }
 
-        if (ragContext) {
-            systemPrompt += `\n\nRELEVANT INFORMATION FROM UPLOADED COMPLIANCE DOCUMENTS:\n${ragContext}`;
-        } else if (contextFiles && contextFiles.length > 0) {
-            systemPrompt += `\n\nCONTEXT FROM UPLOADED FILES:\nThe user has uploaded ${contextFiles.length} documents for analysis.`;
-        }
+        // 4. PREPARE CONTEXT DATA (Outside of System Instructions to avoid Gemini 400 errors)
+        const combinedContext = `
+FINANCIAL DATA(ERP):
+${ financialContext }
 
-        // 4. Call AI with history
-        const reply = await ai.chat(message, systemPrompt, chatHistory);
+${ ragContext ? `RAG DOCUMENTS CONTEXT:\n${ragContext}` : (contextFiles && contextFiles.length > 0 ? `The user has uploaded ${contextFiles.length} documents for analysis.` : '') }
+        `;
+
+        // 5. Call AI with history and contextData separately
+        const reply = await ai.chat(message, systemPrompt, chatHistory, combinedContext);
 
         return NextResponse.json({ reply });
 

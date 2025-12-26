@@ -98,9 +98,9 @@ export async function getAIClient() {
             return analyzeLeadWithOpenAI(text, companyContext);
         },
 
-        async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
-            // Identity and behavior first, then specialized task instructions
-            const enrichedPrompt = `
+        async chat(message: string, systemPrompt: string, history: any[] = [], contextData?: string): Promise<string> {
+            // Role and Behavior strictly in System Prompt
+            const roleAndBehavior = `
                 ${companyContext}
                 
                 SPECIALIZED TASK INSTRUCTIONS:
@@ -108,10 +108,11 @@ export async function getAIClient() {
                 
                 REMINDER: You MUST strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above. Do not deviate from your assigned persona and fiscal perspective.
             `;
+
             if (provider === 'gemini') {
-                return chatWithGemini(message, enrichedPrompt, history);
+                return chatWithGemini(message, roleAndBehavior, history, contextData);
             }
-            return chatWithOpenAI(message, enrichedPrompt, history);
+            return chatWithOpenAI(message, roleAndBehavior, history, contextData);
         }
     };
 }
@@ -296,16 +297,21 @@ async function analyzeLeadWithOpenAI(text: string, companyContext: string): Prom
     return JSON.parse(response.choices[0].message.content || '{}');
 }
 
-async function chatWithOpenAI(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
+async function chatWithOpenAI(message: string, systemPrompt: string, history: any[] = [], contextData?: string): Promise<string> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API Key is not configured.");
 
     const openai = new OpenAI({ apiKey });
 
+    // Prepend context data to the user message for consistency
+    const fullUserMessage = contextData
+        ? `RELEVANT CONTEXT & DATA:\n${contextData}\n\nUSER QUESTION: ${message}`
+        : message;
+
     const messages: any[] = [
         { role: "system", content: systemPrompt },
         ...history,
-        { role: "user", content: message }
+        { role: "user", content: fullUserMessage }
     ];
 
     const response = await openai.chat.completions.create({
@@ -324,7 +330,7 @@ async function analyzeWithGemini(filename: string, text: string, companyContext:
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-8b",
+        model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -357,12 +363,12 @@ async function analyzeWithGemini(filename: string, text: string, companyContext:
     return JSON.parse(response.text());
 }
 
-async function chatWithGemini(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
+async function chatWithGemini(message: string, systemPrompt: string, history: any[] = [], contextData?: string): Promise<string> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Gemini API Key (GEMINI_API_KEY) is not configured.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Format history for Gemini
     const chat = model.startChat({
@@ -373,7 +379,12 @@ async function chatWithGemini(message: string, systemPrompt: string, history: an
         systemInstruction: systemPrompt
     });
 
-    const result = await chat.sendMessage(message);
+    // Prepend context data to the user message to keep systemInstruction clean and avoid 400 Errors
+    const fullUserMessage = contextData
+        ? `RELEVANT CONTEXT DATA:\n${contextData}\n\nUSER QUESTION: ${message}`
+        : message;
+
+    const result = await chat.sendMessage(fullUserMessage);
     const response = await result.response;
     return response.text();
 }
@@ -384,7 +395,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, compan
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-8b",
+        model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -442,7 +453,7 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-8b",
+        model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
     });
 

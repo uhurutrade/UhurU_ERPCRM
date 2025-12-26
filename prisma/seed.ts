@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Start seeding (Lossless Sync: CRM and System data)...');
-  console.log('Generated at: 2025-12-26T20:03:09.820Z');
+  console.log('Generated at: 2025-12-26T20:20:59.217Z');
 
   // --- 1. Transaction Categories ---
   console.log('Upserting Categories...');
