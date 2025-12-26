@@ -52,7 +52,6 @@ logs
 # Misc
 .husky
 patches
-scripts/generate-seed.ts
-scripts/clean-for-vps.ts
-scripts/reprocess-documents.ts
-apply-migration-vps.sh
+# apply-migration-vps.sh
+# scripts/generate-seed.ts
+# scripts/reprocess-documents.ts
