@@ -1,0 +1,4 @@
+🚀 Iniciando prueba FINAL de modelos Gemini...
+
+--- PROBANDO gemini-2.0-flash-exp CON SYSTEM INSTRUCTION ---
+✅ gemini-2.0-flash-exp SOPORTA SYSTEM INSTRUCTION: "Hola."
