@@ -46,14 +46,14 @@ async function getCompanyContext() {
         if (!settings) return "";
 
         return `
-            CONTEXTO DE LA EMPRESA:
+            PRIMARY IDENTITY & STRATEGIC BEHAVIOR:
+            ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
+
+            ENTITY CONTEXT:
             Nombre: ${settings.companyName}
             Sector: ${settings.companyType}
-            Misión/Notas: ${settings.notes || 'N/A'}
             Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
-            
-            DIRECCIONES ESTRATÉGICAS Y COMPORTAMIENTO (PRIORIDAD):
-            ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
+            Notas adicionales: ${settings.notes || 'N/A'}
         `;
     } catch {
         return "";
@@ -95,7 +95,8 @@ export async function getAIClient() {
         },
 
         async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
-            const enrichedPrompt = `${systemPrompt}\n\n${companyContext}`;
+            // Identity and behavior first, then specialized task instructions
+            const enrichedPrompt = `${companyContext}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt}`;
             if (provider === 'gemini') {
                 return chatWithGemini(message, enrichedPrompt, history);
             }
