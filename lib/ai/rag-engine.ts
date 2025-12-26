@@ -206,22 +206,20 @@ export async function ingestDocument(docId: string, filePath: string) {
         for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             try {
-                // Log de progreso sin salto de línea para no saturar
-                const vector = await generateEmbedding(chunk.content);
-                const vectorSql = `[${vector.join(',')}]`;
+                // VPS COMPATIBILITY: Skip embedding generation and raw SQL
+                // Just use standard Prisma create
+                await prisma.documentChunk.create({
+                    data: {
+                        id: randomUUID(),
+                        documentId: docId,
+                        content: chunk.content,
+                        tokenCount: chunk.tokenCount,
+                    }
+                });
 
-                await prisma.$executeRawUnsafe(
-                    `INSERT INTO "DocumentChunk" ("id", "documentId", "content", "tokenCount", "embedding", "createdAt") 
-                     VALUES ($1, $2, $3, $4, $5::vector, NOW())`,
-                    randomUUID(),
-                    docId,
-                    chunk.content,
-                    chunk.tokenCount,
-                    vectorSql
-                );
                 inserted++;
-                if (inserted % 5 === 0 || inserted === chunks.length) {
-                    console.log(`[RAG] Avance: ${inserted}/${chunks.length} fragmentos vectorizados.`);
+                if (inserted % 10 === 0 || inserted === chunks.length) {
+                    console.log(`[RAG] Avance: ${inserted}/${chunks.length} fragmentos procesados.`);
                 }
             } catch (err: any) {
                 console.error(`[RAG] Error en fragmento ${i}:`, err.message);
@@ -320,18 +318,15 @@ export async function ingestText(docId: string, title: string, text: string) {
         let inserted = 0;
         for (const chunk of chunks) {
             try {
-                const vector = await generateEmbedding(chunk.content);
-                const vectorSql = `[${vector.join(',')}]`;
-
-                await prisma.$executeRawUnsafe(
-                    `INSERT INTO "DocumentChunk" ("id", "documentId", "content", "tokenCount", "embedding", "createdAt") 
-                     VALUES ($1, $2, $3, $4, $5::vector, NOW())`,
-                    randomUUID(),
-                    docId,
-                    chunk.content,
-                    chunk.tokenCount,
-                    vectorSql
-                );
+                // VPS COMPATIBILITY: Use standard Prisma without embeddings
+                await prisma.documentChunk.create({
+                    data: {
+                        id: randomUUID(),
+                        documentId: docId,
+                        content: chunk.content,
+                        tokenCount: chunk.tokenCount,
+                    }
+                });
                 inserted++;
             } catch (err: any) {
                 console.error(`[RAG] Error en chunk de ${title}:`, err.message);
@@ -347,21 +342,21 @@ export async function ingestText(docId: string, title: string, text: string) {
 }
 
 /**
- * Búsqueda de Chunks similares usando Cosine Similarity nativo de pgvector
+ * Búsqueda de Chunks similares (DESACTIVADA POR COMPATIBILIDAD VPS)
+ * Retorna solo los últimos chunks por ahora como fallback.
  */
 export async function retrieveContext(query: string, maxResults = 3) {
-    const queryEmbedding = await generateEmbedding(query);
-    const vectorSql = `[${queryEmbedding.join(',')}]`;
+    try {
+        const chunks = await prisma.documentChunk.findMany({
+            take: maxResults,
+            orderBy: { createdAt: 'desc' },
+            include: { document: true }
+        });
 
-    // Búsqueda por similitud de coseno <=> 
-    // similarity = 1 - distance
-    const relevantChunks: any[] = await prisma.$queryRawUnsafe(`
-        SELECT c.content, d.filename, (1 - (c.embedding <=> $1::vector)) as similarity
-        FROM "DocumentChunk" c
-        JOIN "ComplianceDocument" d ON c."documentId" = d.id
-        ORDER BY similarity DESC
-        LIMIT $2
-    `, vectorSql, maxResults);
+        if (chunks.length === 0) return "No hay contexto disponible en la base de datos.";
 
-    return relevantChunks.map((c: any) => `[Fuente: ${c.filename} | Similitud: ${(c.similarity * 100).toFixed(1)}%]\n${c.content}`).join('\n\n---\n\n');
+        return chunks.map((c: any) => `[Fuente: ${c.document?.filename || 'Sistema'}]\n${c.content}`).join('\n\n---\n\n');
+    } catch (err) {
+        return "Error al recuperar contexto (IA en modo básico).";
+    }
 }

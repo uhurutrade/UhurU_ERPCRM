@@ -5,8 +5,8 @@ async function main() {
     console.log('🤖 Starting COMPLETE System Data Vectorization...');
 
     try {
-        // Ensure vector extension is enabled
-        await prisma.$executeRawUnsafe('CREATE EXTENSION IF NOT EXISTS vector');
+        // Ensure vector extension is enabled (DISABLED FOR VPS COMPATIBILITY)
+        // await prisma.$executeRawUnsafe('CREATE EXTENSION IF NOT EXISTS vector');
 
         // Sync ALL system data (todas las tablas)
         await syncAllSystemData();
