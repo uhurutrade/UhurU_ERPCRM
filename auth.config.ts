@@ -31,11 +31,11 @@ export const authConfig = {
             return true;
         },
         async signIn({ user }) {
-            const allowedEmails = ["raul.irus@gmail.com", "uhurutradeuk@gmail.com"]
-            if (user.email && allowedEmails.includes(user.email)) {
+            const allowedEmail = "uhurutradeuk@gmail.com"
+            if (user.email === allowedEmail) {
                 return true;
             }
-            console.log(`Access denied for: ${user.email}`);
+            console.log(`Access denied for: ${user.email}. Only ${allowedEmail} is allowed.`);
             return false;
         }
     },
