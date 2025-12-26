@@ -49,51 +49,63 @@ export async function getGmailClient(userId: string) {
 export async function fetchLabeledEmails(userId: string, labelName: string = 'UhurU-Lead') {
     const gmail = await getGmailClient(userId);
 
-    // 1. Find the label ID for the given name
-    const labelsRes = await gmail.users.labels.list({ userId: 'me' });
-    const label = labelsRes.data.labels?.find(l => l.name?.toLowerCase() === labelName.toLowerCase());
-
-    if (!label) {
-        console.log(`Label ${labelName} not found in Gmail.`);
-        return [];
-    }
-
-    // 2. List messages with this label (Searches Inbox, Sent, Drafts, etc. as long as they have the label)
-    const messagesRes = await gmail.users.messages.list({
+    // 1. Search for threads with this label (Global: Inbox, Sent, Drafts)
+    const threadsRes = await gmail.users.threads.list({
         userId: 'me',
-        q: `label:${labelName}`, // Search query is more reliable for global search
+        q: `label:${labelName}`,
     });
 
-    const messages = messagesRes.data.messages || [];
-    const fullMessages = [];
+    const threads = threadsRes.data.threads || [];
+    const fullThreads = [];
 
-    for (const msg of messages) {
-        const fullMsg = await gmail.users.messages.get({
+    for (const threadInfo of threads) {
+        const thread = await gmail.users.threads.get({
             userId: 'me',
-            id: msg.id!,
+            id: threadInfo.id!,
             format: 'full'
         });
 
-        // Extract body
-        let body = "";
-        const payload = fullMsg.data.payload;
-        if (payload?.parts) {
-            body = payload.parts.find(p => p.mimeType === 'text/plain')?.body?.data || "";
-        } else {
-            body = payload?.body?.data || "";
+        let combinedBody = "";
+        let subject = "";
+
+        // Iterate through all messages in the thread to build a logical conversation context
+        if (thread.data.messages) {
+            for (const msg of thread.data.messages) {
+                const payload = msg.payload;
+                subject = subject || payload?.headers?.find(h => h.name === 'Subject')?.value || "";
+
+                let msgBody = "";
+                // Helper to extract body recursively
+                const getBody = (parts: any[]): string => {
+                    for (const part of parts) {
+                        if (part.mimeType === 'text/plain' && part.body?.data) {
+                            return part.body.data;
+                        }
+                        if (part.parts) {
+                            const found = getBody(part.parts);
+                            if (found) return found;
+                        }
+                    }
+                    return "";
+                };
+
+                const data = payload?.parts ? getBody(payload.parts) : (payload?.body?.data || "");
+                if (data) {
+                    msgBody = Buffer.from(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8');
+                }
+
+                const from = payload?.headers?.find(h => h.name === 'From')?.value || "Unknown";
+                combinedBody += `--- Mensaje de: ${from} ---\n${msgBody}\n\n`;
+            }
         }
 
-        if (body) {
-            body = Buffer.from(body, 'base64').toString('utf-8');
-        }
-
-        fullMessages.push({
-            id: msg.id,
-            snippet: fullMsg.data.snippet,
-            body: body,
-            subject: fullMsg.data.payload?.headers?.find(h => h.name === 'Subject')?.value
+        fullThreads.push({
+            id: threadInfo.id,
+            snippet: thread.data.messages?.[0]?.snippet, // Snippet from last or first message
+            body: combinedBody.trim(),
+            subject: subject
         });
     }
 
-    return fullMessages;
+    return fullThreads;
 }

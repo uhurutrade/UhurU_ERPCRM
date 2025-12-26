@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Sparkles, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { importLeadFromText, commitSmartLeadImport } from "@/app/dashboard/crm/actions";
@@ -21,14 +21,19 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
     const [isSaving, setIsSaving] = useState(false);
     const [importedCount, setImportedCount] = useState(0);
 
-    // Sync queue when initialQueue changes
-    useState(() => {
-        if (initialQueue.length > 0) {
+    // Sync queue when initialQueue changes or modal opens
+    useEffect(() => {
+        if (isOpen && initialQueue && initialQueue.length > 0) {
             setQueue(initialQueue);
+            setQueueIndex(0);
             setExtractedData(initialQueue[0]);
             setStep("review");
+        } else if (isOpen && (!initialQueue || initialQueue.length === 0)) {
+            // Reset to paste mode if no queue
+            setStep("paste");
+            setQueue([]);
         }
-    });
+    }, [initialQueue, isOpen]);
 
     const handleAnalyze = async () => {
         if (!rawText.trim()) return;

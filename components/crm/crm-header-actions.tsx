@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Users, Building2, Target, Zap, MoreVertical } from 'lucide-react';
+import { Plus, Users, Building2, Target, Zap, MoreVertical, Linkedin, Mail, RefreshCw, Sparkles } from 'lucide-react';
 import { DealModal } from './modals/deal-modal';
 import { OrganizationModal } from './modals/organization-modal';
 import { ContactModal } from './modals/contact-modal';
 import { LeadModal } from './modals/lead-modal';
 import { SmartImportModal } from './smart-import-modal';
-import { Sparkles, RefreshCw, Mail } from 'lucide-react';
 import { syncGmailLeads } from '@/app/dashboard/crm/actions';
 import { toast } from 'sonner';
 
@@ -49,6 +48,40 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                 <Building2 size={16} className="sm:w-[18px]" /> Org
             </button>
 
+            {/* LinkedIn Smart Import */}
+            <button
+                onClick={() => setActiveModal('smart-import')}
+                className="flex items-center justify-center p-2.5 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-lg shadow-blue-600/5 group"
+                title="Importar desde LinkedIn"
+            >
+                <Linkedin size={20} className="group-hover:scale-110 transition-transform" />
+            </button>
+
+            {/* Gmail Sync */}
+            <button
+                onClick={async () => {
+                    setIsSyncing(true);
+                    const res = await syncGmailLeads();
+                    setIsSyncing(false);
+                    if (res.success) {
+                        if (res.results && res.results.length > 0) {
+                            setGmailQueue(res.results);
+                            setActiveModal('smart-import');
+                            toast.success(`${res.results.length} correos encontrados para revisión.`);
+                        } else {
+                            toast.success("No se encontraron nuevos leads en Gmail.");
+                        }
+                    } else {
+                        toast.error("Error al sincronizar Gmail: " + res.error);
+                    }
+                }}
+                disabled={isSyncing}
+                className="flex items-center justify-center p-2.5 bg-red-600/10 border border-red-500/20 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-lg shadow-red-600/5 group disabled:opacity-50"
+                title="Sincronizar Gmail"
+            >
+                {isSyncing ? <RefreshCw size={20} className="animate-spin text-white" /> : <Mail size={20} className="group-hover:scale-110 transition-transform" />}
+            </button>
+
             {/* Dropdown for other actions */}
             <div className="relative">
                 <button
@@ -70,7 +103,7 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                         />
                         <div className="absolute right-0 mt-3 w-56 bg-uhuru-card border border-uhuru-border rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in duration-200">
                             <div className="px-4 py-2 mb-1">
-                                <span className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest">More Actions</span>
+                                <span className="text-[10px] font-bold text-uhuru-text-muted uppercase tracking-widest">Otras Acciones</span>
                             </div>
 
                             <button
@@ -80,49 +113,12 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                                 <div className="p-1.5 bg-purple-500/10 rounded-lg text-purple-400">
                                     <Zap size={14} />
                                 </div>
-                                <span className="font-bold">New Lead</span>
-                            </button>
-
-                            <button
-                                onClick={() => { setActiveModal('smart-import'); setShowDropdown(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-indigo-400 hover:text-white hover:bg-slate-800/80 transition-colors group"
-                            >
-                                <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                                    <Sparkles size={14} />
-                                </div>
-                                <span className="font-bold">Smart Import (AI)</span>
-                            </button>
-
-                            <button
-                                onClick={async () => {
-                                    setIsSyncing(true);
-                                    setShowDropdown(false);
-                                    const res = await syncGmailLeads();
-                                    setIsSyncing(false);
-                                    if (res.success) {
-                                        if (res.results && res.results.length > 0) {
-                                            setGmailQueue(res.results);
-                                            setActiveModal('smart-import');
-                                            toast.success(`${res.results.length} correos encontrados para revisión.`);
-                                        } else {
-                                            toast.success("No se encontraron nuevos leads en Gmail.");
-                                        }
-                                    } else {
-                                        toast.error("Error al sincronizar Gmail: " + res.error);
-                                    }
-                                }}
-                                disabled={isSyncing}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-emerald-400 hover:text-white hover:bg-slate-800/80 transition-colors group"
-                            >
-                                <div className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                    {isSyncing ? <RefreshCw size={14} className="animate-spin" /> : <Mail size={14} />}
-                                </div>
-                                <span className="font-bold">{isSyncing ? 'Sincronizando...' : 'Sincronizar Gmail'}</span>
+                                <span className="font-bold">Nuevo Lead</span>
                             </button>
 
                             <div className="mt-2 pt-2 border-t border-uhuru-border">
                                 <div className="px-4 py-2">
-                                    <p className="text-[10px] text-uhuru-text-muted ">Capture new opportunities quickly.</p>
+                                    <p className="text-[10px] text-uhuru-text-muted ">Captura nuevas oportunidades rápidamente.</p>
                                 </div>
                             </div>
                         </div>
