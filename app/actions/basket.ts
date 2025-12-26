@@ -51,13 +51,8 @@ export async function uploadToBasket(formData: FormData) {
             // 3. AI Strategic Analysis
             let fileText = "";
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                try {
-                    const pdf = require('pdf-parse');
-                    const pdfData = await pdf(buffer);
-                    fileText = pdfData.text;
-                } catch (err) {
-                    fileText = `[PDF extraction failed]`;
-                }
+                const { extractTextFromPdf } = await import('@/lib/pdf-helper');
+                fileText = await extractTextFromPdf(buffer).catch(() => "[PDF extraction failed]");
             } else {
                 fileText = await file.text();
             }
@@ -149,14 +144,19 @@ export async function uploadToBasket(formData: FormData) {
             // 5. If analysis found deadlines, create ComplianceEvents
             if (analysis.deadlines && Array.isArray(analysis.deadlines)) {
                 for (const d of analysis.deadlines) {
-                    await prisma.complianceEvent.create({
-                        data: {
-                            title: d.title,
-                            description: d.description,
-                            date: new Date(d.date),
-                            type: 'DEADLINE'
-                        }
-                    });
+                    const deadlineDate = new Date(d.date);
+                    if (!isNaN(deadlineDate.getTime())) {
+                        await prisma.complianceEvent.create({
+                            data: {
+                                title: d.title,
+                                description: d.description,
+                                date: deadlineDate,
+                                type: 'DEADLINE'
+                            }
+                        });
+                    } else {
+                        console.warn(`[UPLOAD] Skipping invalid deadline date: "${d.date}" for event "${d.title}"`);
+                    }
                 }
             }
 
@@ -261,13 +261,8 @@ export async function reprocessDocument(id: string) {
 
         let fileText = "";
         if (doc.filename.toLowerCase().endsWith('.pdf')) {
-            try {
-                const pdf = require('pdf-parse');
-                const pdfData = await pdf(buffer);
-                fileText = pdfData.text;
-            } catch (err) {
-                fileText = `[PDF extraction failed]`;
-            }
+            const { extractTextFromPdf } = await import('@/lib/pdf-helper');
+            fileText = await extractTextFromPdf(buffer).catch(() => "[PDF extraction failed]");
         } else {
             fileText = buffer.toString('utf-8');
         }

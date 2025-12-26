@@ -120,68 +120,10 @@ export async function ingestDocument(docId: string, filePath: string) {
 
         try {
             if (ext === 'pdf') {
-                console.log(`[RAG] 🔍 Extrayendo texto de PDF con pdfjs-dist...`);
-
-                // Estrategia 1: pdfjs-dist (Mozilla PDF.js) - Más compatible con Next.js standalone
-                try {
-                    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js');
-
-                    // FIX: Convert Buffer to Uint8Array as required by pdfjs-dist
-                    const uint8Array = new Uint8Array(dataBuffer);
-
-                    // FIX: Set cMapUrl to avoid 'BCMAP' warnings and font errors
-                    // Assuming standard deployment path, or using local defaults if possible
-                    // For Node.js environments without DOM, we might need to skip some font logic
-                    const loadingTask = pdfjsLib.getDocument({
-                        data: uint8Array,
-                        cMapUrl: 'node_modules/pdfjs-dist/cmaps/',
-                        cMapPacked: true,
-                    });
-
-                    const pdf = await loadingTask.promise;
-
-                    let fullText = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items
-                            .map((item: any) => item.str)
-                            .join(' ');
-                        fullText += pageText + '\n';
-                    }
-                    text = fullText;
-                    console.log(`[RAG] ✅ PDF parseado con pdfjs-dist: ${text.length} caracteres, ${pdf.numPages} páginas`);
-                } catch (pdfjsErr: any) {
-                    console.warn(`[RAG] pdfjs-dist falló: ${pdfjsErr.message}`);
-
-                    // Estrategia 2: Fallback a pdf-parse con require()
-                    try {
-                        console.log(`[RAG] Intentando fallback con pdf-parse (require)...`);
-                        const pdfParse = require('pdf-parse');
-                        const data = await pdfParse(dataBuffer);
-                        text = data.text;
-                        console.log(`[RAG] PDF parseado con pdf-parse: ${text.length} caracteres.`);
-                    } catch (parseErr: any) {
-                        console.warn(`[RAG] pdf-parse también falló: ${parseErr.message}`);
-
-                        // Estrategia 3: Fallback a import dinámico de pdf-parse
-                        try {
-                            console.log(`[RAG] Intentando con import dinámico de pdf-parse...`);
-                            const pdfModule = await import('pdf-parse') as any;
-                            const parse = typeof pdfModule === 'function' ? pdfModule : (pdfModule.default || pdfModule);
-                            const data = await parse(dataBuffer);
-                            text = data.text;
-                            console.log(`[RAG] PDF parseado con import(): ${text.length} caracteres.`);
-                        } catch (importErr: any) {
-                            console.warn(`[RAG] Todas las estrategias de parsing fallaron: ${importErr.message}`);
-
-                            // Estrategia 4: Extracción de texto bruto como último recurso
-                            console.log(`[RAG] Usando extracción de texto bruto...`);
-                            text = dataBuffer.toString('utf-8').replace(/[^\x20-\x7E\n]/g, '');
-                            console.log(`[RAG] Texto bruto extraído: ${text.length} caracteres.`);
-                        }
-                    }
-                }
+                console.log(`[RAG] 🔍 Extrayendo texto de PDF...`);
+                const { extractTextFromPdf } = await import('../pdf-helper');
+                text = await extractTextFromPdf(dataBuffer);
+                console.log(`[RAG] PDF parseado: ${text.length} caracteres.`);
             }
             else if (ext === 'docx') {
                 const mammoth = require('mammoth');

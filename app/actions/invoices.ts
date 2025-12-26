@@ -46,15 +46,11 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
         // 3. AI Analysis
         let fileText = "";
         if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-            try {
-                // pdf-parse is a CommonJS module
-                const pdf = require('pdf-parse');
-                const pdfData = await pdf(buffer);
-                fileText = pdfData.text;
-            } catch (err) {
-                console.error("Error parsing PDF:", err);
-                fileText = `[Unable to extract text from PDF directly, falling back to raw read] ${await file.text()}`;
-            }
+            const { extractTextFromPdf } = await import('@/lib/pdf-helper');
+            fileText = await extractTextFromPdf(buffer).catch((err) => {
+                console.error("Error parsing PDF in invoice.ts:", err);
+                return `[Unable to extract text from PDF directly, falling back to raw read]`;
+            });
         } else {
             fileText = await file.text();
         }
