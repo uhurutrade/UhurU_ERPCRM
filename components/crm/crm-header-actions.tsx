@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { Plus, Users, Building2, Target, Zap, MoreVertical, Linkedin, Mail, RefreshCw, Sparkles } from 'lucide-react';
 import { DealModal } from './modals/deal-modal';
 import { OrganizationModal } from './modals/organization-modal';
@@ -73,8 +74,11 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                         }
                     } else {
                         if (res.error === "Unauthorized") {
-                            toast.error("Para sincronizar Gmail, primero debes iniciar sesión con Google en la página principal.", {
-                                duration: 5000,
+                            toast.info("Vinculando con Google para sincronizar Gmail...", { duration: 3000 });
+                            // Trigger the Google sign-in flow automatically
+                            signIn("google", {
+                                callbackUrl: window.location.href,
+                                prompt: "consent"
                             });
                         } else {
                             toast.error("Error al sincronizar Gmail: " + res.error);
