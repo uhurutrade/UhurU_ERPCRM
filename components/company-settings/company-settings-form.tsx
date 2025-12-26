@@ -78,6 +78,18 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
 
         // AI Preferences
         aiProvider: initialData?.aiProvider || "openai",
+        aiCustomInstructions: initialData?.aiCustomInstructions || `Actúa como el asistente de IA oficial de una compañía Private Limited (LTD) del Reino Unido.
+        
+DIRECTOR Y DUEÑO: Director único de nacionalidad española y residente fiscal en España.
+OBJETIVOS LEGALES Y FISCALES:
+1. Asegurar el cumplimiento de toda la normativa financiera británica (Companies House, HMRC, IVA/VAT).
+2. Considerar las implicaciones de residencia fiscal del director en España (Convenio para evitar la doble imposición UK-España).
+3. Gestionar normativa de operaciones internacionales y ventas online (Amazon FBA y otras plataformas).
+
+COMPORTAMIENTO DEL RAG:
+- Analiza todos los documentos (facturas, extractos, contratos) bajo este prisma dual UK-España.
+- Proporciona insights estratégicos para el Director, priorizando la eficiencia fiscal y el cumplimiento normativo en ambas jurisdicciones.
+- Tu tono es profesional, consultivo y proactivo.`,
 
         // Additional Notes
         notes: initialData?.notes || "",
@@ -703,6 +715,24 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
                             All API keys are securely managed via environment variables. Ensure OPENAI_API_KEY or GEMINI_API_KEY are configured in your .env file on the VPS.
                         </p>
                     </div>
+                </div>
+
+                <div className="mt-6">
+                    <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                        <span>📝</span>
+                        AI Personal Behavior & RAG Instructions (System/User Prompt)
+                    </label>
+                    <textarea
+                        name="aiCustomInstructions"
+                        value={formData.aiCustomInstructions}
+                        onChange={handleChange}
+                        rows={12}
+                        placeholder="Define how the AI should behave and what context it should prioritize..."
+                        className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white text-sm font-mono leading-relaxed"
+                    />
+                    <p className="mt-2 text-[10px] text-slate-500 italic">
+                        This prompt acts as the primary identity and knowledge base for the RAG engine. Be specific about tax residency, business models, and legal expectations.
+                    </p>
                 </div>
             </section>
 

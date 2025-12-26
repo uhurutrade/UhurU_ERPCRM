@@ -420,6 +420,7 @@ model CompanySettings {
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
   aiProvider              String    @default("openai")
+  aiCustomInstructions    String?   @db.Text
 }
 
 model DeletedTransaction {

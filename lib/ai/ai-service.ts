@@ -51,7 +51,9 @@ async function getCompanyContext() {
             Sector: ${settings.companyType}
             Misión/Notas: ${settings.notes || 'N/A'}
             Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
-            Actúas como el asistente de IA oficial de ${settings.companyName}. Tu tono debe ser profesional, eficiente y conocedor del contexto de esta empresa.
+            
+            DIRECCIONES ESTRATÉGICAS Y COMPORTAMIENTO (PRIORIDAD):
+            ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
         `;
     } catch {
         return "";
