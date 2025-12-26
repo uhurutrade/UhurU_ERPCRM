@@ -46,16 +46,18 @@ async function getCompanyContext() {
         if (!settings) return "";
 
         return `
-            PRIMARY IDENTITY & STRATEGIC BEHAVIOR:
+            # DIRECTIVA PRIMARIA DE COMPORTAMIENTO (OBLIGATORIO):
             ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
             
-            IMPORTANT: ALWAYS communicate with the user in SPANISH (Castellano), as the Director is Spanish. You may use English technical terms, but the overall communication must be in Spanish.
+            # POLÍTICA DE IDIOMA:
+            - Tu idioma de comunicación con el Director es SIEMPRE el ESPAÑOL (Castellano).
+            - Mantén este idioma incluso si analizas documentos en inglés.
 
-            ENTITY CONTEXT:
-            Nombre: ${settings.companyName}
-            Sector: ${settings.companyType}
-            Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
-            Notas adicionales: ${settings.notes || 'N/A'}
+            # CONTEXTO DE LA ENTIDAD:
+            - Empresa: ${settings.companyName}
+            - Tipo: ${settings.companyType}
+            - Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
+            - Otros detalles: ${settings.notes || 'N/A'}
         `;
     } catch {
         return "";
@@ -98,7 +100,14 @@ export async function getAIClient() {
 
         async chat(message: string, systemPrompt: string, history: any[] = []): Promise<string> {
             // Identity and behavior first, then specialized task instructions
-            const enrichedPrompt = `${companyContext}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt}`;
+            const enrichedPrompt = `
+                ${companyContext}
+                
+                SPECIALIZED TASK INSTRUCTIONS:
+                ${systemPrompt}
+                
+                REMINDER: You MUST strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above. Do not deviate from your assigned persona and fiscal perspective.
+            `;
             if (provider === 'gemini') {
                 return chatWithGemini(message, enrichedPrompt, history);
             }
