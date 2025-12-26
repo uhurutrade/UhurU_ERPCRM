@@ -184,31 +184,90 @@ export function CategoryBadge({ transactionId, initialCategory, allCategories = 
 
                                 <div className="h-px bg-slate-800 my-1 mx-2" />
 
-                                {categories.map((cat) => (
-                                    <button
-                                        key={cat.name}
-                                        onClick={(e) => { e.stopPropagation(); handleSelect(cat.name); }}
-                                        className={`
-                                            w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-3 group
-                                            ${cat.name === category ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
-                                            {cat.name}
-                                        </div>
-                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
-                                            {cat.name === category && <Check size={12} className="text-emerald-400 mr-1" />}
+                                {(() => {
+                                    // Group categories by prefix
+                                    const groups: Record<string, any[]> = {};
+                                    const ungrouped: any[] = [];
 
-                                            <div onClick={(e) => handleEditClick(cat, e)} className="p-1 text-slate-500 hover:text-uhuru-blue hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Edit Category">
-                                                <Pencil size={11} />
-                                            </div>
-                                            <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="p-1 text-slate-500 hover:text-rose-400 hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Delete Category">
-                                                <Trash2 size={11} />
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
+                                    categories.forEach(cat => {
+                                        if (cat.name.includes(':')) {
+                                            const [groupName, itemName] = cat.name.split(':').map(s => s.trim());
+                                            if (!groups[groupName]) groups[groupName] = [];
+                                            groups[groupName].push({ ...cat, displayName: itemName });
+                                        } else {
+                                            ungrouped.push({ ...cat, displayName: cat.name });
+                                        }
+                                    });
+
+                                    return (
+                                        <>
+                                            {/* Render Groups */}
+                                            {Object.entries(groups).map(([groupName, items]) => (
+                                                <div key={groupName} className="mb-2 last:mb-0">
+                                                    <div className="px-3 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-tighter bg-slate-800/30 rounded-md mb-1 mx-1 flex items-center gap-2">
+                                                        <Tag size={10} />
+                                                        {groupName}
+                                                    </div>
+                                                    {items.map((cat) => (
+                                                        <button
+                                                            key={cat.name}
+                                                            onClick={(e) => { e.stopPropagation(); handleSelect(cat.name); }}
+                                                            className={`
+                                                                w-full text-left px-5 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-3 group
+                                                                ${cat.name === category ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
+                                                            `}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`w-1.5 h-1.5 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
+                                                                {cat.displayName}
+                                                            </div>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                                                                {cat.name === category && <Check size={12} className="text-emerald-400 mr-1" />}
+                                                                <div onClick={(e) => handleEditClick(cat, e)} className="p-1 text-slate-500 hover:text-uhuru-blue hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Edit Category">
+                                                                    <Pencil size={11} />
+                                                                </div>
+                                                                <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="p-1 text-slate-500 hover:text-rose-400 hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Delete Category">
+                                                                    <Trash2 size={11} />
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ))}
+
+                                            {/* Render Ungrouped */}
+                                            {ungrouped.length > 0 && (
+                                                <div className="mt-1">
+                                                    {Object.keys(groups).length > 0 && <div className="h-px bg-slate-800 my-1 mx-2" />}
+                                                    {ungrouped.map((cat) => (
+                                                        <button
+                                                            key={cat.name}
+                                                            onClick={(e) => { e.stopPropagation(); handleSelect(cat.name); }}
+                                                            className={`
+                                                                w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-3 group
+                                                                ${cat.name === category ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
+                                                            `}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`w-2 h-2 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
+                                                                {cat.displayName}
+                                                            </div>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                                                                {cat.name === category && <Check size={12} className="text-emerald-400 mr-1" />}
+                                                                <div onClick={(e) => handleEditClick(cat, e)} className="p-1 text-slate-500 hover:text-uhuru-blue hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Edit Category">
+                                                                    <Pencil size={11} />
+                                                                </div>
+                                                                <div onClick={(e) => handleDeleteCategory(cat.name, e)} className="p-1 text-slate-500 hover:text-rose-400 hover:bg-slate-700 rounded cursor-pointer transition-colors" title="Delete Category">
+                                                                    <Trash2 size={11} />
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                             <div className="border-t border-slate-800 p-1.5">
                                 <button

@@ -242,24 +242,63 @@ export function TransactionTable({
                                     <div className="p-2 border-b border-white/5">
                                         <p className="px-3 py-1 text-[9px] font-black text-slate-500 uppercase tracking-widest">Choose Category</p>
                                     </div>
-                                    <div className="max-h-60 overflow-y-auto p-1.5 custom-scrollbar">
+                                    <div className="max-h-72 overflow-y-auto p-1.5 custom-scrollbar">
                                         <button
                                             onClick={() => handleBulkCategory("")}
-                                            className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2"
+                                            className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 mb-2 border-b border-white/5 pb-2"
                                         >
                                             <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
                                             Uncategorized (Clear)
                                         </button>
-                                        {categories.map((cat) => (
-                                            <button
-                                                key={cat.name}
-                                                onClick={() => handleBulkCategory(cat.name)}
-                                                className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 group"
-                                            >
-                                                <div className={`w-1.5 h-1.5 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
-                                                {cat.name}
-                                            </button>
-                                        ))}
+
+                                        {(() => {
+                                            const groups: Record<string, any[]> = {};
+                                            const ungrouped: any[] = [];
+
+                                            categories.forEach(cat => {
+                                                if (cat.name.includes(':')) {
+                                                    const [groupName, itemName] = cat.name.split(':').map(s => s.trim());
+                                                    if (!groups[groupName]) groups[groupName] = [];
+                                                    groups[groupName].push({ ...cat, displayName: itemName });
+                                                } else {
+                                                    ungrouped.push({ ...cat, displayName: cat.name });
+                                                }
+                                            });
+
+                                            return (
+                                                <>
+                                                    {Object.entries(groups).map(([groupName, items]) => (
+                                                        <div key={groupName} className="mb-2">
+                                                            <div className="px-3 py-1 text-[9px] font-black text-uhuru-blue lg:text-slate-500 uppercase tracking-widest bg-slate-800/30 rounded flex items-center gap-2 mb-1">
+                                                                <Tag size={10} />
+                                                                {groupName}
+                                                            </div>
+                                                            {items.map((cat) => (
+                                                                <button
+                                                                    key={cat.name}
+                                                                    onClick={() => handleBulkCategory(cat.name)}
+                                                                    className="w-full text-left px-5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 group"
+                                                                >
+                                                                    <div className={`w-1 h-1 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
+                                                                    {cat.displayName}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    ))}
+
+                                                    {ungrouped.map((cat) => (
+                                                        <button
+                                                            key={cat.name}
+                                                            onClick={() => handleBulkCategory(cat.name)}
+                                                            className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 group"
+                                                        >
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${cat.color.split(' ')[0].replace('/10', '')}`} />
+                                                            {cat.displayName}
+                                                        </button>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             )}

@@ -4,15 +4,14 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 const DEFAULT_CATEGORIES = [
-    { name: 'Sales', color: 'bg-slate-100/10 text-slate-200 border-slate-100/20 hover:bg-slate-100/20' },
-    { name: 'Marketing', color: 'bg-yellow-400/10 text-yellow-300 border-yellow-400/20 hover:bg-yellow-400/20' },
-    { name: 'Software', color: 'bg-blue-400/10 text-blue-300 border-blue-400/20 hover:bg-blue-400/20' },
-    { name: 'Travel', color: 'bg-rose-400/10 text-rose-300 border-rose-400/20 hover:bg-rose-400/20' },
-    { name: 'Meals', color: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/20 hover:bg-emerald-400/20' },
-    { name: 'Office', color: 'bg-purple-400/10 text-purple-300 border-purple-400/20 hover:bg-purple-400/20' },
-    { name: 'Payroll', color: 'bg-pink-400/10 text-pink-300 border-pink-400/20 hover:bg-pink-400/20' },
-    { name: 'Taxes', color: 'bg-cyan-400/10 text-cyan-300 border-cyan-400/20 hover:bg-cyan-400/20' },
-    { name: 'Utilities', color: 'bg-orange-400/10 text-orange-300 border-orange-400/20 hover:bg-orange-400/20' },
+    { name: 'Loans: In (Director)', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    { name: 'Fees: Bank Fees', color: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+    { name: 'Sales: Amazon Sales', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    { name: 'Sales: Consulting Income', color: 'bg-emerald-600/10 text-emerald-500 border-emerald-600/20' },
+    { name: 'Operating: Hosting', color: 'bg-slate-600/10 text-slate-500 border-slate-600/20' },
+    { name: 'FX: Exchange Gain', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
+    { name: 'Crypto: BTC Purchases', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
+    { name: 'System: Uncategorized', color: 'bg-slate-700/50 text-slate-400 border-slate-600/50' },
 ];
 
 export async function getTransactionCategories() {
