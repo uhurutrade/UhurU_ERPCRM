@@ -29,8 +29,8 @@ export async function POST(req: Request) {
 
         - Provide download links as: [Filename](DOWNLOAD_URL).
 
-        - Maintain strategic continuity.
-        
+        - Maintain strategic continuity.`;
+
         // 3. RAG RETRIEVAL (from uploaded docs)
         let ragContext = "";
         try {
@@ -41,10 +41,10 @@ export async function POST(req: Request) {
 
         // 4. PREPARE CONTEXT DATA (Outside of System Instructions to avoid Gemini 400 errors)
         const combinedContext = `
-FINANCIAL DATA(ERP):
-${ financialContext }
+FINANCIAL DATA (ERP):
+${financialContext}
 
-${ ragContext ? `RAG DOCUMENTS CONTEXT:\n${ragContext}` : (contextFiles && contextFiles.length > 0 ? `The user has uploaded ${contextFiles.length} documents for analysis.` : '') }
+${ragContext ? `RAG DOCUMENTS CONTEXT:\n${ragContext}` : (contextFiles && contextFiles.length > 0 ? `The user has uploaded ${contextFiles.length} documents for analysis.` : '')}
         `;
 
         // 5. Call AI with history and contextData separately
