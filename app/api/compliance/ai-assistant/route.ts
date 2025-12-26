@@ -24,7 +24,8 @@ export async function POST(req: Request) {
         let systemPrompt = `Provide support as a UK Compliance assistant. 
         Help the user analyze financial data and RAG documents.
         
-        - Respond in SPANISH (Technical terms in English).
+        - ALWAYS respond in SPANISH.
+        - Handle technical terms in English (explain in Spanish if needed).
 
         - Provide download links as: [Filename](DOWNLOAD_URL).
 

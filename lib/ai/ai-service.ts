@@ -48,6 +48,8 @@ async function getCompanyContext() {
         return `
             PRIMARY IDENTITY & STRATEGIC BEHAVIOR:
             ${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
+            
+            IMPORTANT: ALWAYS communicate with the user in SPANISH (Castellano), as the Director is Spanish. You may use English technical terms, but the overall communication must be in Spanish.
 
             ENTITY CONTEXT:
             Nombre: ${settings.companyName}
