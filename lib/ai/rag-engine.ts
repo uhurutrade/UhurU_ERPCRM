@@ -18,15 +18,6 @@ function getOpenAIClient(): OpenAI {
     return openaiInstance;
 }
 
-/**
- * RAG ENGINE (PRE-PRODUCTION)
- * 
- * Este módulo gestiona el ciclo de vida de los documentos para el sistema RAG:
- * 1. Extracción de texto (PDF, etc.)
- * 2. Troceado (Chunking) con solapamiento.
- * 3. Generación de Embeddings (Simulados hasta tener API Key).
- */
-
 export interface Chunk {
     content: string;
     tokenCount: number;
@@ -171,7 +162,10 @@ export async function ingestDocument(docId: string, filePath: string) {
         // 2. Asegurar que el documento existe en ComplianceDocument 
         // para mantener integridad referencial en DocumentChunk
         let docName = path.basename(filePath);
-        let doc = await prisma.complianceDocument.findUnique({ where: { id: docId } });
+        let doc = await prisma.complianceDocument.findUnique({
+            where: { id: docId },
+            select: { id: true, filename: true, userNotes: true, path: true }
+        });
 
         if (!doc) {
             console.log(`[RAG] Registrando soporte en ComplianceDocument para attachment: ${docId}`);
@@ -182,8 +176,17 @@ export async function ingestDocument(docId: string, filePath: string) {
                     path: filePath,
                     documentType: 'ATTACHMENT',
                     isProcessed: true
-                }
+                },
+                select: { id: true, filename: true, userNotes: true, path: true }
             });
+        }
+
+        // --- INTEGRACIÓN DE CONTEXTO MANUAL (USER NOTES) ---
+        // Si el usuario añadió notas (ej: en español explicando el contexto de la empresa),
+        // las incluimos al principio del texto para que el RAG las tenga en cuenta.
+        if (doc.userNotes) {
+            console.log(`[RAG] 📝 Incluyendo ${doc.userNotes.length} chars de notas de usuario como contexto.`);
+            text = `[NOTAS DE CONTEXTO DEL USUARIO]:\n${doc.userNotes}\n\n[CONTENIDO DEL DOCUMENTO ORIGINAL]:\n${text}`;
         }
 
         // 3. Crear Chunks

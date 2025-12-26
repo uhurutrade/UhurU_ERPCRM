@@ -10,6 +10,7 @@ import { getAIClient } from '@/lib/ai/ai-service';
 export async function uploadToBasket(formData: FormData) {
     try {
         const files = formData.getAll('files') as File[];
+        const notes = formData.get('notes') as string || null;
 
         if (!files || files.length === 0) {
             return { success: false, error: 'No files provided' };
@@ -130,6 +131,7 @@ export async function uploadToBasket(formData: FormData) {
                     extractedData: analysis as any,
                     strategicInsights: analysis.strategicInsightEN || analysis.strategicInsight || null,
                     documentDate: docDate,
+                    userNotes: notes, // Store the provided notes
                     isProcessed: true,
                     isSuperseded: isAutoSuperseded
                 }
@@ -227,10 +229,17 @@ export async function removeFromBasket(id: string) {
 
 export async function updateDocumentNotes(id: string, notes: string) {
     try {
-        await prisma.complianceDocument.update({
+        const doc = await prisma.complianceDocument.update({
             where: { id },
             data: { userNotes: notes }
         });
+
+        // TRIGGER RAG RE-INGESTION (Lightweight)
+        // Just re-ingest the document so the new notes are part of the context
+        const { ingestDocument } = await import('@/lib/ai/rag-engine');
+        ingestDocument(id, doc.path).catch(err =>
+            console.error(`[RAG] Error re-ingesting document ${id} after notes update:`, err)
+        );
 
         revalidatePath('/dashboard/doc-basket');
         return { success: true };

@@ -247,24 +247,27 @@ async function analyzeLeadWithOpenAI(text: string, companyContext: string): Prom
     const messages: any[] = [
         {
             role: "system",
-            content: `You are an expert sales and CRM assistant for ${companyContext}. Extract structured lead/contact data from the provided raw text (LinkedIn chats, profile summaries, emails, or call transcripts).
+            content: `You are a high-level Strategic Sales Assistant for ${companyContext}. Your goal is to extract structured lead data and provide a deep contextual analysis.
             
             KEY INSTRUCTIONS:
-            1. BILINGUAL SUPPORT: You must handle both English and Spanish inputs. The output "summary" and "organizationSector" should match the language of the input unless specified otherwise.
-            2. CONVERSATION ANALYSIS: If the text is a thread, analyze the relationship, intent, and current stage of the conversation.
-            3. LOGICAL SUMMARY: Provide a brief but logical summary of the person and the opportunity.
+            1. BILINGUAL LOCALIZATION (PRIORITY): You must handle English and Spanish inputs. To maintain CRM consistency, ALWAYS provide the "summary" and "organizationSector" in professional, localized Spanish, even if the input text is English.
+            2. CONTEXTUAL INTELLIGENCE: Analyze the entire conversation or profile. Identify:
+               - The core intent (what do they actually want?).
+               - Pain points (what problems are they solving?).
+               - Opportunity value (why is this lead important for ${companyContext}?).
+            3. LOGICAL SUMMARY: The summary must be a strategic synthesis in Spanish, not just a list of facts.
             
             Return a JSON object with:
             {
                 "contactName": string,
-                "email": string (null if unknown),
-                "phone": string (null if unknown),
+                "email": string,
+                "phone": string,
                 "role": string,
                 "organizationName": string,
                 "organizationSector": string,
-                "summary": string,
+                "summary": string (Professional Strategic Summary in Spanish),
                 "confidence": number (0-1),
-                "language": "es" | "en"
+                "language": "es" | "en" (Original input language)
             }`
         },
         { role: "user", content: `Raw Text: ${text.substring(0, 10000)}` }
@@ -429,11 +432,11 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Analyze this text (LinkedIn chat, email, or profile) and extract structured lead/contact data as the sales assistant for ${companyContext}.
+    const prompt = `As a Strategic Sales Assistant for ${companyContext}, analyze this text (LinkedIn chat, email, or profile) to extract structured data.
     
-    INSTRUCTIONS:
-    - BILINGUAL: Support Spanish and English.
-    - CONTEXT: Analyze the whole conversation thread for intent and relationship.
+    CRITICAL INSTRUCTIONS:
+    - BILINGUAL: Support Spanish/English. ALWAYS provide the "summary" and "organizationSector" in professional SPANISH for CRM consistency.
+    - CONTEXTUAL ANALYSIS: Dig deep into the conversation intent, identifying current needs and potential value for ${companyContext}.
     
     Return JSON:
     {
@@ -443,9 +446,9 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
         "role": string,
         "organizationName": string,
         "organizationSector": string,
-        "summary": string,
+        "summary": string (Strategic analysis in Spanish),
         "confidence": number,
-        "language": "es" | "en"
+        "language": "es" | "en" (Original input language)
     }
     
     Text: ${text.substring(0, 15000)}`;

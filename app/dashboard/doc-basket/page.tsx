@@ -24,6 +24,7 @@ export default function DocBasketPage() {
     const [isReprocessing, setIsReprocessing] = useState(false);
     const [basketPage, setBasketPage] = useState(1);
     const [basketTotalPages, setBasketTotalPages] = useState(1);
+    const [initialNotes, setInitialNotes] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -57,12 +58,16 @@ export default function DocBasketPage() {
 
         const formData = new FormData();
         files.forEach(file => formData.append('files', file));
+        if (initialNotes.trim()) {
+            formData.append('notes', initialNotes);
+        }
 
         try {
             const res = await uploadToBasket(formData);
             if (res.success) {
                 toast.success(res.message || `${files.length} documents added to your Strategic Basket`);
                 setFiles([]);
+                setInitialNotes('');
                 fetchHistory();
             } else {
                 toast.error(res.error || 'Failed to upload documents');
@@ -350,6 +355,26 @@ export default function DocBasketPage() {
                                 )}
                             </div>
                         </div>
+
+                        {files.length > 0 && (
+                            <div className="bg-slate-900/40 border border-uhuru-border rounded-[2rem] p-6 lg:p-8 space-y-4 animate-in slide-in-from-top-4 duration-500">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                        <Info size={16} />
+                                    </div>
+                                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Initial Context / Contexto Inicial</h4>
+                                </div>
+                                <textarea
+                                    value={initialNotes}
+                                    onChange={(e) => setInitialNotes(e.target.value)}
+                                    placeholder="Escribe aquí el contexto en español para darle inteligencia al RAG (ej: 'Cuentas anuales de 2024', 'Comunicación oficial de HMRC sobre VAT')..."
+                                    className="w-full bg-slate-950/60 border border-uhuru-border rounded-2xl p-4 text-sm text-white placeholder:text-uhuru-text-dim focus:outline-none focus:border-indigo-500/50 min-h-[100px] transition-all resize-none shadow-inner"
+                                />
+                                <p className="text-[10px] text-uhuru-text-dim italic">
+                                    * Estas notas se vectorizarán junto con el documento para mejorar la precisión de la IA.
+                                </p>
+                            </div>
+                        )}
 
                         <div className="flex flex-col sm:flex-row justify-end gap-3">
                             {files.length > 0 && (
