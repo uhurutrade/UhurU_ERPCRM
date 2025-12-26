@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncCryptoWallets } = await import('@/lib/ai/auto-sync-rag');
+        syncCryptoWallets();
+
         return NextResponse.json(wallet);
     } catch (error) {
         console.error("Error creating crypto wallet:", error);

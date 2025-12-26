@@ -21,6 +21,11 @@ export async function createOrganization(formData: FormData) {
     await prisma.organization.create({
         data: { name, sector }
     });
+
+    // Trigger RAG Sync (Background)
+    const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
+    syncCRMOrganizations();
+
     revalidatePath('/dashboard/crm');
 }
 
@@ -44,6 +49,11 @@ export async function createContact(formData: FormData) {
             organizationId: orgId || null
         }
     });
+
+    // Trigger RAG Sync (Background)
+    const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
+    syncCRMContacts();
+
     revalidatePath('/dashboard/crm');
 }
 
@@ -71,6 +81,11 @@ export async function createDeal(formData: FormData) {
             organizationId: orgId
         }
     });
+
+    // Trigger RAG Sync (Background)
+    const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+    syncCRMDeals();
+
     revalidatePath('/dashboard/crm');
 }
 
@@ -79,6 +94,11 @@ export async function updateDealStage(dealId: string, newStage: string) {
         where: { id: dealId },
         data: { stage: newStage }
     });
+
+    // Trigger RAG Sync (Background)
+    const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
+    syncCRMDeals();
+
     revalidatePath('/dashboard/crm');
 }
 
@@ -182,6 +202,13 @@ export async function commitSmartLeadImport(data: any) {
         });
 
         revalidatePath('/dashboard/crm');
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads, syncCRMOrganizations, syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+        syncCRMOrganizations();
+        syncCRMContacts();
+
         return { success: true };
     } catch (error: any) {
         console.error("Commit Lead Error:", error);
@@ -211,6 +238,11 @@ export async function discardLead(gmailThreadId: string, name: string) {
         });
 
         revalidatePath('/dashboard/crm');
+
+        // Trigger RAG Sync (Background)
+        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
+        syncCRMLeads();
+
         return { success: true };
     } catch (error: any) {
         console.error("Discard Lead Error:", error);

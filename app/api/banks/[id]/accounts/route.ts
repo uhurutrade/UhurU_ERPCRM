@@ -35,6 +35,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             },
         });
 
+        // Trigger RAG Sync (Background)
+        const { syncBankingOverview } = await import('@/lib/ai/auto-sync-rag');
+        syncBankingOverview();
+
         return NextResponse.json(account);
     } catch (error) {
         console.error("Error creating bank account:", error);

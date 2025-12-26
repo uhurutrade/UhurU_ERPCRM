@@ -343,6 +343,11 @@ export async function restoreInvoice(id: string) {
             data: { deletedAt: null }
         });
         revalidatePath('/dashboard/invoices');
+
+        // Trigger RAG Sync (Background)
+        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+
         return { success: true };
     } catch (error) {
         console.error("Restore Error:", error);
@@ -361,6 +366,12 @@ export async function linkInvoiceToTransaction(invoiceId: string, transactionId:
         });
         revalidatePath('/dashboard/invoices');
         revalidatePath('/dashboard/banking');
+
+        // Trigger RAG Sync (Background)
+        const { syncInvoices, syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
+        syncInvoices();
+        syncRecentTransactions();
+
         return { success: true };
     } catch (error) {
         console.error("Link Error:", error);

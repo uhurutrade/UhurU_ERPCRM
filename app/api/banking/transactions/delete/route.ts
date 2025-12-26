@@ -104,6 +104,13 @@ export async function POST(req: Request) {
             });
         });
 
+        // Trigger RAG Auto-Sync (Async - No bloqueante)
+        try {
+            const { syncRecentTransactions, syncDeletedTransactions } = await import("@/lib/ai/auto-sync-rag");
+            syncRecentTransactions();
+            syncDeletedTransactions();
+        } catch (e) { /* Silent fail */ }
+
         return NextResponse.json({
             success: true,
             count: transactionsToDelete.length,

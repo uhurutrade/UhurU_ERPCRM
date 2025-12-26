@@ -42,7 +42,7 @@ export async function uploadAttachment(formData: FormData) {
         console.error("Error writing file", e);
     }
 
-    await prisma.attachment.create({
+    const attachment = await prisma.attachment.create({
         data: {
             path: `/uploads/${filename}`,
             originalName: file.name,
@@ -50,6 +50,14 @@ export async function uploadAttachment(formData: FormData) {
             transactionId: txId
         }
     });
+
+    // TRIGGER RAG VECTORIZATION (Background)
+    try {
+        const { ingestDocument } = await import('@/lib/ai/rag-engine');
+        // We use the full physical path or the relative path depending on how ingestDocument handles it.
+        // Looking at rag-engine.ts, it resolves public paths.
+        await ingestDocument(attachment.id, attachment.path);
+    } catch (e) { console.error("RAG Error:", e); }
 
     revalidatePath('/dashboard/invoices');
 }
@@ -59,5 +67,10 @@ export async function updateCategory(txId: string, category: string) {
         where: { id: txId },
         data: { category }
     });
+
+    // Trigger RAG Sync (Background)
+    const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
+    syncRecentTransactions();
+
     revalidatePath('/dashboard/invoices');
 }
