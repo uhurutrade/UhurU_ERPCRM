@@ -192,7 +192,16 @@ export async function commitSmartLeadImport(data: any) {
 export async function syncGmailLeads() {
     try {
         const session = await auth();
-        if (!session?.user?.id) throw new Error("Unauthorized");
+
+        console.log("[Gmail Sync] Session check:", {
+            hasSession: !!session,
+            hasUserId: !!session?.user?.id,
+            email: session?.user?.email
+        });
+
+        if (!session?.user?.id) {
+            return { success: false, error: "Unauthorized" };
+        }
 
         const threads = await fetchLabeledEmails(session.user.id, 'UhurU-Lead');
         if (threads.length === 0) return { success: true, results: [] };

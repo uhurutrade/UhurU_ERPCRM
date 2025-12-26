@@ -37,6 +37,20 @@ export const authConfig = {
             }
             console.log(`Access denied for: ${user.email}. Only ${allowedEmail} is allowed.`);
             return false;
+        },
+        async session({ session, user, token }) {
+            console.log("[Auth] Session Callback:", { userId: user?.id, tokenId: token?.sub });
+            if (session.user) {
+                session.user.id = user?.id || (token?.sub as string);
+            }
+            return session;
+        },
+        async jwt({ token, user }) {
+            if (user) {
+                console.log("[Auth] JWT Callback - User ID assigned:", user.id);
+                token.id = user.id;
+            }
+            return token;
         }
     },
     pages: {

@@ -73,9 +73,12 @@ export function CRMHeaderActions({ organizations }: CRMHeaderActionsProps) {
                             toast.success("No se encontraron nuevos leads en Gmail.");
                         }
                     } else {
-                        if (res.error === "Unauthorized") {
+                        const isAuthError = res.error === "Unauthorized" ||
+                            res.error?.includes("No Google account linked") ||
+                            res.error?.includes("missing tokens");
+
+                        if (isAuthError) {
                             toast.info("Vinculando con Google para sincronizar Gmail...", { duration: 3000 });
-                            // Trigger the Google sign-in flow automatically
                             signIn("google", {
                                 callbackUrl: window.location.href,
                                 prompt: "consent"
