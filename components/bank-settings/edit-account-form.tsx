@@ -26,6 +26,7 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
         sortCode: account.sortCode || "",
         accountNumberUK: account.accountNumberUK || "",
         swiftBic: account.swiftBic || "",
+        paymentDetails: (account as any).paymentDetails || "",
         currentBalance: account.currentBalance?.toString() || "",
         isPrimary: account.isPrimary,
         isActive: account.isActive,
@@ -117,7 +118,7 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
 
         if (type === "checkbox") {
@@ -309,6 +310,23 @@ export default function EditAccountForm({ account, bankName }: EditAccountFormPr
                             onChange={handleChange}
                             className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono"
                         />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Invoice Payment Information (Custom Text)
+                        </label>
+                        <textarea
+                            name="paymentDetails"
+                            value={formData.paymentDetails}
+                            onChange={handleChange}
+                            rows={7}
+                            placeholder="Bank Name: Example Bank&#10;Account Name: Uhuru Trade Ltd&#10;BIC/SWIFT: IBAN: ... Swift/BIC: ...&#10;Sort Code: ... Account No: ...&#10;Rue du Trône 100, 3rd floor, Brussels, Belgium"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white font-mono text-sm leading-relaxed"
+                        />
+                        <p className="mt-2 text-xs text-slate-500 italic">
+                            How you write it here is how it will look on the PDF. <span className="font-bold text-slate-400">Bold text</span> is automatically applied to everything before the colon (:).
+                        </p>
                     </div>
 
                     <div>

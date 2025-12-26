@@ -179,25 +179,47 @@ export default async function InvoicePdfPage({ params }: { params: { id: string 
                         {/* Bank Details */}
                         {invoice.bankAccount && (
                             <div className="text-[11px] text-black font-mono space-y-1">
-                                <p className="font-bold text-black uppercase tracking-wider mb-2 text-sm underline decoration-1 underline-offset-4">Payment Information</p>
-                                <p className="text-black leading-tight"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
-                                <p className="text-black leading-tight"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
-
-                                <div className="leading-tight text-black">
-                                    {invoice.bankAccount.swiftBic && (
-                                        <span className="mr-4"><span className="font-bold">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
-                                    )}
-                                    {invoice.bankAccount.iban && <span><span className="font-bold">IBAN:</span> {invoice.bankAccount.iban}</span>}
+                                <div className="flex items-baseline justify-between mb-2">
+                                    <p className="font-bold text-black uppercase tracking-wider text-sm underline decoration-1 underline-offset-4 leading-none">Payment Information</p>
+                                    <p className="text-[9px] text-black italic leading-none pr-4">Please make the transfer in <span className="font-bold">{invoice.currency}</span></p>
                                 </div>
 
-                                <div className="flex gap-4 text-black leading-tight">
-                                    {invoice.bankAccount.sortCode && <span><span className="font-bold">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
-                                    {invoice.bankAccount.accountNumberUK && <span><span className="font-bold">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
-                                    {invoice.bankAccount.routingNumber && <span><span className="font-bold">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
-                                </div>
-                                <p className="text-[10px] text-black mt-2 leading-tight">
-                                    {(invoice.bankAccount.bank.bankAddress || '') + ', ' + (invoice.bankAccount.bank.bankCity || '') + ', ' + (invoice.bankAccount.bank.bankCountry || 'UK')}
-                                </p>
+                                {invoice.bankAccount.paymentDetails ? (
+                                    <div className="space-y-1 whitespace-pre-wrap">
+                                        {invoice.bankAccount.paymentDetails.split('\n').map((line, i) => {
+                                            const parts = line.split(':');
+                                            if (parts.length > 1) {
+                                                return (
+                                                    <p key={i} className="text-black leading-tight">
+                                                        <span className="font-bold">{parts[0]}:</span>{parts.slice(1).join(':')}
+                                                    </p>
+                                                );
+                                            }
+                                            return <p key={i} className="text-black leading-tight">{line}</p>;
+                                        })}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-black leading-tight"><span className="font-bold">Bank Name:</span> {invoice.bankAccount.bank.bankName}</p>
+                                        <p className="text-black leading-tight"><span className="font-bold">Account Name:</span> Uhuru Trade Ltd</p>
+
+                                        <div className="leading-tight text-black">
+                                            {invoice.bankAccount.swiftBic && (
+                                                <span className="mr-4"><span className="font-bold">BIC/SWIFT:</span> {invoice.bankAccount.swiftBic}</span>
+                                            )}
+                                            {invoice.bankAccount.iban && <span><span className="font-bold">IBAN:</span> {invoice.bankAccount.iban}</span>}
+                                        </div>
+
+                                        <div className="flex gap-4 text-black leading-tight">
+                                            {invoice.bankAccount.sortCode && <span><span className="font-bold">Sort Code:</span> {invoice.bankAccount.sortCode}</span>}
+                                            {invoice.bankAccount.accountNumberUK && <span><span className="font-bold">Account No:</span> {invoice.bankAccount.accountNumberUK}</span>}
+                                            {invoice.bankAccount.routingNumber && <span><span className="font-bold">Routing:</span> {invoice.bankAccount.routingNumber}</span>}
+                                        </div>
+                                        <p className="text-[10px] text-black mt-2 leading-tight">
+                                            {(invoice.bankAccount.bank.bankAddress || '') + ', ' + (invoice.bankAccount.bank.bankCity || '') + ', ' + (invoice.bankAccount.bank.bankCountry || 'UK')}
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         )}
 

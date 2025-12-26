@@ -184,6 +184,7 @@ model BankAccount {
   routingNumber     String?
   sortCode          String?
   swiftBic          String?
+  paymentDetails    String?           @db.Text
   order             Int               @default(0)
   wireRoutingNumber String?
   bank              Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)

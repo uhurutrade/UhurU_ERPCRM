@@ -58,6 +58,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
                 sortCode: data.sortCode || null,
                 accountNumberUK: data.accountNumberUK || null,
                 swiftBic: data.swiftBic || null,
+                paymentDetails: data.paymentDetails || null,
                 currentBalance: data.currentBalance ? parseFloat(data.currentBalance) : undefined,
                 isPrimary: data.isPrimary,
                 isActive: data.isActive,
