@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 async function testModels() {
     console.log("🚀 Iniciando prueba FINAL de modelos Gemini...");
-    const apiKey = "AIzaSyDcjKEv2fTwuPHG9uz4wPX4RwKz89S3X-Y";
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) return;
 
