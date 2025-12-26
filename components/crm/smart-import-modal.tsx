@@ -1,17 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Modal } from "@/components/ui/modal";
 import { Sparkles, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { importLeadFromText, commitSmartLeadImport } from "@/app/dashboard/crm/actions";
 import { toast } from "sonner";
@@ -99,168 +89,167 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && reset()}>
-            <DialogContent className="sm:max-w-[700px] bg-uhuru-card border-uhuru-border text-white shadow-2xl">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center justify-between gap-2 text-xl font-bold">
-                        <div className="flex items-center gap-2">
-                            <Sparkles className="text-indigo-400" size={24} />
-                            {queue.length > 0 ? `Revisión de Gmail (${queueIndex + 1}/${queue.length})` : 'Importación Inteligente'}
+        <Modal
+            isOpen={isOpen}
+            onClose={reset}
+            title={queue.length > 0 ? `Revisión de Gmail (${queueIndex + 1}/${queue.length})` : 'Importación Inteligente de Leads'}
+            size="lg"
+        >
+            <div className="space-y-6">
+                {step === "paste" && (
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-400">
+                            Pega un chat de LinkedIn, una descripción de perfil o un email. Nuestra IA extraerá automáticamente los detalles del contacto y la empresa.
+                        </p>
+                        <textarea
+                            placeholder="Pega el texto aquí..."
+                            className="w-full min-h-[200px] bg-slate-900/50 border border-white/10 rounded-2xl p-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all resize-none"
+                            value={rawText}
+                            onChange={(e) => setRawText(e.target.value)}
+                        />
+                        <div className="flex justify-end gap-3 pt-2">
+                            <button onClick={reset} className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleAnalyze}
+                                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center gap-2"
+                            >
+                                <Sparkles size={16} /> Analizar con IA
+                            </button>
                         </div>
-                        {extractedData?.language && (
-                            <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded uppercase tracking-tighter">
-                                {extractedData.language === 'es' ? 'Español' : 'English'}
-                            </span>
-                        )}
-                    </DialogTitle>
-                </DialogHeader>
+                    </div>
+                )}
 
-                <div className="py-2">
-                    {step === "paste" && (
-                        <div className="space-y-4">
-                            <p className="text-sm text-uhuru-text-dim">
-                                Pega un chat de LinkedIn, una descripción de perfil o un email. Nuestra IA extraerá automáticamente los detalles del contacto y la empresa.
-                            </p>
-                            <Textarea
-                                placeholder="Pega el texto aquí..."
-                                className="min-h-[200px] bg-slate-900/50 border-uhuru-border text-white focus:ring-indigo-500"
-                                value={rawText}
-                                onChange={(e) => setRawText(e.target.value)}
-                            />
+                {step === "analyze" && (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full animate-pulse" />
+                            <Loader2 className="animate-spin text-indigo-400 relative z-10" size={48} />
                         </div>
-                    )}
+                        <p className="text-lg font-medium text-white animate-pulse">Analizando contexto bilingüe...</p>
+                        <p className="text-sm text-slate-500">Esto puede tardar unos segundos</p>
+                    </div>
+                )}
 
-                    {step === "analyze" && (
-                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                            <Loader2 className="animate-spin text-indigo-400" size={48} />
-                            <p className="text-lg font-medium animate-pulse">Analizando contexto bilingüe...</p>
-                        </div>
-                    )}
-
-                    {step === "review" && extractedData && (
+                {step === "review" && extractedData && (
+                    <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4 overflow-y-auto max-h-[450px] pr-2">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1">
-                                        <Label className="text-[11px] uppercase text-uhuru-text-dim">Nombre</Label>
-                                        <Input
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Nombre</label>
+                                        <input
                                             value={extractedData.contactName || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, contactName: e.target.value })}
-                                            className="bg-slate-900/50 border-uhuru-border h-9"
+                                            className="w-full h-11 bg-slate-900/50 border border-white/10 rounded-xl px-4 text-white focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <Label className="text-[11px] uppercase text-uhuru-text-dim">Email</Label>
-                                        <Input
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Email</label>
+                                        <input
                                             value={extractedData.email || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, email: e.target.value })}
-                                            className="bg-slate-900/50 border-uhuru-border h-9"
+                                            className="w-full h-11 bg-slate-900/50 border border-white/10 rounded-xl px-4 text-white focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <Label className="text-[11px] uppercase text-uhuru-text-dim">Cargo</Label>
-                                        <Input
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Cargo / Rol</label>
+                                        <input
                                             value={extractedData.role || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, role: e.target.value })}
-                                            className="bg-slate-900/50 border-uhuru-border h-9"
+                                            className="w-full h-11 bg-slate-900/50 border border-white/10 rounded-xl px-4 text-white focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <Label className="text-[11px] uppercase text-uhuru-text-dim">Teléfono</Label>
-                                        <Input
-                                            value={extractedData.phone || ""}
-                                            onChange={(e) => setExtractedData({ ...extractedData, phone: e.target.value })}
-                                            className="bg-slate-900/50 border-uhuru-border h-9"
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Empresa</label>
+                                        <input
+                                            value={extractedData.organizationName || ""}
+                                            onChange={(e) => setExtractedData({ ...extractedData, organizationName: e.target.value })}
+                                            className="w-full h-11 bg-slate-900/50 border border-white/10 rounded-xl px-4 text-white focus:border-indigo-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <Label className="text-[11px] uppercase text-uhuru-text-dim">Empresa / Organización</Label>
-                                    <Input
-                                        value={extractedData.organizationName || ""}
-                                        onChange={(e) => setExtractedData({ ...extractedData, organizationName: e.target.value })}
-                                        className="bg-slate-900/50 border-uhuru-border h-9"
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-[11px] uppercase text-uhuru-text-dim">Sector</Label>
-                                    <Input
-                                        value={extractedData.organizationSector || ""}
-                                        onChange={(e) => setExtractedData({ ...extractedData, organizationSector: e.target.value })}
-                                        className="bg-slate-900/50 border-uhuru-border h-9"
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-[11px] uppercase text-uhuru-text-dim">Resumen lógico (IA)</Label>
-                                    <Textarea
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Resumen Lógico (IA)</label>
+                                    <textarea
                                         value={extractedData.summary || ""}
                                         onChange={(e) => setExtractedData({ ...extractedData, summary: e.target.value })}
-                                        className="bg-slate-900/50 border-uhuru-border min-h-[120px] text-sm leading-relaxed"
+                                        className="w-full h-[180px] bg-slate-900/50 border border-white/10 rounded-xl p-4 text-sm text-slate-300 focus:border-indigo-500 outline-none transition-all resize-none leading-relaxed"
                                     />
                                 </div>
-                            </div>
-
-                            <div className="bg-slate-900/80 rounded-xl p-4 border border-uhuru-border/50">
-                                <Label className="text-[11px] uppercase text-uhuru-text-muted mb-2 block">Texto Original / Contexto</Label>
-                                <div className="text-[12px] text-uhuru-text-dim max-h-[400px] overflow-y-auto whitespace-pre-wrap font-mono leading-tight bg-black/20 p-3 rounded-lg border border-uhuru-border/20">
-                                    {extractedData.rawText || rawText}
+                                <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-3">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <AlertCircle size={14} className="text-indigo-400" />
+                                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Confianza IA</span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-indigo-500 transition-all duration-1000"
+                                            style={{ width: `${(extractedData.confidence || 0.5) * 100}%` }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    )}
 
-                    {step === "success" && (
-                        <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
-                            <div className="p-4 bg-emerald-500/10 rounded-full text-emerald-400">
+                        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                            <div className="flex gap-2">
+                                {queue.length > 0 && (
+                                    <button
+                                        onClick={handleDiscard}
+                                        className="px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                                    >
+                                        Descartar
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => queue.length > 0 ? reset() : setStep("paste")}
+                                    className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors"
+                                >
+                                    {queue.length > 0 ? "Cancelar Todo" : "Volver"}
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center gap-2"
+                                >
+                                    {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                                    Aprobar y Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {step === "success" && (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-6 text-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full" />
+                            <div className="relative p-6 bg-emerald-500/10 rounded-full text-emerald-400">
                                 <CheckCircle2 size={64} />
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold">¡Proceso Finalizado!</h3>
-                                <p className="text-uhuru-text-dim mt-2">
-                                    Has importado {importedCount} leads correctamente al CRM.
-                                </p>
-                            </div>
                         </div>
-                    )}
-                </div>
-
-                <DialogFooter className="gap-2 sm:justify-between border-t border-uhuru-border pt-4 mt-2">
-                    {step === "review" && queue.length > 0 && (
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" onClick={handleDiscard} className="border-red-500/30 hover:bg-red-500/10 text-red-400">
-                                Descartar este
-                            </Button>
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold text-white">¡Proceso Finalizado!</h3>
+                            <p className="text-slate-400 max-w-[300px] mx-auto">
+                                Has importado {importedCount} leads correctamente al CRM.
+                            </p>
                         </div>
-                    )}
-
-                    <div className="flex gap-2 ml-auto">
-                        {step === "paste" && (
-                            <>
-                                <Button variant="ghost" onClick={reset}>Cancelar</Button>
-                                <Button onClick={handleAnalyze} className="bg-indigo-600 hover:bg-indigo-700">
-                                    Analizar con IA
-                                </Button>
-                            </>
-                        )}
-                        {step === "review" && (
-                            <>
-                                <Button variant="ghost" onClick={() => queue.length > 0 ? reset() : setStep("paste")}>
-                                    {queue.length > 0 ? "Cancelar Todo" : "Volver"}
-                                </Button>
-                                <Button onClick={handleSave} disabled={isSaving} className="bg-emerald-600 hover:bg-emerald-700">
-                                    {isSaving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                                    Aprobar y Guardar
-                                </Button>
-                            </>
-                        )}
-                        {step === "success" && (
-                            <Button onClick={reset} className="bg-indigo-600 hover:bg-indigo-700 w-full">
-                                Finalizar
-                            </Button>
-                        )}
+                        <button
+                            onClick={reset}
+                            className="w-full max-w-[200px] h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                        >
+                            Cerrar
+                        </button>
                     </div>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                )}
+            </div>
+        </Modal>
     );
 }

@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getAIClient } from "@/lib/ai/ai-service";
