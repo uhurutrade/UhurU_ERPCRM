@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 // import { Dialog... } removed as we used custom modal structure
-import { X, Paperclip, FileText, Calendar, CreditCard, Tag, Upload, Eye } from 'lucide-react';
+import { X, Paperclip, FileText, Calendar, CreditCard, Tag, Upload, Eye, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { uploadTransactionAttachment } from '@/app/actions/banking';
 import { CategoryBadge } from './category-badge';
@@ -243,6 +243,16 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                             key={file.id}
                                             className="group relative flex items-center p-3 bg-slate-900 border border-slate-700 rounded-xl hover:border-uhuru-blue/50 transition-colors"
                                         >
+                                            {/* Download Button */}
+                                            <a
+                                                href={file.path.startsWith('/uploads/') ? `/api/uploads/${file.path.replace('/uploads/', '')}` : file.path}
+                                                download={file.originalName || 'document'}
+                                                className="absolute top-2 right-10 p-1 bg-slate-800 hover:bg-uhuru-blue text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                                title="Descargar archivo"
+                                            >
+                                                <Download size={14} />
+                                            </a>
+
                                             {/* Delete Button */}
                                             <button
                                                 onClick={(e) => {

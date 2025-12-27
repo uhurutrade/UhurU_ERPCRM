@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, Link as LinkIcon, Loader2 } from 'lucide-react';
+import { Trash2, Link as LinkIcon, Loader2, Download, Eye } from 'lucide-react';
 import { deleteAttachment } from '@/app/actions/invoices';
 import { toast } from 'sonner';
 import { useConfirm } from '@/components/providers/modal-provider';
@@ -77,5 +77,33 @@ export function LinkInvoiceButton({ id, amount, hasTransaction }: { id: string, 
         >
             <LinkIcon size={16} />
         </button>
+    );
+}
+export function DownloadAttachmentButton({ path, filename }: { path: string, filename: string }) {
+    const fullPath = path.startsWith('/uploads/') ? `/api/uploads/${path.replace('/uploads/', '')}` : path;
+    return (
+        <a
+            href={fullPath}
+            download={filename}
+            className="p-1.5 text-uhuru-text-dim hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
+            title="Download Document"
+        >
+            <Download size={16} />
+        </a>
+    );
+}
+
+export function ViewAttachmentButton({ path }: { path: string }) {
+    const fullPath = path.startsWith('/uploads/') ? `/api/uploads/${path.replace('/uploads/', '')}` : path;
+    return (
+        <a
+            href={fullPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-uhuru-text-dim hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            title="View Document"
+        >
+            <Eye size={16} />
+        </a>
     );
 }

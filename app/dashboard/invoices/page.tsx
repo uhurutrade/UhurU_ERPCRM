@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { Plus, FileText, ArrowUpRight, Upload, Check, Trash2 } from 'lucide-react';
+import { Plus, FileText, ArrowUpRight, Upload, Check, Trash2, Download } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
-import { DeleteAttachmentButton, LinkAttachmentButton, LinkInvoiceButton } from '@/components/invoices/invoice-actions';
+import { DeleteAttachmentButton, LinkAttachmentButton, LinkInvoiceButton, ViewAttachmentButton, DownloadAttachmentButton } from '@/components/invoices/invoice-actions';
 import { InvoiceDeleteButton, InvoiceRestoreButton } from '@/components/invoices/invoice-server-actions';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { StandardPagination } from '@/components/invoices/invoices-pagination';
@@ -125,6 +125,8 @@ export default async function InvoicesPage({
                                         </div>
                                     </div>
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        <ViewAttachmentButton path={att.path} />
+                                        <DownloadAttachmentButton path={att.path} filename={att.originalName} />
                                         <LinkAttachmentButton id={att.id} hasTransaction={!!att.transactionId} />
                                         <DeleteAttachmentButton id={att.id} />
                                     </div>
@@ -206,6 +208,14 @@ export default async function InvoicesPage({
                                                     <Link href={`/invoice-pdf/${inv.id}`} target="_blank" className="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-all" title="View PDF">
                                                         <FileText size={14} />
                                                     </Link>
+                                                    <a
+                                                        href={`/invoice-pdf/${inv.id}`}
+                                                        download={`Invoice-${inv.number}.pdf`}
+                                                        className="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-all"
+                                                        title="Download PDF"
+                                                    >
+                                                        <Download size={14} />
+                                                    </a>
                                                     {inv.status === 'DRAFT' && (
                                                         <Link href={`/dashboard/invoices/${inv.id}/edit`} className="p-2 bg-uhuru-blue/10 text-uhuru-blue hover:bg-uhuru-blue hover:text-white rounded-lg transition-all" title="Edit Draft">
                                                             <ArrowUpRight size={14} />

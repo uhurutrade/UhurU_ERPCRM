@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, Check, AlertCircle, Loader2, Info, History, ShieldAlert, ShieldCheck, Clock, Trash2, Search } from 'lucide-react';
+import { Upload, FileText, Check, AlertCircle, Loader2, Info, History, ShieldAlert, ShieldCheck, Clock, Trash2, Search, Download, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadToBasket, getBasketHistory, removeFromBasket, updateDocumentNotes, reprocessDocument } from '@/app/actions/basket';
 import { format } from 'date-fns';
@@ -195,12 +195,33 @@ export default function DocBasketPage() {
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
-                                    className="p-3 hover:bg-white/5 rounded-2xl text-uhuru-text-dim hover:text-white transition-all"
-                                >
-                                    <AlertCircle size={20} className="rotate-45" />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        href={selectedDoc.path}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-uhuru-text-dim hover:text-white transition-all group"
+                                        title="View Original"
+                                    >
+                                        <Eye size={20} className="group-hover:scale-110 transition-transform" />
+                                    </a>
+                                    <a
+                                        href={selectedDoc.path}
+                                        download={selectedDoc.filename}
+                                        className="p-3 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-2xl text-indigo-400 transition-all flex items-center gap-2 group"
+                                        title="Download Original"
+                                    >
+                                        <Download size={20} className="group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Download Source</span>
+                                    </a>
+                                    <button
+                                        onClick={() => { setSelectedDoc(null); setModalLang('en'); }}
+                                        className="p-3 hover:bg-white/5 rounded-2xl text-uhuru-text-dim hover:text-white transition-all"
+                                    >
+                                        <AlertCircle size={20} className="rotate-45" />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -486,12 +507,33 @@ export default function DocBasketPage() {
                                                                     <Clock size={10} />
                                                                     {format(new Date(doc.uploadedAt), 'MMM d, p')}
                                                                 </span>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleDelete(doc.id); }}
-                                                                    className="p-1.5 text-uhuru-text-dim hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-500/10 opacity-0 group-hover:opacity-100"
-                                                                >
-                                                                    <Trash2 size={14} />
-                                                                </button>
+                                                                <div className="flex items-center gap-1">
+                                                                    <a
+                                                                        href={doc.path}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="p-1.5 text-uhuru-text-dim hover:text-white transition-colors rounded-lg hover:bg-white/5 opacity-0 group-hover:opacity-100"
+                                                                        title="View Source"
+                                                                    >
+                                                                        <Eye size={14} />
+                                                                    </a>
+                                                                    <a
+                                                                        href={doc.path}
+                                                                        download={doc.filename}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="p-1.5 text-uhuru-text-dim hover:text-indigo-400 transition-colors rounded-lg hover:bg-indigo-500/10 opacity-0 group-hover:opacity-100"
+                                                                        title="Download Source"
+                                                                    >
+                                                                        <Download size={14} />
+                                                                    </a>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleDelete(doc.id); }}
+                                                                        className="p-1.5 text-uhuru-text-dim hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-500/10 opacity-0 group-hover:opacity-100"
+                                                                    >
+                                                                        <Trash2 size={14} />
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-wrap items-center gap-2">
