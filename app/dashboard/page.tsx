@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { serializeData } from "@/lib/serialization";
+import { AIStatusBadge } from "@/components/ai/status-badge";
 
 export default async function DashboardPage() {
     // 1. Fetch recent transactions
@@ -69,9 +70,7 @@ export default async function DashboardPage() {
                     <p className="text-uhuru-text-muted mt-1 uppercase text-[10px] font-bold tracking-[0.2em]">Strategic Management & Resource Planning</p>
                 </div>
                 <div className="flex justify-center sm:justify-end">
-                    <span className="text-[10px] font-bold text-slate-500 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-white/5 uppercase tracking-widest">
-                        System Online
-                    </span>
+                    <AIStatusBadge />
                 </div>
             </header>
 
@@ -131,7 +130,7 @@ export default async function DashboardPage() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 luxury-grid">
                 {/* Recent Activity */}
                 <div className="bg-uhuru-card p-6 rounded-2xl border border-uhuru-border shadow-card h-full">
                     <div className="flex items-center justify-between mb-6">
