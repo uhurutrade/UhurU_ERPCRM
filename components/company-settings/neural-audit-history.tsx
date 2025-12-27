@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle } from "lucide-react";
+import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle, FileDown, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useConfirm } from "@/components/providers/modal-provider";
 
 interface Audit {
     id: string;
@@ -21,6 +22,7 @@ interface Audit {
 export function NeuralAuditHistory() {
     const [audits, setAudits] = useState<Audit[]>([]);
     const [loading, setLoading] = useState(true);
+    const { confirm: systemConfirm } = useConfirm();
 
     const fetchAudits = async () => {
         try {
@@ -43,7 +45,15 @@ export function NeuralAuditHistory() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Estás seguro de que deseas eliminar este reporte de auditoría? Esta acción es irreversible.")) return;
+        const ok = await systemConfirm({
+            title: "Eliminar Auditoría",
+            message: "¿Estás seguro de que deseas eliminar este reporte de forma definitiva? Esta acción no se puede deshacer.",
+            type: "danger",
+            confirmText: "Eliminar para siempre",
+            cancelText: "Cancelar"
+        });
+
+        if (!ok) return;
 
         try {
             const response = await fetch(`/api/neural-audits/${id}`, {
@@ -51,14 +61,42 @@ export function NeuralAuditHistory() {
             });
 
             if (response.ok) {
-                toast.success("Audit deleted successfully");
+                toast.success("Auditoría eliminada físicamente.");
                 fetchAudits();
             } else {
-                toast.error("Failed to delete audit");
+                toast.error("Error al eliminar la auditoría.");
             }
         } catch (error) {
             console.error("Error deleting audit:", error);
-            toast.error("An error occurred while deleting the audit");
+            toast.error("Error de conexión al eliminar.");
+        }
+    };
+
+    const handleClearAll = async () => {
+        const ok = await systemConfirm({
+            title: "PURGAR HISTORIAL COMPLETO",
+            message: "¡ALERTA DE SEGURIDAD! Estás a punto de borrar ABSOLUTAMENTE TODO el historial de inteligencia. Esta acción limpiará la base de datos de forma física e irreversible.",
+            type: "danger",
+            confirmText: "PURGAR TODO EL SISTEMA",
+            cancelText: "Abortar"
+        });
+
+        if (!ok) return;
+
+        try {
+            const response = await fetch("/api/neural-audits/clear-all", {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                toast.success("Historial purgado con éxito.");
+                fetchAudits();
+            } else {
+                toast.error("Error al purgar el historial.");
+            }
+        } catch (error) {
+            console.error("Error clearing audits:", error);
+            toast.error("Error crítico de red.");
         }
     };
 
@@ -71,52 +109,61 @@ export function NeuralAuditHistory() {
         const primaryColor = [16, 185, 129]; // Emerald-500
 
         // Header
-        doc.setFillColor(30, 41, 59); // Slate-800
-        doc.rect(0, 0, 210, 40, "F");
+        doc.setFillColor(15, 23, 42); // Slate-950
+        doc.rect(0, 0, 210, 50, "F");
 
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
+        doc.setFontSize(26);
         doc.setFont("helvetica", "bold");
-        doc.text("NEURAL AUDIT REPORT", 20, 20);
+        doc.text("NEURAL AUDIT REPORT", 20, 25);
 
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("UHURU ERP SYSTEM • AUTONOMOUS INTELLIGENCE UNIT", 20, 30);
+        doc.text("UHURU ERP SYSTEM • AUTONOMOUS INTELLIGENCE UNIT • SECURITY ID: NA-" + audit.id.slice(-6).toUpperCase(), 20, 35);
+
+        // Badge
+        doc.setDrawColor(16, 185, 129);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(160, 15, 35, 12, 2, 2, "S");
+        doc.setTextColor(16, 185, 129);
+        doc.setFontSize(8);
+        doc.text("CERTIFIED", 170, 23);
 
         // Audit Meta Box
         doc.setFillColor(248, 250, 252); // Slate-50
-        doc.roundedRect(15, 50, 180, 40, 3, 3, "F");
+        doc.roundedRect(15, 60, 180, 45, 3, 3, "F");
 
         doc.setTextColor(51, 65, 85); // Slate-700
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Audit Timestamp:", 25, 60);
-        doc.text("IA Providers:", 25, 70);
-        doc.text("Sync Result:", 25, 80);
+        doc.text("Audit Timestamp:", 25, 72);
+        doc.text("IA Providers:", 25, 82);
+        doc.text("Sync Result:", 25, 92);
 
         doc.setFont("helvetica", "normal");
-        doc.text(format(new Date(audit.timestamp), "PPPPpp", { locale: es }), 70, 60);
-        doc.text(audit.provider, 70, 70);
-        doc.text(`${audit.totalChanges} changes detected - STATUS: ${audit.status}`, 70, 80);
+        doc.text(format(new Date(audit.timestamp), "PPPPpp", { locale: es }), 70, 72);
+        doc.text(audit.provider, 70, 82);
+        doc.text(`${audit.totalChanges} changes detected - STATUS: ${audit.status}`, 70, 92);
 
         // Changes Section
         doc.setTextColor(16, 185, 129); // Emerald
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("MODIFICATIONS LOG", 20, 105);
+        doc.text("MODIFICATIONS LOG", 20, 120);
 
         doc.setDrawColor(226, 232, 240); // Slate-200
-        doc.line(20, 108, 190, 108);
+        doc.line(20, 123, 190, 123);
 
         const changeLabels = (audit.changeLog || "").split(", ");
         const tableData = changeLabels.map(label => [label, "AI Adjusted", "Regulatory Compliance"]);
 
         autoTable(doc, {
-            startY: 115,
+            startY: 130,
             head: [["Affected Field", "Action", "Context"]],
             body: tableData,
-            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
             alternateRowStyles: { fillColor: [248, 250, 252] },
+            styles: { fontSize: 9, cellPadding: 4 }
         });
 
         const finalY = (doc as any).lastAutoTable.finalY + 20;
@@ -135,16 +182,70 @@ export function NeuralAuditHistory() {
         const splitText = doc.splitTextToSize(audit.justification || "No justification provided.", 170);
         doc.text(splitText, 20, finalY + 15);
 
+        // Watermark
+        doc.setTextColor(241, 245, 249);
+        doc.setFontSize(40);
+        doc.setFont("helvetica", "bold");
+        doc.text("UHURU ERP", 105, 240, { align: 'center', angle: 45, opacity: 0.1 });
+
         // Footer
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
             doc.setTextColor(148, 163, 184); // Slate-400
-            doc.text(`Certified by UhurU Neural Engine Core v1.0 • Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
+            doc.text(`Certified by UhurU Neural Engine Core v1.0 • Secure Ledger Hash: 0x${audit.id.slice(0, 12)}... • Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
         }
 
         doc.save(filename);
+    };
+
+    const generateFullSummaryPDF = () => {
+        const doc = new jsPDF() as any;
+        const filename = `Intelligence_Summary_${format(new Date(), "yyyyMMdd")}.pdf`;
+
+        // Title Page
+        doc.setFillColor(15, 23, 42);
+        doc.rect(0, 0, 210, 297, "F");
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(36);
+        doc.setFont("helvetica", "bold");
+        doc.text("INTELLIGENCE HUB", 105, 100, { align: "center" });
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "normal");
+        doc.text("Strategic Audit Summary Ledger", 105, 115, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.setTextColor(16, 185, 129);
+        doc.text("GENERATE ON: " + format(new Date(), "PPPP", { locale: es }), 105, 140, { align: "center" });
+
+        doc.addPage();
+
+        doc.setTextColor(15, 23, 42);
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text("Complete Audit Trail", 20, 20);
+        doc.line(20, 23, 190, 23);
+
+        const tableData = audits.map(a => [
+            format(new Date(a.timestamp), "yyyy-MM-dd HH:mm"),
+            a.provider,
+            a.changeLog || "No Changes",
+            a.status
+        ]);
+
+        autoTable(doc, {
+            startY: 30,
+            head: [["Date", "Providers", "Changes", "Status"]],
+            body: tableData,
+            headStyles: { fillColor: [15, 23, 42] },
+            styles: { fontSize: 8 }
+        });
+
+        doc.save(filename);
+        toast.success("Resumen completo generado con éxito.");
     };
 
     if (loading) return (
@@ -167,9 +268,27 @@ export function NeuralAuditHistory() {
                         <BrainCircuit size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Neural Sync Audits</h2>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-0.5">Automated Change Vector Ledger</p>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Historial de Auditorías</h2>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-0.5">Control de Cambios Autónomos</p>
                     </div>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={generateFullSummaryPDF}
+                        disabled={audits.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all"
+                    >
+                        <FileDown size={14} />
+                        Exportar Todo
+                    </button>
+                    <button
+                        onClick={handleClearAll}
+                        disabled={audits.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-rose-950/40 hover:bg-rose-600 disabled:opacity-50 text-rose-400 hover:text-white rounded-xl border border-rose-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
+                    >
+                        <Trash size={14} />
+                        Purgar Historial
+                    </button>
                 </div>
             </div>
 
