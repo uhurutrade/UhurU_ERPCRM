@@ -14,7 +14,8 @@ import {
     LogOut,
     FileText,
     Menu,
-    X
+    X,
+    BrainCircuit
 } from "lucide-react";
 
 const navItems = [
@@ -24,7 +25,8 @@ const navItems = [
     { href: "/dashboard/invoices", label: "Invoices", icon: Briefcase, color: "text-emerald-400" },
     { href: "/dashboard/banking", label: "General Ledger", icon: Landmark, color: "text-amber-400" },
     { href: "/dashboard/compliance", label: "Compliance (UK)", icon: ShieldCheck, color: "text-rose-400" },
-    { href: "/dashboard/doc-basket", label: "Upload Doc Basket", icon: Briefcase, color: "text-indigo-400" }, // Using Briefcase or similar
+    { href: "/dashboard/neural-reports", label: "Intelligence Reports", icon: BrainCircuit, color: "text-emerald-400" },
+    { href: "/dashboard/doc-basket", label: "Upload Doc Basket", icon: Briefcase, color: "text-indigo-400" },
     { href: "/dashboard/company-settings", label: "Company Settings", icon: Building2, color: "text-cyan-400" },
     { href: "/dashboard/bank-settings", label: "Bank Settings", icon: Settings, color: "text-indigo-400" },
 ];
