@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { getAIClient } from "@/lib/ai/ai-service";
+import { prisma } from "../prisma";
+import { getAIClient } from "./ai-service";
 
 /**
  * Registra un reporte de auditoría estratégica generado por IA.

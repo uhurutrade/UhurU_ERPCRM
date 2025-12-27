@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../prisma';
 import { execSync } from 'child_process';
 import { writeFileSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
