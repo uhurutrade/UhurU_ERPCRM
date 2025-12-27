@@ -39,7 +39,7 @@ export default function SyncNodeButton() {
 
             if (data.success) {
                 const changeLog = data.changes && data.changes.length > 0
-                    ? `Updated: ${data.changes.join(", ")}.`
+                    ? `Updated: ${data.changes.join(", ")}. A detailed Audit Report is available at the bottom.`
                     : "No adjustments needed - System at peak precision.";
 
                 toast.success("Intelligence Synchronized", {

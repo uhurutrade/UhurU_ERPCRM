@@ -40,7 +40,8 @@ export async function recalculateComplianceDeadlines() {
             "nextConfirmationStatementDue": "YYYY-MM-DD",
             "nextAccountsCompaniesHouseDue": "YYYY-MM-DD",
             "nextAccountsHMRCDue": "YYYY-MM-DD",
-            "nextFYEndDate": "YYYY-MM-DD"
+            "nextFYEndDate": "YYYY-MM-DD",
+            "justification": "Professional explanation in SPANISH of why you updated these specific dates based on the financial and document context provided (max 400 chars)."
         }
         `;
 
@@ -102,6 +103,8 @@ export async function recalculateComplianceDeadlines() {
             nextFYEndDate: settings.nextFYEndDate?.toISOString().split('T')[0]
         };
 
+        const justification = dataGE?.justification || dataOA?.justification || "No explicit justification provided by AI.";
+
         // Update Database
         await prisma.companySettings.update({
             where: { id: settings.id },
@@ -124,13 +127,27 @@ export async function recalculateComplianceDeadlines() {
         if (oldDeadlines.nextAccountsHMRCDue !== deadlines.nextAccountsHMRCDue) changes.push("HMRC Corporation Tax");
         if (oldDeadlines.nextFYEndDate !== deadlines.nextFYEndDate) changes.push("Financial Year End");
 
+        // Record Audit if there are changes
+        if (changes.length > 0) {
+            await prisma.neuralAudit.create({
+                data: {
+                    provider: providerSummary,
+                    changeLog: changes.join(", "),
+                    justification: justification,
+                    totalChanges: changes.length,
+                    status: "UPDATED"
+                }
+            });
+        }
+
         console.log(`[Compliance-Service] ✅ Consensus reached via ${providerSummary}. Changes: ${changes.length}`);
 
         return {
             deadlines,
             provider: providerSummary,
             changes: changes.length > 0 ? changes : null,
-            details: consensus
+            details: consensus,
+            justification
         };
 
     } catch (error: any) {

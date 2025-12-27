@@ -495,3 +495,13 @@ model DocumentChunk {
 
   @@index([documentId])
 }
+
+model NeuralAudit {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+  provider      String
+  changeLog     String?
+  justification String?  @db.Text
+  totalChanges  Int      @default(0)
+  status        String   @default("STABLE") // STABLE, UPDATED, FAILED
+}

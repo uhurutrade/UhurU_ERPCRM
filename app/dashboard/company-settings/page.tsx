@@ -3,6 +3,7 @@ import CompanySettingsForm from "@/components/company-settings/company-settings-
 import ComplianceOverview from "@/components/company-settings/compliance-overview";
 import { serializeData } from "@/lib/serialization";
 import SyncNodeButton from "@/components/company-settings/sync-node-button";
+import { NeuralAuditHistory } from "@/components/company-settings/neural-audit-history";
 
 export default async function CompanySettingsPage() {
     // Fetch existing company settings (there should only be one record)
@@ -26,6 +27,9 @@ export default async function CompanySettingsPage() {
             <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
                 <CompanySettingsForm initialData={serializeData(companySettings)} />
             </div>
+
+            {/* Neural Audit History - AI Sync Intelligence Feed */}
+            <NeuralAuditHistory />
         </div>
     );
 }

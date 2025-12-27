@@ -163,8 +163,11 @@ OPERATIONAL IDENTITY:
             window.dispatchEvent(new Event('settings-saved'));
 
             if (syncData.success) {
+                const auditNote = syncData.changes && syncData.changes.length > 0
+                    ? " A strategic Audit Report has been generated below."
+                    : "";
                 toast.success("Neural Consensus Reached", {
-                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider} completed successfully.`,
+                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider} complete.${auditNote}`,
                     duration: 10000
                 });
             } else {
