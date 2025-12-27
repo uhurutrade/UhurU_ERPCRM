@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FinancialCategoriesGuide } from "./financial-categories-guide";
-import { RefreshCw, Sparkles, AlertTriangle } from "lucide-react";
+import { RefreshCw, Sparkles, AlertTriangle, BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/modal-provider";
 
@@ -813,7 +813,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="md:col-span-2">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Primary Intelligence Infrastructure</ts>
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Primary Intelligence Infrastructure</label>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
@@ -897,9 +897,9 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                             name="aiCustomInstructions"
                             value={formData.aiCustomInstructions}
                             onChange={handleChange}
-                            rows={15}
-                            placeholder="Ejemplo: [DIRECTIVA]: Nunca preguntes por el IVA de transportes, ya sé que es 0%."
-                            className="w-full pl-8 pr-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-indigo-100 text-sm font-mono leading-relaxed placeholder:opacity-30 scrollbar-hide"
+                            rows={20}
+                            placeholder="Vuelca aquí todo: [DIRECTIVA]: No me preguntes más por el IVA de los envíos de Amazon. [MEMORIA]: En 2024 cambiamos de oficina..."
+                            className="w-full pl-8 pr-4 py-4 bg-slate-950/70 border border-indigo-500/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-indigo-100 text-sm font-mono leading-relaxed placeholder:opacity-40 scrollbar-hide shadow-inner"
                         />
                         <div className="absolute bottom-4 right-4 text-[10px] font-mono text-slate-600 pointer-events-none">
                             SECURE_STORAGE_LAYER_V2
