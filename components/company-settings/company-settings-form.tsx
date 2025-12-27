@@ -166,8 +166,8 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
             window.dispatchEvent(new Event('settings-saved'));
 
             if (syncData.success) {
-                toast.success("Settings Saved & AI Recalculated", {
-                    description: `Dates updated via ${syncData.provider?.toUpperCase()}.`
+                toast.success("Settings Saved & Consensus Reached", {
+                    description: `Dual-AI verification complete via ${syncData.provider}. Deadlines secured.`
                 });
             } else {
                 toast.success("Settings Saved", {
