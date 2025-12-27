@@ -126,7 +126,7 @@ export async function getConsensusAI() {
     const companyContext = await getCompanyContext();
     return {
         async chat(message: string, systemPrompt: string): Promise<{ openai: string, gemini: string }> {
-            const roleAndBehavior = `${companyContext.trim()}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt.trim()}`.trim();
+            const roleAndBehavior = `${companyContext.trim()}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt.trim()}\n\nREMINDER: You MUST strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above.`.trim();
 
             const [oa, ge] = await Promise.allSettled([
                 chatWithOpenAI(message, roleAndBehavior),
@@ -151,7 +151,7 @@ async function analyzeWithOpenAI(filename: string, text: string, companyContext:
     const messages: any[] = [
         {
             role: "system",
-            content: `You are an expert accountant at ${companyContext}. Analyze the provided invoice.
+            content: `${companyContext}\n\nTASK: Analyze the provided invoice.
             Return a JSON object with:
             {
                 "isInvoice": boolean,
@@ -210,7 +210,7 @@ async function analyzeStrategicWithOpenAI(filename: string, text: string, compan
     const messages: any[] = [
         {
             role: "system",
-            content: `You are a UK Corporate Law & Tax expert representing ${companyContext}. Analyze the provided document for a UK LTD company.
+            content: `${companyContext}\n\nTASK: You are a UK Corporate Law & Tax expert. Analyze the provided document for a UK LTD company.
             ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
             Extract details for: relevance, documentDate (YYYY-MM-DD), docTopic, deadlines, vatLiability, and a strategicInsight.
             
@@ -286,14 +286,11 @@ async function analyzeLeadWithOpenAI(text: string, companyContext: string): Prom
     const messages: any[] = [
         {
             role: "system",
-            content: `You are a high-level Strategic Sales Assistant for ${companyContext}. Your goal is to extract structured lead data and provide a deep contextual analysis.
+            content: `${companyContext}\n\nTASK: You are a high-level Strategic Sales Assistant. Your goal is to extract structured lead data and provide a deep contextual analysis.
             
             KEY INSTRUCTIONS:
             1. BILINGUAL LOCALIZATION (PRIORITY): You must handle English and Spanish inputs. To maintain CRM consistency, ALWAYS provide the "summary" and "organizationSector" in professional, localized Spanish, even if the input text is English.
-            2. CONTEXTUAL INTELLIGENCE: Analyze the entire conversation or profile. Identify:
-               - The core intent (what do they actually want?).
-               - Pain points (what problems are they solving?).
-               - Opportunity value (why is this lead important for ${companyContext}?).
+            2. CONTEXTUAL INTELLIGENCE: Analyze the entire conversation or profile. Identify the core intent, pain points, and opportunity value.
             3. LOGICAL SUMMARY: The summary must be a strategic synthesis in Spanish, not just a list of facts.
             
             Return a JSON object with:
@@ -307,7 +304,9 @@ async function analyzeLeadWithOpenAI(text: string, companyContext: string): Prom
                 "summary": string (Professional Strategic Summary in Spanish),
                 "confidence": number (0-1),
                 "language": "es" | "en" (Original input language)
-            }`
+            }
+            
+            REMINDER: Strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above.`
         },
         { role: "user", content: `Raw Text: ${text.substring(0, 10000)}` }
     ];
@@ -358,7 +357,7 @@ async function analyzeWithGemini(filename: string, text: string, companyContext:
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `You are an expert accountant for ${companyContext}. Analyze the following invoice and return a JSON object with:
+    const prompt = `${companyContext}\n\nTASK: Analyze the following invoice and return a JSON object with:
     {
         "isInvoice": boolean,
         "issuer": string,
@@ -426,7 +425,7 @@ async function analyzeStrategicWithGemini(filename: string, text: string, compan
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `Analyze this document as a UK LTD corporate expert for ${companyContext}. Filename: ${filename}.
+    const prompt = `${companyContext}\n\nTASK: Analyze this document as a UK LTD corporate expert. Filename: ${filename}.
     ${userNotes ? `CONTEXT FROM USER: ${userNotes}\n` : ''}
     Determine if it is relevant to business/tax/legal management (isRelevant).
     Extract the effective date (documentDate) and a specific topic name (docTopic) used for versioning.
@@ -484,11 +483,11 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
         generationConfig: { responseMimeType: "application/json" }
     });
 
-    const prompt = `As a Strategic Sales Assistant for ${companyContext}, analyze this text (LinkedIn chat, email, or profile) to extract structured data.
+    const prompt = `${companyContext}\n\nTASK: As a Strategic Sales Assistant, analyze this text (LinkedIn chat, email, or profile) to extract structured data.
     
     CRITICAL INSTRUCTIONS:
-    - BILINGUAL: Support Spanish/English. ALWAYS provide the "summary" and "organizationSector" in professional SPANISH for CRM consistency.
-    - CONTEXTUAL ANALYSIS: Dig deep into the conversation intent, identifying current needs and potential value for ${companyContext}.
+    - BILINGUAL: Support Spanish/English. ALWAYS provide the "summary" and "organizationSector" in professional SPANISH.
+    - CONTEXTUAL ANALYSIS: Dig deep into the conversation intent, identifying current needs and potential value for the entity.
     
     Return JSON:
     {
@@ -502,6 +501,8 @@ async function analyzeLeadWithGemini(text: string, companyContext: string): Prom
         "confidence": number,
         "language": "es" | "en" (Original input language)
     }
+    
+    REMINDER: Strictly adhere to the PRIMARY IDENTITY & STRATEGIC BEHAVIOR defined above.
     
     Text: ${text.substring(0, 15000)}`;
 
