@@ -60,6 +60,7 @@ export function NeuralAuditHistory() {
     }, [page]);
 
     useEffect(() => {
+        const handleSync = () => fetchAudits();
         window.addEventListener('settings-saved', handleSync);
         return () => window.removeEventListener('settings-saved', handleSync);
     }, []);
