@@ -787,75 +787,145 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                 </div>
             </section>
 
-            {/* AI Configuration */}
-            <section className="bg-slate-900/40 p-6 rounded-xl border border-indigo-500/20 shadow-lg">
-                <h2 className="text-xl font-semibold mb-4 text-indigo-400 flex items-center gap-2">
-                    <span className="p-1.5 bg-indigo-500/10 rounded-lg">🤖</span>
-                    AI Configuration & Assistant
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Strategic Neural Center (AI Configuration) */}
+            <section className="bg-slate-900/40 p-6 rounded-2xl border border-indigo-500/30 shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <BrainCircuit size={80} className="text-indigo-400" />
+                </div>
+
+                <div className="flex justify-between items-start mb-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Select AI Infrastructure Provider
-                        </label>
+                        <h2 className="text-xl font-bold text-indigo-400 flex items-center gap-3">
+                            <div className="p-2 bg-indigo-500/20 rounded-xl shadow-inner">
+                                <Sparkles className="text-indigo-400" size={20} />
+                            </div>
+                            Strategic Neural Center
+                        </h2>
+                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.25em] mt-1 ml-11">Core Behavioral Engine</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-tighter">RAG Memory Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="md:col-span-2">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Primary Intelligence Infrastructure</ts>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, aiProvider: 'openai' }))}
-                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${formData.aiProvider === 'openai'
-                                    ? 'bg-indigo-600/20 border-indigo-500 text-white font-bold'
-                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                onClick={() => {
+                                    setFormData(prev => ({ ...prev, aiProvider: 'openai' }));
+                                    window.dispatchEvent(new Event('settings-dirty'));
+                                }}
+                                className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all group/btn ${formData.aiProvider === 'openai'
+                                    ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.2)]'
+                                    : 'bg-slate-800/40 border-slate-700/50 text-slate-500 hover:border-slate-600'
                                     }`}
                             >
-                                <span className="text-lg">✨</span>
-                                OpenAI (ChatGPT)
+                                <div className={`p-2 rounded-lg ${formData.aiProvider === 'openai' ? 'bg-indigo-500' : 'bg-slate-700'}`}>
+                                    <Sparkles size={18} className="text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-black uppercase tracking-widest opacity-60">OpenAI</p>
+                                    <p className="text-sm font-bold">GPT-4o Mini</p>
+                                </div>
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, aiProvider: 'gemini' }))}
-                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${formData.aiProvider === 'gemini'
-                                    ? 'bg-teal-600/20 border-teal-500 text-white font-bold'
-                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                onClick={() => {
+                                    setFormData(prev => ({ ...prev, aiProvider: 'gemini' }));
+                                    window.dispatchEvent(new Event('settings-dirty'));
+                                }}
+                                className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all group/btn ${formData.aiProvider === 'gemini'
+                                    ? 'bg-teal-600/20 border-teal-500 text-white shadow-[0_0_20px_rgba(20,184,166,0.2)]'
+                                    : 'bg-slate-800/40 border-slate-700/50 text-slate-500 hover:border-slate-600'
                                     }`}
                             >
-                                <span className="text-lg">💎</span>
-                                Google Gemini
+                                <div className={`p-2 rounded-lg ${formData.aiProvider === 'gemini' ? 'bg-teal-500' : 'bg-slate-700'}`}>
+                                    <BrainCircuit size={18} className="text-white" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-black uppercase tracking-widest opacity-60">Google</p>
+                                    <p className="text-sm font-bold">Gemini 1.5 Flash</p>
+                                </div>
                             </button>
                         </div>
-                        <p className="mt-2 text-[10px] text-slate-500 uppercase font-bold tracking-widest">
-                            {formData.aiProvider === 'openai'
-                                ? "Infrastructure: GPT-4o Mini (Cost Optimized)"
-                                : "Infrastructure: Gemini 1.5 Flash (Optimized Cost)"}
-                        </p>
                     </div>
 
-                    <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5 flex flex-col justify-center">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className={`w-2 h-2 rounded-full ${process.env.NEXT_PUBLIC_AI_STATUS === 'ready' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">System Status</span>
-                        </div>
-                        <p className="text-xs text-slate-400 ">
-                            All API keys are securely managed via environment variables. Ensure OPENAI_API_KEY or GEMINI_API_KEY are configured in your .env file on the VPS.
+                    <div className="p-5 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 flex flex-col justify-center">
+                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3">Multi-Model Protocol</p>
+                        <p className="text-xs text-slate-400 leading-relaxed italic">
+                            The system now operates under a "Safe Consensus" logic. Both neural nodes are consulted for compliance and the most restrictive date is chosen automatically.
                         </p>
                     </div>
                 </div>
 
-                <div className="mt-6">
-                    <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-                        <span>📝</span>
-                        AI Personal Behavior & RAG Instructions (System/User Prompt)
-                    </label>
-                    <textarea
-                        name="aiCustomInstructions"
-                        value={formData.aiCustomInstructions}
-                        onChange={handleChange}
-                        rows={12}
-                        placeholder="Define how the AI should behave and what context it should prioritize..."
-                        className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white text-sm font-mono leading-relaxed"
-                    />
-                    <p className="mt-2 text-[10px] text-slate-500 italic">
-                        This prompt acts as the primary identity and knowledge base for the RAG engine. Be specific about tax residency, business models, and legal expectations.
-                    </p>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-end">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                <BrainCircuit size={14} className="text-indigo-400" />
+                                Neural Directives & Strategic Memory
+                            </label>
+                            <p className="text-[10px] text-slate-500 font-medium">Inject operational rules, day-to-day behaviors, and business logic (ES/EN).</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const timestamp = new Date().toLocaleDateString('es-ES');
+                                    const directive = `\n[DIRECTIVA ${timestamp}]: `;
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        aiCustomInstructions: (prev.aiCustomInstructions || "") + directive
+                                    }));
+                                }}
+                                className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all active:scale-95"
+                            >
+                                + Nueva Directiva
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="relative group/textarea">
+                        <div className="absolute top-4 left-4 w-1 h-full bg-indigo-500/20 rounded-full group-focus-within/textarea:bg-indigo-500 transition-colors" />
+                        <textarea
+                            name="aiCustomInstructions"
+                            value={formData.aiCustomInstructions}
+                            onChange={handleChange}
+                            rows={15}
+                            placeholder="Ejemplo: [DIRECTIVA]: Nunca preguntes por el IVA de transportes, ya sé que es 0%."
+                            className="w-full pl-8 pr-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-indigo-100 text-sm font-mono leading-relaxed placeholder:opacity-30 scrollbar-hide"
+                        />
+                        <div className="absolute bottom-4 right-4 text-[10px] font-mono text-slate-600 pointer-events-none">
+                            SECURE_STORAGE_LAYER_V2
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2">
+                        <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tighter self-center mr-2">Quick Injectors:</span>
+                        {["Residente Fiscal ES", "Bilingue ES/EN", "Foco en Cashflow", "Strict Compliance"].map((chip) => (
+                            <button
+                                key={chip}
+                                type="button"
+                                onClick={() => {
+                                    const directive = `\n# POLICY: ${chip.toUpperCase()}\n- Act strictly following ${chip} perspective.`;
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        aiCustomInstructions: (prev.aiCustomInstructions || "") + directive
+                                    }));
+                                    window.dispatchEvent(new Event('settings-dirty'));
+                                }}
+                                className="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-md text-[9px] font-medium text-slate-400 transition-colors"
+                            >
+                                {chip}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </section>
 
