@@ -47,7 +47,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
             setMatches([result.match]);
             setStep("review");
         } else {
-            toast.error("Error en el análisis de IA: " + result.error);
+            toast.error("AI Analysis Error: " + result.error);
             setStep("paste");
         }
     };
@@ -69,12 +69,12 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                 const nextIndex = queueIndex + 1;
                 setQueueIndex(nextIndex);
                 setExtractedData(queue[nextIndex]);
-                toast.success("Lead guardado correctamente.");
+                toast.success("Lead saved successfully.");
             } else {
                 setStep("success");
             }
         } else {
-            toast.error("Error al guardar: " + result.error);
+            toast.error("Save Error: " + result.error);
         }
     };
 
@@ -82,7 +82,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
         // If it's a Gmail lead, persist the discard so it doesn't show up again
         if (extractedData?.gmailThreadId) {
             await discardLead(extractedData.gmailThreadId, extractedData.contactName);
-            toast.info("Lead descartado y omitido para futuras sincronizaciones.");
+            toast.info("Lead discarded and omitted for future syncs.");
         }
 
         if (queue.length > 0 && queueIndex < queue.length - 1) {
@@ -112,30 +112,30 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
         <Modal
             isOpen={isOpen}
             onClose={reset}
-            title={queue.length > 0 ? `Revisión de Gmail (${queueIndex + 1}/${queue.length})` : 'Importación Inteligente de Leads'}
+            title={queue.length > 0 ? `Gmail Review (${queueIndex + 1}/${queue.length})` : 'Intelligent Lead Import'}
             size="lg"
         >
             <div className="space-y-6">
                 {step === "paste" && (
                     <div className="space-y-4">
                         <p className="text-sm text-slate-400">
-                            Pega un chat de LinkedIn, una descripción de perfil o un email. Nuestra IA extraerá automáticamente los detalles del contacto y la empresa.
+                            Paste a LinkedIn chat, profile description, or email. Our AI will automatically extract contact and company details.
                         </p>
                         <textarea
-                            placeholder="Pega el texto aquí..."
+                            placeholder="Paste text here..."
                             className="w-full min-h-[200px] bg-slate-900/50 border border-white/10 rounded-2xl p-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all resize-none"
                             value={rawText}
                             onChange={(e) => setRawText(e.target.value)}
                         />
                         <div className="flex justify-end gap-3 pt-2">
                             <button onClick={reset} className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">
-                                Cancelar
+                                Cancel
                             </button>
                             <button
                                 onClick={handleAnalyze}
                                 className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center gap-2"
                             >
-                                <Sparkles size={16} /> Analizar con IA
+                                <Sparkles size={16} /> Analyze with AI
                             </button>
                         </div>
                     </div>
@@ -147,8 +147,8 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                             <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full animate-pulse" />
                             <Loader2 className="animate-spin text-indigo-400 relative z-10" size={48} />
                         </div>
-                        <p className="text-lg font-medium text-white animate-pulse">Analizando contexto bilingüe...</p>
-                        <p className="text-sm text-slate-500">Esto puede tardar unos segundos</p>
+                        <p className="text-lg font-medium text-white animate-pulse">Analyzing bilingual context...</p>
+                        <p className="text-sm text-slate-500">This may take a few seconds</p>
                     </div>
                 )}
 
@@ -158,12 +158,12 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                         <div className="flex gap-2 mb-2">
                             {queue[queueIndex]?.importType === "UPDATE" && (
                                 <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-blue-500/30">
-                                    Actualización Detectada
+                                    Update Detected
                                 </span>
                             )}
                             {currentMatch?.contact && (
                                 <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-amber-500/30">
-                                    Contacto en CRM
+                                    Contact in CRM
                                 </span>
                             )}
                         </div>
@@ -176,12 +176,12 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                 </div>
                                 <div className="text-sm">
                                     <p className={`font-bold mb-1 ${queue[queueIndex]?.importType === "UPDATE" ? 'text-blue-200' : 'text-amber-200'}`}>
-                                        {queue[queueIndex]?.importType === "UPDATE" ? "Actualización de Conversación Detectada" : "Registro Existente Detectado"}
+                                        {queue[queueIndex]?.importType === "UPDATE" ? "Conversation Update Detected" : "Existing Record Detected"}
                                     </p>
                                     <p className={`leading-relaxed ${queue[queueIndex]?.importType === "UPDATE" ? 'text-blue-400/80' : 'text-amber-400/80'}`}>
                                         {queue[queueIndex]?.importType === "UPDATE"
-                                            ? "Este hilo de Gmail ya estaba registrado, pero hay nuevos mensajes. Al guardar, se actualizará el resumen y la información del lead."
-                                            : `Email: ${extractedData.email || 'N/A'}. Al guardar, se actualizarán los datos actuales.`
+                                            ? "This Gmail thread was already registered, but there are new messages. Saving will update the summary and lead info."
+                                            : `Email: ${extractedData.email || 'N/A'}. Saving will update the existing data.`
                                         }
                                     </p>
                                 </div>
@@ -192,7 +192,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Nombre</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Name</label>
                                         <input
                                             value={extractedData.contactName || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, contactName: e.target.value })}
@@ -208,7 +208,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Cargo / Rol</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Position / Role</label>
                                         <input
                                             value={extractedData.role || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, role: e.target.value })}
@@ -216,7 +216,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Empresa</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Company</label>
                                         <input
                                             value={extractedData.organizationName || ""}
                                             onChange={(e) => setExtractedData({ ...extractedData, organizationName: e.target.value })}
@@ -228,7 +228,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Resumen Lógico (IA)</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Logical Summary (AI)</label>
                                     <textarea
                                         value={extractedData.summary || ""}
                                         onChange={(e) => setExtractedData({ ...extractedData, summary: e.target.value })}
@@ -238,7 +238,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                 <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-3">
                                     <div className="flex items-center gap-2 mb-1">
                                         <AlertCircle size={14} className="text-indigo-400" />
-                                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Confianza IA</span>
+                                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">AI Confidence</span>
                                     </div>
                                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                         <div
@@ -256,7 +256,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                     onClick={handleDiscard}
                                     className="px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
                                 >
-                                    Descartar
+                                    Discard
                                 </button>
                             </div>
                             <div className="flex gap-3">
@@ -264,7 +264,7 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                     onClick={() => queue.length > 0 ? reset() : setStep("paste")}
                                     className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors"
                                 >
-                                    {queue.length > 0 ? "Cancelar Todo" : "Volver"}
+                                    {queue.length > 0 ? "Cancel All" : "Back"}
                                 </button>
                                 <button
                                     onClick={handleSave}
@@ -273,8 +273,8 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                                 >
                                     {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
                                     {queue.length > 1 && queueIndex < queue.length - 1
-                                        ? "Guardar y Siguiente"
-                                        : (currentMatch?.contact || queue[queueIndex]?.importType === "UPDATE" ? "Actualizar y Finalizar" : "Aprobar y Finalizar")
+                                        ? "Save and Next"
+                                        : (currentMatch?.contact || queue[queueIndex]?.importType === "UPDATE" ? "Update and Finish" : "Approve and Finish")
                                     }
                                 </button>
                             </div>
@@ -291,16 +291,16 @@ export function SmartImportModal({ isOpen, onClose, initialQueue = [] }: SmartIm
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-3xl font-black text-white tracking-tight">¡Proceso Finalizado!</h3>
+                            <h3 className="text-3xl font-black text-white tracking-tight">Process Finished!</h3>
                             <p className="text-slate-400 text-lg">
-                                Has gestionado <span className="text-white font-bold">{importedCount}</span> leads correctamente.
+                                You have managed <span className="text-white font-bold">{importedCount}</span> leads successfully.
                             </p>
                         </div>
                         <button
                             onClick={reset}
                             className="w-full max-w-[200px] h-12 bg-white text-slate-900 hover:bg-slate-100 rounded-2xl font-black text-sm shadow-xl hover:shadow-white/10 transition-all active:scale-95"
                         >
-                            Volver al CRM
+                            Back to CRM
                         </button>
                     </div>
                 )}

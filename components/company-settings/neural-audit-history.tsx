@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle, FileDown, Trash, CheckSquare, Square, MailOpen, Mail } from "lucide-react";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -51,11 +50,11 @@ export function NeuralAuditHistory() {
 
     const handleDelete = async (id: string) => {
         const ok = await systemConfirm({
-            title: "Eliminar Auditoría",
-            message: "¿Estás seguro de que deseas eliminar este reporte de forma definitiva? Esta acción no se puede deshacer.",
+            title: "Delete Audit",
+            message: "Are you sure you want to permanently delete this report? This action cannot be undone.",
             type: "danger",
-            confirmText: "Eliminar para siempre",
-            cancelText: "Cancelar"
+            confirmText: "Delete Forever",
+            cancelText: "Cancel"
         });
 
         if (!ok) return;
@@ -66,14 +65,14 @@ export function NeuralAuditHistory() {
             });
 
             if (response.ok) {
-                toast.success("Auditoría eliminada físicamente.");
+                toast.success("Audit physically deleted.");
                 fetchAudits();
             } else {
-                toast.error("Error al eliminar la auditoría.");
+                toast.error("Error deleting audit.");
             }
         } catch (error) {
             console.error("Error deleting audit:", error);
-            toast.error("Error de conexión al eliminar.");
+            toast.error("Connection error during deletion.");
         }
     };
 
@@ -81,11 +80,11 @@ export function NeuralAuditHistory() {
         if (selectedIds.size === 0) return;
 
         const ok = await systemConfirm({
-            title: "Eliminación Masiva",
-            message: `¿Estás seguro de que deseas eliminar permanentemente ${selectedIds.size} reportes?`,
+            title: "Bulk Deletion",
+            message: `Are you sure you want to permanently delete ${selectedIds.size} reports?`,
             type: "danger",
-            confirmText: "Borrar Todo",
-            cancelText: "Cancelar"
+            confirmText: "Clear All",
+            cancelText: "Cancel"
         });
 
         if (!ok) return;
@@ -97,12 +96,12 @@ export function NeuralAuditHistory() {
             });
 
             if (response.ok) {
-                toast.success(`${selectedIds.size} reportes eliminados.`);
+                toast.success(`${selectedIds.size} reports deleted.`);
                 setSelectedIds(new Set());
                 fetchAudits();
             }
         } catch (error) {
-            toast.error("Error en el borrado masivo.");
+            toast.error("Error during bulk deletion.");
         }
     };
 
@@ -121,7 +120,7 @@ export function NeuralAuditHistory() {
                 fetchAudits();
             }
         } catch (error) {
-            toast.error("Error al marcar como leído.");
+            toast.error("Error marking as read.");
         }
     };
 
@@ -141,7 +140,7 @@ export function NeuralAuditHistory() {
     };
 
     const parseJustification = (justification: string | null) => {
-        if (!justification) return { en: "No strategic logic provided by Neural Consensus.", es: "No se proporcionó lógica estratégica por Consenso Neural." };
+        if (!justification) return { en: "No strategic logic provided by Neural Consensus.", es: "No strategic logic provided by Neural Consensus." };
         try {
             // Check if it's JSON
             if (justification.startsWith('{')) {
@@ -198,7 +197,7 @@ export function NeuralAuditHistory() {
         doc.text("Sync Result:", 25, 92);
 
         doc.setFont("helvetica", "normal");
-        doc.text(format(new Date(audit.timestamp), "PPPPpp", { locale: es }), 70, 72);
+        doc.text(format(new Date(audit.timestamp), "PPPPpp"), 70, 72);
         doc.text(audit.provider, 70, 82);
         doc.text(`${audit.totalChanges} changes detected - STATUS: ${audit.status}`, 70, 92);
 
@@ -255,7 +254,7 @@ export function NeuralAuditHistory() {
             doc.setFont("helvetica", "bold");
             doc.setTextColor(100, 116, 139);
             doc.setFontSize(10);
-            doc.text("RESUMEN ESTRATÉGICO (ESPAÑOL)", 20, currentY);
+            doc.text("STRATEGIC SUMMARY (EN)", 20, currentY);
 
             doc.setDrawColor(203, 213, 225);
             doc.setLineWidth(0.4);
@@ -314,7 +313,7 @@ export function NeuralAuditHistory() {
 
         doc.setFontSize(10);
         doc.setTextColor(16, 185, 129);
-        doc.text("GENERATE ON: " + format(new Date(), "PPPP", { locale: es }), 105, 140, { align: "center" });
+        doc.text("GENERATED ON: " + format(new Date(), "PPPP"), 105, 140, { align: "center" });
 
         doc.addPage();
 
@@ -340,7 +339,7 @@ export function NeuralAuditHistory() {
         });
 
         doc.save(filename);
-        toast.success("Resumen completo generado con éxito.");
+        toast.success("Full summary generated successfully.");
     };
 
     if (loading) return (
@@ -363,8 +362,8 @@ export function NeuralAuditHistory() {
                         <BrainCircuit size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Historial de Auditorías</h2>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-0.5">Control de Cambios Autónomos</p>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Audit History</h2>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-0.5">Autonomous Change Ledger</p>
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -375,14 +374,14 @@ export function NeuralAuditHistory() {
                                 className="flex items-center gap-2 px-4 py-2 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl border border-emerald-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
                             >
                                 <MailOpen size={14} />
-                                Leer ({selectedIds.size})
+                                Mark as Read ({selectedIds.size})
                             </button>
                             <button
                                 onClick={handleBulkDelete}
                                 className="flex items-center gap-2 px-4 py-2 bg-rose-950/40 text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl border border-rose-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
                             >
                                 <Trash size={14} />
-                                Borrar ({selectedIds.size})
+                                Delete ({selectedIds.size})
                             </button>
                         </>
                     )}
@@ -391,7 +390,7 @@ export function NeuralAuditHistory() {
                         className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all"
                     >
                         {selectedIds.size === audits.length ? <CheckSquare size={14} /> : <Square size={14} />}
-                        {selectedIds.size === audits.length ? 'Deseleccionar' : 'Sel. Todo'}
+                        {selectedIds.size === audits.length ? 'Deselect All' : 'Select All'}
                     </button>
                     <button
                         onClick={generateFullSummaryPDF}
@@ -399,7 +398,7 @@ export function NeuralAuditHistory() {
                         className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all"
                     >
                         <FileDown size={14} />
-                        Exportar
+                        Export
                     </button>
                 </div>
             </div>
@@ -430,10 +429,10 @@ export function NeuralAuditHistory() {
                             </div>
                             <div>
                                 <h4 className={`text-sm transition-transform ${!audit.isRead ? 'font-black text-white' : 'font-medium text-slate-300'}`}>
-                                    {audit.totalChanges} Variables Ajustadas
+                                    {audit.totalChanges} Adjusted Variables
                                 </h4>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
-                                    {audit.provider} • {format(new Date(audit.timestamp), "HH:mm:ss", { locale: es })}
+                                    {audit.provider} • {format(new Date(audit.timestamp), "HH:mm:ss")}
                                 </p>
                             </div>
                         </div>

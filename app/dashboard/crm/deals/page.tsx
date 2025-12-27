@@ -10,20 +10,20 @@ export default async function DealsPage() {
     return (
         <div className="h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Pipeline de Ventas</h1>
+                <h1 className="text-3xl font-bold">Sales Pipeline</h1>
 
                 {/* Quick Add Deal */}
                 <form action={createDeal} className="flex gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800">
-                    <input name="title" placeholder="Título Oportunidad" className="bg-slate-800 rounded px-2 py-1 text-sm" required />
-                    <input name="amount" type="number" placeholder="£ Valor" className="bg-slate-800 rounded px-2 py-1 text-sm w-24" />
+                    <input name="title" placeholder="Opportunity Title" className="bg-slate-800 rounded px-2 py-1 text-sm" required />
+                    <input name="amount" type="number" placeholder="£ Amount" className="bg-slate-800 rounded px-2 py-1 text-sm w-24" />
                     <select name="organizationId" className="bg-slate-800 rounded px-2 py-1 text-sm" required>
-                        <option value="">Cliente...</option>
+                        <option value="">Customer...</option>
                         {orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
                     </select>
                     <select name="stage" className="bg-slate-800 rounded px-2 py-1 text-sm">
                         {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
-                    <button className="px-3 py-1 bg-emerald-600 text-white rounded text-sm font-bold">Añadir</button>
+                    <button className="px-3 py-1 bg-emerald-600 text-white rounded text-sm font-bold">Add</button>
                 </form>
             </div>
 

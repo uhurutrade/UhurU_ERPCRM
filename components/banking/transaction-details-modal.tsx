@@ -92,11 +92,11 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('Error al eliminar el archivo');
+                alert('Error deleting file');
             }
         } catch (error) {
             console.error(error);
-            alert('Error al eliminar el archivo');
+            alert('Error deleting file');
         } finally {
             setDeletingId(null);
             setConfirmDelete(null);
@@ -248,7 +248,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                                 href={file.path.startsWith('/uploads/') ? `/api/uploads/${file.path.replace('/uploads/', '')}` : file.path}
                                                 download={file.originalName || 'document'}
                                                 className="absolute top-2 right-10 p-1 bg-slate-800 hover:bg-uhuru-blue text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                                                title="Descargar archivo"
+                                                title="Download file"
                                             >
                                                 <Download size={14} />
                                             </a>
@@ -261,7 +261,7 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                                 }}
                                                 disabled={deletingId === file.id}
                                                 className="absolute top-2 right-2 p-1 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-md transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                                                title="Eliminar archivo"
+                                                title="Delete file"
                                             >
                                                 <X size={14} />
                                             </button>
@@ -351,15 +351,15 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                     <div className="bg-slate-900 border border-red-900/50 rounded-2xl max-w-md w-full p-6 shadow-2xl">
                         <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
                             <X className="text-red-500" size={24} />
-                            Eliminar Archivo
+                            Delete File
                         </h3>
 
                         <p className="text-slate-300 mb-2">
-                            ¿Eliminar <strong className="text-white">"{confirmDelete.name}"</strong>?
+                            Delete <strong className="text-white">"{confirmDelete.name}"</strong>?
                         </p>
 
                         <p className="text-sm text-slate-400 mb-6">
-                            Esta acción no se puede deshacer.
+                            This action cannot be undone.
                         </p>
 
                         <div className="flex gap-3">
@@ -367,14 +367,14 @@ export function TransactionDetailsModal({ isOpen, onClose, transaction, allCateg
                                 onClick={() => setConfirmDelete(null)}
                                 className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors"
                             >
-                                Cancelar
+                                Cancel
                             </button>
                             <button
                                 onClick={handleDeleteAttachment}
                                 disabled={deletingId !== null}
                                 className="flex-1 py-3 bg-red-600 hover:bg-red-500 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl font-bold shadow-lg shadow-red-900/30 transition-all disabled:shadow-none"
                             >
-                                {deletingId ? 'Eliminando...' : 'Eliminar'}
+                                {deletingId ? 'Deleting...' : 'Delete'}
                             </button>
                         </div>
                     </div>
