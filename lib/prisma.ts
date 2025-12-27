@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClient = new PrismaClient()
+// Unified Prisma Client with Strategic AI Auditing Extension
 
 // MODÈLES À SURVEILLER (Business Impact Models)
 // We include everything except internal/auth noise
