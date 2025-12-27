@@ -25,8 +25,8 @@ export async function createOrganization(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMOrganizations();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -75,8 +75,8 @@ export async function updateOrganization(id: string, formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMOrganizations();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -90,8 +90,8 @@ export async function deleteOrganization(id: string) {
         await prisma.organization.delete({ where: { id } });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMOrganizations } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMOrganizations();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -136,8 +136,8 @@ export async function createContact(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMContacts();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -186,8 +186,8 @@ export async function updateContact(id: string, formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMContacts();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -202,8 +202,8 @@ export async function deleteContact(id: string) {
         await prisma.contact.delete({ where: { id } });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMContacts } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMContacts();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -233,8 +233,8 @@ export async function createDeal(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMDeals();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -251,8 +251,8 @@ export async function updateDealStage(dealId: string, newStage: string) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMDeals();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -279,8 +279,8 @@ export async function updateDeal(id: string, formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMDeals();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -294,8 +294,8 @@ export async function deleteDeal(id: string) {
         await prisma.deal.delete({ where: { id } });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMDeals } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMDeals();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -320,8 +320,8 @@ export async function createLead(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMLeads();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -344,8 +344,8 @@ export async function updateLead(id: string, formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMLeads();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -359,8 +359,8 @@ export async function deleteLead(id: string) {
         await prisma.lead.delete({ where: { id } });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMLeads();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -377,8 +377,8 @@ export async function discardLeadAction(id: string) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMLeads();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -411,9 +411,8 @@ export async function convertLeadToDeal(leadId: string, orgId: string) {
         revalidatePath('/dashboard/crm');
 
         // Trigger RAG Sync (Background)
-        const { syncCRMDeals, syncCRMLeads } = await import('@/lib/ai/auto-sync-rag');
-        syncCRMDeals();
-        syncCRMLeads();
+        const { triggerCRMSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCRMSync();
 
         return { success: true };
     } catch (error) {
@@ -442,8 +441,8 @@ export async function createTask(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
-        syncTasks();
+        const { triggerTaskSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerTaskSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -460,8 +459,8 @@ export async function toggleTask(id: string, completed: boolean) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
-        syncTasks();
+        const { triggerTaskSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerTaskSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };
@@ -475,8 +474,8 @@ export async function deleteTask(id: string) {
         await prisma.task.delete({ where: { id } });
 
         // Trigger RAG Sync (Background)
-        const { syncTasks } = await import('@/lib/ai/auto-sync-rag');
-        syncTasks();
+        const { triggerTaskSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerTaskSync();
 
         revalidatePath('/dashboard/crm');
         return { success: true };

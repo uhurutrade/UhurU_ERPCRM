@@ -116,22 +116,21 @@ export async function uploadBankStatement(formData: FormData, bankAccountId: str
         }
 
         // Trigger RAG Auto-Sync (Async - No bloqueante)
-        try {
-            const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
-            syncRecentTransactions(); // Fire and forget
-        } catch (e) { /* Silent fail */ }
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync(); // Fire and forget in background
+    } catch (e) { /* Silent fail */ }
 
-        revalidatePath('/dashboard/banking');
+    revalidatePath('/dashboard/banking');
 
-        return {
-            success: true,
-            message: `Imported ${importedCount} transactions. (Skipped: ${duplicateCount} duplicates, ${currencyMismatchCount} mismatching currencies)`
-        };
+    return {
+        success: true,
+        message: `Imported ${importedCount} transactions. (Skipped: ${duplicateCount} duplicates, ${currencyMismatchCount} mismatching currencies)`
+    };
 
-    } catch (error: any) {
-        console.error('Upload error:', error);
-        return { success: false, error: error.message || 'Failed to process file' };
-    }
+} catch (error: any) {
+    console.error('Upload error:', error);
+    return { success: false, error: error.message || 'Failed to process file' };
+}
 }
 
 export async function createBankAccount(formData: FormData) {
@@ -163,24 +162,23 @@ export async function createBankAccount(formData: FormData) {
         });
 
         // Trigger RAG Auto-Sync (Async - No bloqueante)
-        try {
-            const { syncBankingOverview } = await import('@/lib/ai/auto-sync-rag');
-            syncBankingOverview(); // Fire and forget
-        } catch (e) { /* Silent fail */ }
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
+    } catch (e) { /* Silent fail */ }
 
-        revalidatePath('/dashboard/banking');
-        revalidatePath('/dashboard/banking/upload');
+    revalidatePath('/dashboard/banking');
+    revalidatePath('/dashboard/banking/upload');
 
-        return {
-            success: true,
-            message: 'Bank account created successfully',
-            accountId: account.id
-        };
+    return {
+        success: true,
+        message: 'Bank account created successfully',
+        accountId: account.id
+    };
 
-    } catch (error) {
-        console.error('Create bank account error:', error);
-        return { success: false, error: 'Failed to create bank account' };
-    }
+} catch (error) {
+    console.error('Create bank account error:', error);
+    return { success: false, error: 'Failed to create bank account' };
+}
 }
 
 export async function uploadTransactionAttachment(formData: FormData, transactionId: string) {
@@ -256,8 +254,8 @@ export async function updateTransactionCategory(transactionId: string, category:
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
-        syncRecentTransactions();
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
 
         return { success: true };
     } catch (error) {
@@ -298,8 +296,8 @@ export async function bulkUpdateTransactionCategory(
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
-        syncRecentTransactions();
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
 
         return { success: true };
     } catch (error) {

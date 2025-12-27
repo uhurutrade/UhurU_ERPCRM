@@ -175,8 +175,8 @@ export async function createInvoice(formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
+        const { triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
 
         revalidatePath('/dashboard/invoices');
         return { success: true };
@@ -286,8 +286,8 @@ export async function updateInvoice(id: string, formData: FormData) {
         });
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
+        const { triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
 
         revalidatePath('/dashboard/invoices');
         revalidatePath(`/invoice-pdf/${id}`);
@@ -307,8 +307,8 @@ export async function updateInvoiceStatus(id: string, status: string) {
         revalidatePath('/dashboard/invoices');
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
+        const { triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
 
         return { success: true };
     } catch (error) {
@@ -326,8 +326,8 @@ export async function deleteInvoice(id: string) {
         revalidatePath('/dashboard/invoices');
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
+        const { triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
 
         return { success: true };
     } catch (error) {
@@ -345,8 +345,8 @@ export async function restoreInvoice(id: string) {
         revalidatePath('/dashboard/invoices');
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
+        const { triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
 
         return { success: true };
     } catch (error) {
@@ -368,9 +368,9 @@ export async function linkInvoiceToTransaction(invoiceId: string, transactionId:
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncInvoices, syncRecentTransactions } = await import('@/lib/ai/auto-sync-rag');
-        syncInvoices();
-        syncRecentTransactions();
+        const { triggerInvoiceSync, triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerInvoiceSync();
+        triggerBankingSync();
 
         return { success: true };
     } catch (error) {

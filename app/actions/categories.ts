@@ -50,8 +50,8 @@ export async function createTransactionCategory(name: string, color: string) {
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncTransactionCategories } = await import('@/lib/ai/auto-sync-rag');
-        syncTransactionCategories();
+        const { triggerCategorySync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCategorySync();
 
         return { success: true, category };
     } catch (error) {
@@ -77,8 +77,8 @@ export async function deleteTransactionCategory(name: string) {
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncTransactionCategories } = await import('@/lib/ai/auto-sync-rag');
-        syncTransactionCategories();
+        const { triggerCategorySync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCategorySync();
 
         return { success: true };
     } catch (error) {
@@ -118,8 +118,8 @@ export async function updateTransactionCategoryDefinition(oldName: string, newNa
         revalidatePath('/dashboard/banking');
 
         // Trigger RAG Sync (Background)
-        const { syncTransactionCategories } = await import('@/lib/ai/auto-sync-rag');
-        syncTransactionCategories();
+        const { triggerCategorySync } = await import('@/lib/ai/auto-sync-rag');
+        triggerCategorySync();
 
         return { success: true };
     } catch (error) {

@@ -132,6 +132,11 @@ export async function uploadAndAnalyzeInvoice(formData: FormData) {
 
         revalidatePath('/dashboard/invoices');
 
+        // Trigger Sync
+        const { triggerBankingSync, triggerInvoiceSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
+        triggerInvoiceSync();
+
         return serializeData({
             success: true,
             attachmentId: attachment.id,
@@ -286,6 +291,11 @@ export async function linkAttachmentToTransaction(attachmentId: string, transact
         });
         revalidatePath('/dashboard/invoices');
         revalidatePath('/dashboard/banking');
+
+        // Trigger Sync
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
+
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -307,6 +317,10 @@ export async function deleteAttachment(id: string) {
         // revalidate
         revalidatePath('/dashboard/invoices');
         revalidatePath('/dashboard/banking');
+
+        // Trigger Sync
+        const { triggerBankingSync } = await import('@/lib/ai/auto-sync-rag');
+        triggerBankingSync();
 
         return { success: true };
     } catch (error: any) {

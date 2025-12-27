@@ -71,25 +71,15 @@ export function syncAllSystemData() {
     triggerSync('FULL_SYSTEM_SYNC', async () => {
         // CORE BUSINESS DATA
         await triggerComplianceSync(); // Includes RAG sync + AI Dates
-        await syncBankingOverview();
-        await syncRecentTransactions();
-        await syncCryptoWallets();
-        await syncCryptoTransactions();
+        await triggerBankingSync();
+        await triggerCRMSync();
+        await triggerInvoiceSync();
 
         // DOCUMENTS & COMPLIANCE
         await syncComplianceDocuments();
         await syncTaxObligations();
         await syncFiscalYears();
         await syncComplianceEvents();
-
-        // CRM
-        await syncCRMOrganizations();
-        await syncCRMContacts();
-        await syncCRMLeads();
-        await syncCRMDeals();
-
-        // INVOICING
-        await syncInvoices();
 
         // TASKS & ACTIVITIES
         await syncTasks();
@@ -100,22 +90,54 @@ export function syncAllSystemData() {
 
         // AUDIT & METADATA
         await syncDeletedTransactions();
-        await syncTransactionCategories();
-
-        /**
-         * FUTURE MODULES REGISTRY
-         * ========================
-         * 1. Create your sync function below (e.g., syncMarketing())
-         * 2. Await it here for Full Sync
-         * 3. Call it from your Server Actions in background:
-         *    const { syncMyModule } = await import('@/lib/ai/auto-sync-rag');
-         *    syncMyModule();
-         */
-
-        // await syncMarketing();
-        // await syncInventory();
+        await triggerCategorySync();
 
         console.log('[RAG Auto-Sync] ✅ Sincronización COMPLETA finalizada');
+    });
+}
+
+/**
+ * Disparadores GRANULARES para ser llamados desde Server Actions
+ */
+
+export function triggerBankingSync() {
+    triggerSync('BANKING', async () => {
+        await syncBankingOverview();
+        await syncRecentTransactions();
+    });
+}
+
+export function triggerCRMSync() {
+    triggerSync('CRM', async () => {
+        await syncCRMOrganizations();
+        await syncCRMContacts();
+        await syncCRMLeads();
+        await syncCRMDeals();
+    });
+}
+
+export function triggerInvoiceSync() {
+    triggerSync('INVOICES', async () => {
+        await syncInvoices();
+    });
+}
+
+export function triggerCategorySync() {
+    triggerSync('CATEGORIES', async () => {
+        await syncTransactionCategories();
+    });
+}
+
+export function triggerTaskSync() {
+    triggerSync('TASKS', async () => {
+        await syncTasks();
+        await syncActivities();
+    });
+}
+
+export function triggerAssetSync() {
+    triggerSync('ASSETS', async () => {
+        await syncAssets();
     });
 }
 
@@ -312,6 +334,9 @@ export async function syncRecentTransactions() {
                         accountName: true,
                         bank: { select: { bankName: true } }
                     }
+                },
+                attachments: {
+                    select: { originalName: true }
                 }
             }
         });
@@ -324,6 +349,9 @@ export async function syncRecentTransactions() {
             txContent += `Account: ${tx.bankAccount.accountName} (${tx.bankAccount.bank.bankName})\n`;
             if (tx.counterparty) txContent += `Counterparty: ${tx.counterparty}\n`;
             if (tx.category) txContent += `Category: ${tx.category}\n`;
+            if (tx.attachments && tx.attachments.length > 0) {
+                txContent += `Attachments: ${tx.attachments.map(a => a.originalName).join(', ')}\n`;
+            }
             txContent += `---\n\n`;
         }
 
