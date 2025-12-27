@@ -7,6 +7,11 @@ import { join } from 'path';
 export async function GET() {
     try {
         const docs = await prisma.complianceDocument.findMany({
+            where: {
+                NOT: {
+                    documentType: 'SYSTEM'
+                }
+            },
             orderBy: { uploadedAt: 'desc' },
             select: {
                 id: true,
