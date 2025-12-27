@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import AddBankForm from "@/components/bank-settings/add-bank-form";
 import Link from "next/link";
 

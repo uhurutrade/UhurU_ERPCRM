@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { BrainCircuit } from "lucide-react";
 import { NeuralAuditHistory } from "@/components/company-settings/neural-audit-history";
 

@@ -1,4 +1,6 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
+import { BrainCircuit } from "lucide-react";
 import CompanySettingsForm from "@/components/company-settings/company-settings-form";
 import ComplianceOverview from "@/components/company-settings/compliance-overview";
 import { serializeData } from "@/lib/serialization";

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import AddCryptoWalletForm from "@/components/bank-settings/add-crypto-wallet-form";
 import Link from "next/link";
 

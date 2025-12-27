@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useConfirm } from "@/components/providers/modal-provider";
 

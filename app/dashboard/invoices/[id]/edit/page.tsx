@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from '@/lib/prisma';
 import EditInvoiceForm from './form';
 import { notFound } from 'next/navigation';

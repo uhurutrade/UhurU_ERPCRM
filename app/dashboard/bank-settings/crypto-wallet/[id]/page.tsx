@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import EditCryptoWalletForm from "@/components/bank-settings/edit-crypto-wallet-form";

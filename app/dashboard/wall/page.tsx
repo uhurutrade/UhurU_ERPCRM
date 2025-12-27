@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { format, addYears, isBefore, isAfter, startOfDay, endOfDay } from "date-fns";
 import { FileText, Calendar, ArrowUpRight, ArrowDownRight, TrendingUp, AlertCircle, Lock, Unlock, Upload } from "lucide-react";

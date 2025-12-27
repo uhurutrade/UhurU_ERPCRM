@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getDeals, getOrganizations, createDeal } from "../actions";
 
 const STAGES = ["PROSPECTING", "PROPOSAL", "NEGOTIATION", "WON", "LOST"];

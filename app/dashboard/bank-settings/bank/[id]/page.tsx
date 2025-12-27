@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import EditBankForm from "@/components/bank-settings/edit-bank-form";
 import Link from "next/link";
