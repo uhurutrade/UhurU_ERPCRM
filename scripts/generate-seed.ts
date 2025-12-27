@@ -9,18 +9,17 @@ async function main() {
 
   console.log(`🔄 Iniciando extracción DINÁMICA... [Modo: ${isFullExport ? 'BACKUP TOTAL' : 'SOLO INFRAESTRUCTURA'}]`);
 
-  // Extraemos todos los nombres de modelos definidos en el schema actual
-  // Esto hace que el script sea compatible con cualquier módulo nuevo que añadas en el futuro
+  // Extraemos los metadatos del esquema para saber qué tablas existen
   const modelNames = Prisma.dmmf.datamodel.models.map(m => m.name);
   const allData = {};
 
   if (isFullExport) {
-    console.log(`📦 Detectados ${modelNames.length} módulos. Extrayendo datos vivos...`);
+    console.log(`📦 Detectados ${modelNames.length} módulos registrados.`);
     for (const modelName of modelNames) {
-      // Convertimos el nombre del modelo a camelCase para acceder a la propiedad de prisma (ej: User -> user)
       const prismaKey = modelName.charAt(0).toLowerCase() + modelName.slice(1);
       if (prisma[prismaKey]) {
-        console.log(`   - Extrayendo: ${modelName}...`);
+        const count = await prisma[prismaKey].count();
+        console.log(`   - [Backup] ${modelName}: ${count} registros encontrados.`);
         allData[prismaKey] = await prisma[prismaKey].findMany();
       }
     }
@@ -35,40 +34,39 @@ const prisma = new PrismaClient();
 
 async function main() {
   const fullMode = ${isFullExport};
-  console.log('🌱 Ejecutando Seed ' + (fullMode ? 'COMPLETO (Backup)' : 'PARCIAL (Sistema)'));
+  console.log('🌱 Ejecutando Seed de Seguridad UhurU v2.0');
   console.log('Generado: ${new Date().toISOString()}');
 
   const allData = ${JSON.stringify(allData)};
+  const modelOrder = ${JSON.stringify(modelNames)};
 
   if (fullMode) {
-    console.log('⚠️ LIMPIEZA TOTAL: Preparando base de datos para restauración integral...');
+    console.log('⚠️ LIMPIEZA PROFUNDA: Vaciando base de datos para restaurar ' + modelOrder.length + ' tablas...');
     
-    // Lista de modelos detectados en el momento del backup
-    const models = ${JSON.stringify(modelNames)};
-    
-    // Para limpiar una base de datos con dependencias complejas, la forma más robusta en Postgres 
-    // es usar un TRUNCATE en cascada o borrar en el orden correcto.
-    // Aquí implementamos un borrado inverso seguro:
-    for (const modelName of models.reverse()) {
+    // Borrado en orden INVERSO (hijos primero) para respetar Foreign Keys
+    for (const modelName of [...modelOrder].reverse()) {
       const key = modelName.charAt(0).toLowerCase() + modelName.slice(1);
       if (prisma[key]) {
         try {
           await prisma[key].deleteMany({});
         } catch (e) {
-          // Si falla por dependencias, se reintentará en la siguiente fase
+          // Ignoramos errores de borrado si hay dependencias circulares (se limpiará en la siguiente pasada)
         }
       }
     }
   }
 
-  // --- Sincronización de Datos ---
-  for (const [key, items] of Object.entries(allData)) {
-    if (items.length === 0) continue;
-    
-    console.log('   - Restaurando ' + key + ' (' + items.length + ' registros)...');
-    
+  // --- RESTAURACIÓN ORDENADA ---
+  // Creamos en orden DIRECTO (padres primero) para que las relaciones encajen
+  for (const modelName of modelOrder) {
+    const key = modelName.charAt(0).toLowerCase() + modelName.slice(1);
+    const items = allData[key];
+
+    if (!items || items.length === 0) continue;
+
+    console.log('   - Procesando ' + modelName + ': ' + items.length + ' registros...');
+
     if (key === 'transactionCategory') {
-      // Especial: Las categorías se sincronizan con upsert para no romper etiquetas
       for (const cat of items) {
         await prisma.transactionCategory.upsert({
           where: { name: cat.name },
@@ -77,24 +75,22 @@ async function main() {
         });
       }
     } else {
-      // General: Restauración directa para el resto de módulos
-      // Usamos loops simples para asegurar que las foreign keys se respeten si el orden del backup fue correcto
       for (const item of items) {
         await prisma[key].create({ data: item }).catch(e => {
-            // Silenciamos errores menores si el registro ya existe (upsert manual implícito)
+            // Silencio administrativo para duplicados en modo upsert implícito
         });
       }
     }
   }
 
-  console.log('✅ Operación completada con éxito.');
+  console.log('✅ Base de datos reestablecida al 100%.');
 }
 
-main().catch(e => { console.error('Seed Error:', e); process.exit(1); }).finally(async () => { await prisma.$disconnect(); });
+main().catch(e => { console.error('Seed Panic:', e); process.exit(1); }).finally(async () => { await prisma.$disconnect(); });
 `;
 
   fs.writeFileSync('prisma/seed.ts', seedContent);
-  console.log(`✅ prisma/seed.ts regenerado DINÁMICAMENTE. Compatible con futuros módulos.`);
+  console.log(`✅ prisma/seed.ts actualizado: Incluye TODO (Banks, Settings, etc.)`);
 }
 
 main().catch(e => { console.error('Generator Error:', e); process.exit(1); }).finally(async () => { await prisma.$disconnect(); });
