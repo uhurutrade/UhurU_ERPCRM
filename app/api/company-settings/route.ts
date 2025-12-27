@@ -15,11 +15,11 @@ export async function POST(req: NextRequest) {
 
             // UK Filing Matrix Dates
             lastConfirmationStatementDate: data.lastConfirmationStatementDate ? new Date(data.lastConfirmationStatementDate) : undefined,
-            lastAccountsCHDate: data.lastAccountsCHDate ? new Date(data.lastAccountsCHDate) : undefined,
+            lastAccountsCompaniesHouseDate: data.lastAccountsCompaniesHouseDate ? new Date(data.lastAccountsCompaniesHouseDate) : undefined,
             lastAccountsHMRCDate: data.lastAccountsHMRCDate ? new Date(data.lastAccountsHMRCDate) : undefined,
             lastFYEndDate: data.lastFYEndDate ? new Date(data.lastFYEndDate) : undefined,
             nextConfirmationStatementDue: data.nextConfirmationStatementDue ? new Date(data.nextConfirmationStatementDue) : undefined,
-            nextAccountsCHDue: data.nextAccountsCHDue ? new Date(data.nextAccountsCHDue) : undefined,
+            nextAccountsCompaniesHouseDue: data.nextAccountsCompaniesHouseDue ? new Date(data.nextAccountsCompaniesHouseDue) : undefined,
             nextAccountsHMRCDue: data.nextAccountsHMRCDue ? new Date(data.nextAccountsHMRCDue) : undefined,
             nextFYEndDate: data.nextFYEndDate ? new Date(data.nextFYEndDate) : undefined,
 
@@ -76,11 +76,11 @@ export async function PUT(req: NextRequest) {
 
             // UK Filing Matrix Dates
             lastConfirmationStatementDate: updateData.lastConfirmationStatementDate ? new Date(updateData.lastConfirmationStatementDate) : undefined,
-            lastAccountsCHDate: updateData.lastAccountsCHDate ? new Date(updateData.lastAccountsCHDate) : undefined,
+            lastAccountsCompaniesHouseDate: updateData.lastAccountsCompaniesHouseDate ? new Date(updateData.lastAccountsCompaniesHouseDate) : undefined,
             lastAccountsHMRCDate: updateData.lastAccountsHMRCDate ? new Date(updateData.lastAccountsHMRCDate) : undefined,
             lastFYEndDate: updateData.lastFYEndDate ? new Date(updateData.lastFYEndDate) : undefined,
             nextConfirmationStatementDue: updateData.nextConfirmationStatementDue ? new Date(updateData.nextConfirmationStatementDue) : undefined,
-            nextAccountsCHDue: updateData.nextAccountsCHDue ? new Date(updateData.nextAccountsCHDue) : undefined,
+            nextAccountsCompaniesHouseDue: updateData.nextAccountsCompaniesHouseDue ? new Date(updateData.nextAccountsCompaniesHouseDue) : undefined,
             nextAccountsHMRCDue: updateData.nextAccountsHMRCDue ? new Date(updateData.nextAccountsHMRCDue) : undefined,
             nextFYEndDate: updateData.nextFYEndDate ? new Date(updateData.nextFYEndDate) : undefined,
 

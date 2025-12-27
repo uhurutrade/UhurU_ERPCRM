@@ -400,13 +400,13 @@ model CompanySettings {
   
   // UK Filing Matrix - Row 1: Last Filed
   lastConfirmationStatementDate DateTime?
-  lastAccountsCHDate            DateTime?
+  lastAccountsCompaniesHouseDate DateTime?
   lastAccountsHMRCDate          DateTime?
   lastFYEndDate                 DateTime?
 
   // UK Filing Matrix - Row 2: Next Deadlines (AI Calculated)
   nextConfirmationStatementDue DateTime?
-  nextAccountsCHDue            DateTime?
+  nextAccountsCompaniesHouseDue DateTime?
   nextAccountsHMRCDue          DateTime?
   nextFYEndDate                DateTime?
 

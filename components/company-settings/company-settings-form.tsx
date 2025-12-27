@@ -45,12 +45,11 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
             ? new Date(initialData.confirmationNextDueDate).toISOString().split('T')[0]
             : "",
 
-        // UK Filing Matrix - Row 1: Last Filed
         lastConfirmationStatementDate: initialData?.lastConfirmationStatementDate
             ? new Date(initialData.lastConfirmationStatementDate).toISOString().split('T')[0]
             : "",
-        lastAccountsCHDate: initialData?.lastAccountsCHDate
-            ? new Date(initialData.lastAccountsCHDate).toISOString().split('T')[0]
+        lastAccountsCompaniesHouseDate: initialData?.lastAccountsCompaniesHouseDate
+            ? new Date(initialData.lastAccountsCompaniesHouseDate).toISOString().split('T')[0]
             : "",
         lastAccountsHMRCDate: initialData?.lastAccountsHMRCDate
             ? new Date(initialData.lastAccountsHMRCDate).toISOString().split('T')[0]
@@ -59,12 +58,11 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
             ? new Date(initialData.lastFYEndDate).toISOString().split('T')[0]
             : "",
 
-        // UK Filing Matrix - Row 2: Next Deadlines (AI Calculated)
         nextConfirmationStatementDue: initialData?.nextConfirmationStatementDue
             ? new Date(initialData.nextConfirmationStatementDue).toISOString().split('T')[0]
             : "",
-        nextAccountsCHDue: initialData?.nextAccountsCHDue
-            ? new Date(initialData.nextAccountsCHDue).toISOString().split('T')[0]
+        nextAccountsCompaniesHouseDue: initialData?.nextAccountsCompaniesHouseDue
+            ? new Date(initialData.nextAccountsCompaniesHouseDue).toISOString().split('T')[0]
             : "",
         nextAccountsHMRCDue: initialData?.nextAccountsHMRCDue
             ? new Date(initialData.nextAccountsHMRCDue).toISOString().split('T')[0]
@@ -137,7 +135,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
         try {
             const prompt = `Calcula las próximas fechas de vencimiento (Next Deadlines) para una empresa UK Ltd basándome en:
 - Fecha de Incorporación: ${formData.incorporationDate}
-- Última Presentación CH: ${formData.lastAccountsCHDate || 'No disponible'}
+- Última Presentación CompaniesHouse: ${formData.lastAccountsCompaniesHouseDate || 'No disponible'}
 - Última Presentación HMRC: ${formData.lastAccountsHMRCDate || 'No disponible'}
 - Última Confirmation Statement: ${formData.lastConfirmationStatementDate || 'No disponible'}
 - Último Año Fiscal Finalizado: ${formData.lastFYEndDate || 'No disponible'}
@@ -145,7 +143,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
 Devuelve un JSON estrictamente con este formato:
 {
   "nextConfirmationStatementDue": "YYYY-MM-DD",
-  "nextAccountsCHDue": "YYYY-MM-DD",
+  "nextAccountsCompaniesHouseDue": "YYYY-MM-DD",
   "nextAccountsHMRCDue": "YYYY-MM-DD",
   "nextFYEndDate": "YYYY-MM-DD"
 }`;
@@ -169,7 +167,7 @@ Devuelve un JSON estrictamente con este formato:
             // Also update the fallback legacy fields
             setFormData(prev => ({
                 ...prev,
-                accountsNextDueDate: deadlines.nextAccountsCHDue,
+                accountsNextDueDate: deadlines.nextAccountsCompaniesHouseDue,
                 confirmationNextDueDate: deadlines.nextConfirmationStatementDue
             }));
 
@@ -441,7 +439,7 @@ Devuelve un JSON estrictamente con este formato:
                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 px-1">Row 1: Last Filed (Manual Entry)</label>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CH Confirmation Statement</label>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CompaniesHouse Confirmation Statement</label>
                                 <input
                                     type="date"
                                     name="lastConfirmationStatementDate"
@@ -451,11 +449,11 @@ Devuelve un JSON estrictamente con este formato:
                                 />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CH Annual Accounts</label>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CompaniesHouse Annual Accounts</label>
                                 <input
                                     type="date"
-                                    name="lastAccountsCHDate"
-                                    value={formData.lastAccountsCHDate}
+                                    name="lastAccountsCompaniesHouseDate"
+                                    value={formData.lastAccountsCompaniesHouseDate}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm"
                                 />
@@ -503,11 +501,11 @@ Devuelve un JSON estrictamente con este formato:
                                 />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next CH Accounts Due</label>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next CompaniesHouse Accounts Due</label>
                                 <input
                                     type="date"
-                                    name="nextAccountsCHDue"
-                                    value={formData.nextAccountsCHDue}
+                                    name="nextAccountsCompaniesHouseDue"
+                                    value={formData.nextAccountsCompaniesHouseDue}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm font-bold"
                                 />
@@ -554,7 +552,7 @@ Devuelve un JSON estrictamente con este formato:
                             <label className="block text-sm font-medium text-slate-300 mb-2">Legacy Sync Status</label>
                             <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-500 font-mono">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                LEGACY CH FIELDS SYNCHRONIZED
+                                LEGACY CompaniesHouse FIELDS SYNCHRONIZED
                             </div>
                         </div>
                     </div>

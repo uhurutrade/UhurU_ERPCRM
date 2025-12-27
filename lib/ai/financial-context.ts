@@ -33,8 +33,8 @@ COMPANY PROFILE (UK COMPLIANCE):
 - Company: ${settings?.companyName || 'N/A'} (No. ${settings?.companyNumber || 'N/A'})
 - Incorporation Date: ${settings?.incorporationDate?.toLocaleDateString() || 'N/A'}
 - Financial Year End: ${settings?.financialYearEnd || 'N/A'}
-- Next CH Accounts Due: ${settings?.nextAccountsCHDue?.toLocaleDateString() || 'N/A'}
-- Last CH Accounts Filed: ${settings?.lastAccountsCHDate?.toLocaleDateString() || 'N/A'}
+- Next CompaniesHouse Accounts Due: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
+- Last CompaniesHouse Accounts Filed: ${settings?.lastAccountsCompaniesHouseDate?.toLocaleDateString() || 'N/A'}
 
 FINANCIAL SUMMARY (GENERAL LEDGER):
 - Total Recent Inbound: £${totals.totalInbound.toLocaleString()}
