@@ -106,21 +106,21 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
 
         // AI Preferences
         aiProvider: initialData?.aiProvider || "openai",
-        aiSystemPrompt: initialData?.aiSystemPrompt || `Actúa como el Chief Financial Officer (CFO) y Consultor Estratégico Senior de esta compañía Private Limited (LTD) del Reino Unido.
+        aiSystemPrompt: initialData?.aiSystemPrompt || `Act as the Chief Financial Officer (CFO) and Senior Strategic Consultant for this UK Private Limited (LTD) company.
 
-IDENTIDAD OPERATIVA:
-- Entidad: UK Ltd (Sujeta a Companies House y HMRC).
-- Director: Único accionista, de nacionalidad española y residente fiscal en España (Modelo 100/720 en España).
-- Modelos de Negocio: Consultoría de servicios profesionales IT/Estrategica y Venta Retail Multicanal (Amazon FBA, Shopify, Stripe).`,
-        aiStrategicDirectives: initialData?.aiStrategicDirectives || `PROTOCOLOS DE COMPORTAMIENTO (SYSTEM PROMPT):
-1. PERSPECTIVA DUAL (UK-ES): Cada vez que analices un gasto o ingreso, considera no solo su deducibilidad en el Reino Unido (Corporation Tax), sino también las implicaciones del Convenio para evitar la Doble Imposición (CDI) entre UK y España.
-2. FOCO EN AMAZON FBA: Entiende la estructura de los informes de Amazon (fees, removals, storage, VAT en destino). Ayuda a conciliar los Settlements con las transacciones bancarias.
-3. CUMPLIMIENTO FISCAL (VAT/TAX): Sé extremadamente riguroso con los umbrales de IVA (VAT thresholds) y las reglas de "Place of Supply" para servicios. Alerta proactivamente sobre fechas de "Confirmation Statement" y "Annual Accounts".
-4. TONO Y LENGUAJE: Dirígete a mí SIEMPRE en Español, ya que soy español. Aunque el sistema y los documentos estén en inglés y podamos tratar conceptos técnicos en ese idioma, tu comunicación conmigo debe ser en castellano profesional y directo.`,
-        aiMemoryPrompt: initialData?.aiMemoryPrompt || `OBJETIVOS DEL RAG (USER EXPECTATIONS):
-- Al recuperar datos financieros, no te limites a listar transacciones; sintetiza la salud de la tesorería.
-- Si detectas una factura de un proveedor español, recuerda la importancia del IVA intracomunitario (VIES) o la posible retención si aplica.
-- Evalúa los movimientos entre la cuenta de la empresa y la cuenta personal del director como "Director's Loan Account" o dividendos, advirtiendo sobre las implicaciones fiscales según las leyes de UK y la residencia en España.`,
+OPERATIONAL IDENTITY:
+- Entity: UK Ltd (Subject to Companies House and HMRC).
+- Director: Sole shareholder, Spanish nationality, tax resident in Spain.
+- Business Models: IT/Strategic professional services and Multichannel Retail (Amazon FBA, Shopify, Stripe).`,
+        aiStrategicDirectives: initialData?.aiStrategicDirectives || `BEHAVIORAL PROTOCOLS:
+1. DUAL PERSPECTIVE (UK-ES): Consider UK Corporation Tax and Spanish Tax Residency implications (CDI).
+2. AMAZON FBA FOCUS: Understand Amazon reports (fees, storage, VAT) and reconcile Settlements.
+3. FISCAL COMPLIANCE: Be rigorous with VAT thresholds and Companies House deadlines.
+4. TONE: Professional, strategic, and direct.`,
+        aiMemoryPrompt: initialData?.aiMemoryPrompt || `RAG OBJECTIVES & USER EXPECTATIONS:
+- Synthesize treasury health when retrieving financial data.
+- Alert on VAT implications for EU suppliers (VIES).
+- Monitor Director's Loan Account (DLA) movements between personal and company accounts.`,
         aiCustomInstructions: initialData?.aiCustomInstructions || "",
 
         // Additional Notes
@@ -908,8 +908,8 @@ IDENTIDAD OPERATIVA:
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const timestamp = new Date().toLocaleDateString('es-ES');
-                                    const directive = `\n[DIRECTIVA ${timestamp}]: `;
+                                    const timestamp = new Date().toLocaleDateString('en-GB');
+                                    const directive = `\n[DIRECTIVE ${timestamp}]: `;
                                     setFormData(prev => ({
                                         ...prev,
                                         aiMemoryPrompt: (prev.aiMemoryPrompt || "") + directive
@@ -917,7 +917,7 @@ IDENTIDAD OPERATIVA:
                                 }}
                                 className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-lg text-[9px] font-bold text-amber-400 uppercase tracking-widest transition-all active:scale-95"
                             >
-                                + Nueva Directiva
+                                + New Directive
                             </button>
                         </div>
 
@@ -927,13 +927,13 @@ IDENTIDAD OPERATIVA:
                                 value={formData.aiMemoryPrompt}
                                 onChange={handleChange}
                                 rows={22}
-                                placeholder="Cubo de basura neural: Vuelca aquí todo lo que quieras que recuerde..."
+                                placeholder="Neural Trash Box: Dump everything you want me to remember here (rules, context, style)..."
                                 className="w-full h-full px-4 py-4 bg-slate-950/60 border border-amber-500/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-amber-50/90 text-sm font-mono leading-relaxed placeholder:opacity-20"
                             />
                         </div>
 
                         <div className="flex flex-wrap gap-2 pt-2">
-                            {["Residente Fiscal ES", "Bilingue ES/EN", "Foco en Cashflow"].map((chip) => (
+                            {["Tax Resident ES", "Bilingual ES/EN", "Cashflow Focus"].map((chip) => (
                                 <button
                                     key={chip}
                                     type="button"

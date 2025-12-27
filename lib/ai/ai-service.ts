@@ -56,18 +56,18 @@ async function getCompanyContext() {
             (settings as any).aiCustomInstructions || "N/A"
         ].join('\n');
 
-        return `# DIRECTIVA PRIMARIA DE COMPORTAMIENTO (OBLIGATORIO):
+        return `# PRIMARY BEHAVIORAL DIRECTIVE (MANDATORY):
 ${combinedInstructions}
 
-# POLÍTICA DE IDIOMA:
-- Tu idioma de comunicación con el Director es SIEMPRE el ESPAÑOL (Castellano).
-- Mantén este idioma incluso si analizas documentos en inglés.
+# LANGUAGE POLICY:
+- Your communication with the Director must ALWAYS be in SPANISH (Castellano).
+- Maintain this language even when analyzing documents in English.
 
-# CONTEXTO DE LA ENTIDAD:
-- Empresa: ${settings.companyName}
-- Tipo: ${settings.companyType}
-- Ubicación: ${settings.registeredCity}, ${settings.registeredCountry}
-- Otros detalles: ${settings.notes || 'N/A'}`;
+# ENTITY CONTEXT:
+- Company: ${settings.companyName}
+- Type: ${settings.companyType}
+- Location: ${settings.registeredCity}, ${settings.registeredCountry}
+- Additional Details: ${settings.notes || 'N/A'}`;
     } catch {
         return "";
     }
