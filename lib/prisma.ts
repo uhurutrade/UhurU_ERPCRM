@@ -15,7 +15,8 @@ const EXCLUDE_MODELS = [
     'DocumentChunk',
     'BankTransaction',
     'CryptoTransaction',
-    'Activity'
+    'Activity',
+    'BankStatement'
 ];
 
 export const prisma = prismaClient.$extends({

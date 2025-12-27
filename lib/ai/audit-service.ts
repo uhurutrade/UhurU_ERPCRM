@@ -18,22 +18,22 @@ export async function recordStrategicAudit(action: string, details: string, type
         const ai = await getAIClient();
 
         const prompt = `
-            You are a Strategic Data Auditor for UhurU ERP. 
-            An event occurred in the system: ${action}
-            Context/Details: ${details}
+            You are a Data Auditor for UhurU ERP. 
+            Event: ${action}
+            Technical Details: ${details}
             
             Task:
-            1. Provide a professional "Strategic Rationale" explaining why this event matters for the company's financial integrity, institutional coherence, or growth. 
-            2. Be concise but insightful (2-3 sentences max).
-            3. Must return a JSON object with "en" (English) and "es" (Spanish) keys.
-            4. The Spanish version should be a faithful translation of the English one.
+            1. Provide a CRITICAL and CONCISE summary of WHAT changed and WHY it matters for the data records.
+            2. Max 1-2 very short sentences. Avoid fluff or formal greetings.
+            3. Must return a JSON object with "en" and "es" keys.
+            
+            Example Content: "Created lead 'Raul' for CRM tracking. Essential for sales pipeline visibility."
             
             JSON Structure:
             {
-                "en": "The logical reasoning in English...",
-                "es": "El razonamiento lógico en español..."
+                "en": "Short text...",
+                "es": "Texto corto..."
             }
-            Do not include any other text, markdown blocks, or comments.
         `;
 
         const response = await ai.chat(prompt, "You are a senior business intelligence consultant.");
