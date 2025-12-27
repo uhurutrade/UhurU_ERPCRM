@@ -681,18 +681,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                         />
                     </div>
 
-                    <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Company Secretary
-                        </label>
-                        <input
-                            type="text"
-                            name="companySecretary"
-                            value={formData.companySecretary}
-                            onChange={handleChange}
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        />
-                    </div>
+
                 </div>
             </section>
 
