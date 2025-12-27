@@ -42,61 +42,66 @@ export default function SyncNodeButton() {
                     ? `Updated: ${data.changes.join(", ")}.`
                     : "Deadlines verified - No adjustments needed.";
 
-                if (data.success) {
-                    toast.success("Intelligence Synchronized", {
-                        id: toastId,
-                        description: `Dual-AI Consensus: ${data.provider} confirmed.`,
-                        duration: 8000
-                    });
-                    // Wait a bit and refresh
-                    setTimeout(() => router.refresh(), 2000);
-                } else {
-                    throw new Error(data.error || "Neural link failure");
-                }
-            } catch (error: any) {
-                console.error("Sync Error:", error);
-                toast.error("Audit Failed", {
+                toast.success("Intelligence Synchronized", {
                     id: toastId,
-                    description: "The neural node could not be fully synchronized.",
-                    duration: 8000
+                    description: (
+                        <div className="space-y-1">
+                            <p><b>Legal Audit:</b> Dual-AI Consensus: {data.provider} confirmed.</p>
+                            <p><b>System Sync:</b> Background RAG vectorization started for all modules.</p>
+                            <p className="text-[10px] opacity-70 italic mt-1">{changeLog}</p>
+                        </div>
+                    ),
+                    duration: 10000
                 });
-            } finally {
-                setIsSyncing(false);
+                // Wait a bit and refresh
+                setTimeout(() => router.refresh(), 2000);
+            } else {
+                throw new Error(data.error || "Neural link failure");
             }
-        };
+        } catch (error: any) {
+            console.error("Sync Error:", error);
+            toast.error("Audit Failed", {
+                id: toastId,
+                description: "The neural node could not be fully synchronized.",
+                duration: 8000
+            });
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
-        return (
-            <button
-                onClick={handleFullSync}
-                disabled={isSyncing || isDirty}
-                className={`group relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r ${isDirty
-                    ? 'from-slate-700 to-slate-800 cursor-not-allowed'
-                    : 'from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'
-                    } disabled:opacity-50 text-white rounded-2xl shadow-xl transition-all active:scale-95 overflow-hidden`}
-            >
-                {/* Background glow effect on hover */}
-                {!isDirty && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />}
+    return (
+        <button
+            onClick={handleFullSync}
+            disabled={isSyncing || isDirty}
+            className={`group relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r ${isDirty
+                ? 'from-slate-700 to-slate-800 cursor-not-allowed'
+                : 'from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'
+                } disabled:opacity-50 text-white rounded-2xl shadow-xl transition-all active:scale-95 overflow-hidden`}
+        >
+            {/* Background glow effect on hover */}
+            {!isDirty && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />}
 
-                {isSyncing ? (
-                    <RefreshCw size={20} className="animate-spin" />
-                ) : isDirty ? (
-                    <AlertTriangle size={20} className="text-amber-400" />
-                ) : (
-                    <BrainCircuit size={20} className="group-hover:rotate-12 transition-transform" />
-                )}
+            {isSyncing ? (
+                <RefreshCw size={20} className="animate-spin" />
+            ) : isDirty ? (
+                <AlertTriangle size={20} className="text-amber-400" />
+            ) : (
+                <BrainCircuit size={20} className="group-hover:rotate-12 transition-transform" />
+            )}
 
-                <div className="flex flex-col items-start leading-none">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
-                        {isDirty ? "Action Required" : "Strategic Audit"}
-                    </span>
-                    <span className="text-sm font-bold tracking-tight">
-                        {isDirty ? "Save Settings to Sync" : "Sync Intelligence Node"}
-                    </span>
-                </div>
+            <div className="flex flex-col items-start leading-none">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
+                    {isDirty ? "Action Required" : "Strategic Audit"}
+                </span>
+                <span className="text-sm font-bold tracking-tight">
+                    {isDirty ? "Save Settings to Sync" : "Sync Intelligence Node"}
+                </span>
+            </div>
 
-                {!isSyncing && !isDirty && (
-                    <Sparkles size={14} className="text-white/50 animate-pulse hidden sm:block" />
-                )}
-            </button>
-        );
-    }
+            {!isSyncing && !isDirty && (
+                <Sparkles size={14} className="text-white/50 animate-pulse hidden sm:block" />
+            )}
+        </button>
+    );
+}
