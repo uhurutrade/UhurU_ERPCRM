@@ -108,6 +108,28 @@ export async function getAIClient() {
     };
 }
 
+/**
+ * Specialized helper to get responses from both providers for consensus
+ */
+export async function getConsensusAI() {
+    const companyContext = await getCompanyContext();
+    return {
+        async chat(message: string, systemPrompt: string): Promise<{ openai: string, gemini: string }> {
+            const roleAndBehavior = `${companyContext.trim()}\n\nSPECIALIZED TASK INSTRUCTIONS:\n${systemPrompt.trim()}`.trim();
+
+            const [oa, ge] = await Promise.allSettled([
+                chatWithOpenAI(message, roleAndBehavior),
+                chatWithGemini(message, roleAndBehavior)
+            ]);
+
+            return {
+                openai: oa.status === 'fulfilled' ? oa.value : "OPENAI_FAILED",
+                gemini: ge.status === 'fulfilled' ? ge.value : "GEMINI_FAILED"
+            };
+        }
+    };
+}
+
 // --- OpenAI Implementation ---
 async function analyzeWithOpenAI(filename: string, text: string, companyContext: string, buffer?: Buffer, mimeType?: string): Promise<AIExtractionResult> {
     const apiKey = process.env.OPENAI_API_KEY;

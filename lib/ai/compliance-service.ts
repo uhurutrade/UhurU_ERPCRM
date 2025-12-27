@@ -44,14 +44,53 @@ export async function recalculateComplianceDeadlines() {
         }
         `;
 
-        const ai = await getAIClient();
-        const response = await ai.chat(prompt, "You are a UK Compliance Expert specialized in Ltd companies.");
+        const { getConsensusAI } = await import("@/lib/ai/ai-service");
+        const ai = await getConsensusAI();
+        const responses = await ai.chat(prompt, "You are a UK Compliance Expert. Use strict UK legal terminology.");
 
-        // Extract JSON from AI response
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error("AI did not return valid JSON");
+        const parser = (resp: string) => {
+            try {
+                const match = resp.match(/\{[\s\S]*\}/);
+                return match ? JSON.parse(match[0]) : null;
+            } catch { return null; }
+        };
 
-        const deadlines = JSON.parse(jsonMatch[0]);
+        const dataOA = parser(responses.openai);
+        const dataGE = parser(responses.gemini);
+
+        if (!dataOA && !dataGE) throw new Error("Both AI providers failed to return valid data");
+
+        // CONSENSUS LOGIC: Pick the MOST RESTRICTIVE (earliest) date for each field
+        const pickEarliest = (field: string) => {
+            const dateOA = dataOA?.[field] ? new Date(dataOA[field]) : null;
+            const dateGE = dataGE?.[field] ? new Date(dataGE[field]) : null;
+
+            if (dateOA && dateGE) {
+                if (dateOA <= dateGE) return { date: dataOA[field], provider: 'openai' };
+                return { date: dataGE[field], provider: 'gemini' };
+            }
+            if (dateOA) return { date: dataOA[field], provider: 'openai' };
+            if (dateGE) return { date: dataGE[field], provider: 'gemini' };
+            return { date: null, provider: 'failed' };
+        };
+
+        const consensus = {
+            nextConfirmationStatementDue: pickEarliest('nextConfirmationStatementDue'),
+            nextAccountsCompaniesHouseDue: pickEarliest('nextAccountsCompaniesHouseDue'),
+            nextAccountsHMRCDue: pickEarliest('nextAccountsHMRCDue'),
+            nextFYEndDate: pickEarliest('nextFYEndDate')
+        };
+
+        const deadlines = {
+            nextConfirmationStatementDue: consensus.nextConfirmationStatementDue.date,
+            nextAccountsCompaniesHouseDue: consensus.nextAccountsCompaniesHouseDue.date,
+            nextAccountsHMRCDue: consensus.nextAccountsHMRCDue.date,
+            nextFYEndDate: consensus.nextFYEndDate.date
+        };
+
+        // Summary of who won
+        const providersUsed = Array.from(new Set(Object.values(consensus).map(c => c.provider.toUpperCase())));
+        const providerSummary = providersUsed.join(" & ");
 
         // Capture old values for comparison
         const oldDeadlines = {
@@ -69,7 +108,7 @@ export async function recalculateComplianceDeadlines() {
                 nextAccountsCompaniesHouseDue: new Date(deadlines.nextAccountsCompaniesHouseDue),
                 nextAccountsHMRCDue: new Date(deadlines.nextAccountsHMRCDue),
                 nextFYEndDate: new Date(deadlines.nextFYEndDate),
-                // Sync legacy fields for compatibility
+                // Sync legacy fields
                 accountsNextDueDate: new Date(deadlines.nextAccountsCompaniesHouseDue),
                 confirmationNextDueDate: new Date(deadlines.nextConfirmationStatementDue),
                 updatedAt: new Date()
@@ -83,11 +122,13 @@ export async function recalculateComplianceDeadlines() {
         if (oldDeadlines.nextAccountsHMRCDue !== deadlines.nextAccountsHMRCDue) changes.push("HMRC Corporation Tax");
         if (oldDeadlines.nextFYEndDate !== deadlines.nextFYEndDate) changes.push("Financial Year End");
 
-        console.log(`[Compliance-Service] ✅ Deadlines updated successfully via AI (${ai.provider}). Changes: ${changes.length}`);
+        console.log(`[Compliance-Service] ✅ Consensus reached via ${providerSummary}. Changes: ${changes.length}`);
+
         return {
             deadlines,
-            provider: ai.provider,
-            changes: changes.length > 0 ? changes : null
+            provider: providerSummary,
+            changes: changes.length > 0 ? changes : null,
+            details: consensus
         };
 
     } catch (error: any) {
