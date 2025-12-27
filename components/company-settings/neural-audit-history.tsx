@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle, FileDown, Trash } from "lucide-react";
+import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle, FileDown, Trash, CheckSquare, Square, MailOpen, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ interface Audit {
 export function NeuralAuditHistory() {
     const [audits, setAudits] = useState<Audit[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const { confirm: systemConfirm } = useConfirm();
 
     const fetchAudits = async () => {
@@ -29,6 +30,9 @@ export function NeuralAuditHistory() {
             const response = await fetch("/api/neural-audits");
             const data = await response.json();
             setAudits(data);
+
+            // Notify sidebar to update unread count
+            window.dispatchEvent(new CustomEvent('unread-audits-updated'));
         } catch (error) {
             console.error("Error fetching audits:", error);
         } finally {
@@ -72,31 +76,66 @@ export function NeuralAuditHistory() {
         }
     };
 
-    const handleClearAll = async () => {
+    const handleBulkDelete = async () => {
+        if (selectedIds.size === 0) return;
+
         const ok = await systemConfirm({
-            title: "PURGAR HISTORIAL COMPLETO",
-            message: "¡ALERTA DE SEGURIDAD! Estás a punto de borrar ABSOLUTAMENTE TODO el historial de inteligencia. Esta acción limpiará la base de datos de forma física e irreversible.",
+            title: "Eliminación Masiva",
+            message: `¿Estás seguro de que deseas eliminar permanentemente ${selectedIds.size} reportes?`,
             type: "danger",
-            confirmText: "PURGAR TODO EL SISTEMA",
-            cancelText: "Abortar"
+            confirmText: "Borrar Todo",
+            cancelText: "Cancelar"
         });
 
         if (!ok) return;
 
         try {
-            const response = await fetch("/api/neural-audits/clear-all", {
-                method: 'DELETE',
+            const response = await fetch("/api/neural-audits/bulk-delete", {
+                method: 'POST',
+                body: JSON.stringify({ ids: Array.from(selectedIds) })
             });
 
             if (response.ok) {
-                toast.success("Historial purgado con éxito.");
+                toast.success(`${selectedIds.size} reportes eliminados.`);
+                setSelectedIds(new Set());
                 fetchAudits();
-            } else {
-                toast.error("Error al purgar el historial.");
             }
         } catch (error) {
-            console.error("Error clearing audits:", error);
-            toast.error("Error crítico de red.");
+            toast.error("Error en el borrado masivo.");
+        }
+    };
+
+    const handleMarkAsRead = async (ids?: string[]) => {
+        const targetIds = ids || Array.from(selectedIds);
+        if (targetIds.length === 0) return;
+
+        try {
+            const response = await fetch("/api/neural-audits/mark-read", {
+                method: 'POST',
+                body: JSON.stringify({ ids: targetIds })
+            });
+
+            if (response.ok) {
+                setSelectedIds(new Set());
+                fetchAudits();
+            }
+        } catch (error) {
+            toast.error("Error al marcar como leído.");
+        }
+    };
+
+    const toggleSelect = (id: string) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) newSelected.delete(id);
+        else newSelected.add(id);
+        setSelectedIds(newSelected);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === audits.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(audits.map(a => a.id)));
         }
     };
 
@@ -284,22 +323,39 @@ export function NeuralAuditHistory() {
                         <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-0.5">Control de Cambios Autónomos</p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                    {selectedIds.size > 0 && (
+                        <>
+                            <button
+                                onClick={() => handleMarkAsRead()}
+                                className="flex items-center gap-2 px-4 py-2 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl border border-emerald-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
+                            >
+                                <MailOpen size={14} />
+                                Leer ({selectedIds.size})
+                            </button>
+                            <button
+                                onClick={handleBulkDelete}
+                                className="flex items-center gap-2 px-4 py-2 bg-rose-950/40 text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl border border-rose-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
+                            >
+                                <Trash size={14} />
+                                Borrar ({selectedIds.size})
+                            </button>
+                        </>
+                    )}
+                    <button
+                        onClick={toggleSelectAll}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all"
+                    >
+                        {selectedIds.size === audits.length ? <CheckSquare size={14} /> : <Square size={14} />}
+                        {selectedIds.size === audits.length ? 'Deseleccionar' : 'Sel. Todo'}
+                    </button>
                     <button
                         onClick={generateFullSummaryPDF}
                         disabled={audits.length === 0}
                         className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all"
                     >
                         <FileDown size={14} />
-                        Exportar Todo
-                    </button>
-                    <button
-                        onClick={handleClearAll}
-                        disabled={audits.length === 0}
-                        className="flex items-center gap-2 px-4 py-2 bg-rose-950/40 hover:bg-rose-600 disabled:opacity-50 text-rose-400 hover:text-white rounded-xl border border-rose-500/20 text-[10px] uppercase font-black tracking-widest transition-all"
-                    >
-                        <Trash size={14} />
-                        Purgar Historial
+                        Exportar
                     </button>
                 </div>
             </div>
@@ -308,17 +364,28 @@ export function NeuralAuditHistory() {
                 {audits.map((audit) => (
                     <div
                         key={audit.id}
-                        className="group bg-uhuru-card hover:bg-slate-900 transition-all border border-uhuru-border hover:border-emerald-500/40 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+                        onClick={() => !audit.isRead && handleMarkAsRead([audit.id])}
+                        className={`group bg-uhuru-card hover:bg-slate-900 transition-all border ${selectedIds.has(audit.id) ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-uhuru-border hover:border-emerald-500/40'} p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden cursor-pointer`}
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[40px] rounded-full -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* Status Dot / Unread Indicator */}
+                        {!audit.isRead && (
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" title="Unread" />
+                        )}
 
                         <div className="flex items-center gap-4 relative z-10">
-                            <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex flex-col items-center justify-center text-emerald-400 font-bold group-hover:bg-slate-700 transition-colors">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); toggleSelect(audit.id); }}
+                                className={`p-1.5 rounded-lg transition-colors ${selectedIds.has(audit.id) ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500 hover:text-slate-300'}`}
+                            >
+                                {selectedIds.has(audit.id) ? <CheckSquare size={16} /> : <Square size={16} />}
+                            </button>
+
+                            <div className={`w-12 h-12 rounded-xl bg-slate-800 border ${!audit.isRead ? 'border-emerald-500/50' : 'border-slate-700'} flex flex-col items-center justify-center ${!audit.isRead ? 'text-emerald-400' : 'text-slate-400'} font-bold group-hover:bg-slate-700 transition-colors`}>
                                 <span className="text-[10px] text-slate-500">{format(new Date(audit.timestamp), "MMM")}</span>
-                                <span className="text-lg leading-none">{format(new Date(audit.timestamp), "dd")}</span>
+                                <span className={`text-lg leading-none ${!audit.isRead ? 'font-black scale-110' : ''}`}>{format(new Date(audit.timestamp), "dd")}</span>
                             </div>
                             <div>
-                                <h4 className="text-sm font-black text-white group-hover:translate-x-1 transition-transform">
+                                <h4 className={`text-sm transition-transform ${!audit.isRead ? 'font-black text-white' : 'font-medium text-slate-300'}`}>
                                     {audit.totalChanges} Variables Ajustadas
                                 </h4>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">

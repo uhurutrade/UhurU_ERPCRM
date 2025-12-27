@@ -35,11 +35,28 @@ export function Sidebar({ userEmail }: { userEmail?: string | null }) {
     const pathname = usePathname();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const [unreadAudits, setUnreadAudits] = useState(0);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const response = await fetch('/api/neural-audits/unread-count');
+            const data = await response.json();
+            if (data.count !== undefined) setUnreadAudits(data.count);
+        } catch (error) {
+            console.error('Failed to fetch unread audits:', error);
+        }
+    };
 
     // Close sidebar on route change (mobile)
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
+
+    useEffect(() => {
+        fetchUnreadCount();
+        window.addEventListener('unread-audits-updated', fetchUnreadCount);
+        return () => window.removeEventListener('unread-audits-updated', fetchUnreadCount);
+    }, []);
 
     const handleLogout = () => {
         // Clear session storage
@@ -116,7 +133,14 @@ export function Sidebar({ userEmail }: { userEmail?: string | null }) {
                   `}>
                                     {item.label}
                                 </span>
-                                {isActive && (
+
+                                {item.href === "/dashboard/neural-reports" && unreadAudits > 0 && (
+                                    <div className="ml-auto min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-emerald-500 text-slate-950 text-[10px] font-black rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.4)] animate-pulse">
+                                        {unreadAudits}
+                                    </div>
+                                )}
+
+                                {isActive && !(item.href === "/dashboard/neural-reports" && unreadAudits > 0) && (
                                     <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                                 )}
                             </Link>

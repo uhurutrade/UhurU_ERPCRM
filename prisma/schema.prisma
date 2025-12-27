@@ -504,4 +504,5 @@ model NeuralAudit {
   justification String?  @db.Text
   totalChanges  Int      @default(0)
   status        String   @default("STABLE") // STABLE, UPDATED, FAILED
+  isRead        Boolean  @default(false)
 }
