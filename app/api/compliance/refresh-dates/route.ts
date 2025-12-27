@@ -7,21 +7,23 @@ export async function POST(req: Request) {
         const isFullSync = body.fullSync === true;
 
         let provider = 'unknown';
+        let result: any = null;
 
         if (isFullSync) {
-            const { syncAllSystemData } = await import('@/lib/ai/auto-sync-rag');
+            const { syncAllSystemData, syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
             syncAllSystemData();
-            // Full sync also triggers compliance, but we want the provider back
-            const { syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
-            provider = await syncComplianceAndReturnProvider();
+            result = await syncComplianceAndReturnProvider();
+            provider = result.provider;
         } else {
             const { syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
-            provider = await syncComplianceAndReturnProvider();
+            result = await syncComplianceAndReturnProvider();
+            provider = result.provider;
         }
 
         return NextResponse.json({
             success: true,
             provider,
+            changes: result?.changes,
             message: isFullSync ? "Full Intelligence Sync triggered" : "AI Refresh triggered"
         });
     } catch (error: any) {

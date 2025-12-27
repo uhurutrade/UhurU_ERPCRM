@@ -24,9 +24,13 @@ export default function SyncNodeButton() {
             const data = await response.json();
 
             if (data.success) {
+                const changeLog = data.changes && data.changes.length > 0
+                    ? `Updated: ${data.changes.join(", ")}.`
+                    : "No adjustments needed - System at peak precision.";
+
                 toast.success("Intelligence Synchronized", {
                     id: toastId,
-                    description: `Neural nodes updated via ${data.provider?.toUpperCase()}. Strategic deadlines recalculated.`
+                    description: `Neural nodes verified via ${data.provider?.toUpperCase()}. ${changeLog}`
                 });
                 // Wait a bit and refresh
                 setTimeout(() => router.refresh(), 2000);

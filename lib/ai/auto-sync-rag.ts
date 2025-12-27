@@ -33,9 +33,6 @@ export async function triggerComplianceSync() {
     });
 }
 
-/**
- * Versión bloqueante para APIs que requieren respuesta inmediata del proveedor de IA
- */
 export async function syncComplianceAndReturnProvider() {
     // 1. Sync RAG first
     await syncCompanySettings();
@@ -44,10 +41,10 @@ export async function syncComplianceAndReturnProvider() {
     try {
         const { recalculateComplianceDeadlines } = await import("./compliance-service");
         const result = await recalculateComplianceDeadlines();
-        return result?.provider || 'unknown';
+        return result || { provider: 'unknown', changes: null };
     } catch (e) {
         console.error("[RAG Auto-Sync] ❌ AI Recalculation failed:", e);
-        return 'failed';
+        return { provider: 'failed', changes: null };
     }
 }
 

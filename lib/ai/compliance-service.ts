@@ -48,6 +48,14 @@ export async function recalculateComplianceDeadlines() {
 
         const deadlines = JSON.parse(jsonMatch[0]);
 
+        // Capture old values for comparison
+        const oldDeadlines = {
+            nextConfirmationStatementDue: settings.nextConfirmationStatementDue?.toISOString().split('T')[0],
+            nextAccountsCompaniesHouseDue: settings.nextAccountsCompaniesHouseDue?.toISOString().split('T')[0],
+            nextAccountsHMRCDue: settings.nextAccountsHMRCDue?.toISOString().split('T')[0],
+            nextFYEndDate: settings.nextFYEndDate?.toISOString().split('T')[0]
+        };
+
         // Update Database
         await prisma.companySettings.update({
             where: { id: settings.id },
@@ -63,8 +71,19 @@ export async function recalculateComplianceDeadlines() {
             }
         });
 
-        console.log(`[Compliance-Service] ✅ Deadlines updated successfully via AI (${ai.provider}).`);
-        return { deadlines, provider: ai.provider };
+        // Identify changes
+        const changes: string[] = [];
+        if (oldDeadlines.nextConfirmationStatementDue !== deadlines.nextConfirmationStatementDue) changes.push("Confirmation Statement");
+        if (oldDeadlines.nextAccountsCompaniesHouseDue !== deadlines.nextAccountsCompaniesHouseDue) changes.push("Companies House Accounts");
+        if (oldDeadlines.nextAccountsHMRCDue !== deadlines.nextAccountsHMRCDue) changes.push("HMRC Corporation Tax");
+        if (oldDeadlines.nextFYEndDate !== deadlines.nextFYEndDate) changes.push("Financial Year End");
+
+        console.log(`[Compliance-Service] ✅ Deadlines updated successfully via AI (${ai.provider}). Changes: ${changes.length}`);
+        return {
+            deadlines,
+            provider: ai.provider,
+            changes: changes.length > 0 ? changes : null
+        };
 
     } catch (error: any) {
         console.error("[Compliance-Service] ❌ Failed to auto-recalculate deadlines:", error.message);
