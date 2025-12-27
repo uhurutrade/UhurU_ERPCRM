@@ -59,7 +59,8 @@ export function syncAllSystemData() {
         await syncRecentTransactions();
         await syncCryptoWallets();
 
-        // TAX & COMPLIANCE
+        // DOCUMENTS & COMPLIANCE
+        await syncComplianceDocuments();
         await syncTaxObligations();
         await syncFiscalYears();
         await syncComplianceEvents();
@@ -208,13 +209,18 @@ export async function syncBankingOverview() {
 
 export async function syncRecentTransactions() {
     try {
+        const settings = await prisma.companySettings.findFirst();
+        const startDate = settings?.lastFYEndDate
+            ? new Date(settings.lastFYEndDate)
+            : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+
         const transactions = await prisma.bankTransaction.findMany({
-            take: 200,
+            where: { date: { gte: startDate } },
             orderBy: { date: 'desc' },
             include: { bankAccount: { include: { bank: true } } }
         });
 
-        let txContent = "RECENT BANK TRANSACTIONS (LAST 200)\n====================================\n\n";
+        let txContent = `BANK TRANSACTIONS (SINCE ${startDate.toLocaleDateString()})\n====================================\n\n`;
 
         for (const tx of transactions) {
             txContent += `${tx.date.toISOString().split('T')[0]} | ${tx.description}\n`;
@@ -225,8 +231,8 @@ export async function syncRecentTransactions() {
             txContent += `---\n\n`;
         }
 
-        await ingestText('sys_recent_transactions', 'Recent Bank Transactions', txContent);
-        console.log('[RAG Auto-Sync] ✓ Recent Transactions');
+        await ingestText('sys_recent_transactions', 'Financial Transactions Ledger', txContent);
+        console.log('[RAG Auto-Sync] ✓ Transactions Ledger');
     } catch (error: any) {
         console.error('[RAG Auto-Sync] Error syncing Transactions:', error.message);
     }
@@ -332,6 +338,31 @@ export async function syncComplianceEvents() {
     }
 }
 
+export async function syncComplianceDocuments() {
+    try {
+        const docs = await prisma.complianceDocument.findMany({
+            orderBy: { uploadedAt: 'desc' },
+            take: 50 // Ingest high-level metadata for last 50 docs
+        });
+
+        let docContent = "OFFICIAL COMPLIANCE DOCUMENTS\n============================\n\n";
+
+        for (const doc of docs) {
+            docContent += `File: ${doc.filename}\n`;
+            docContent += `Type: ${doc.documentType || 'General Document'} | Date: ${doc.documentDate?.toISOString().split('T')[0] || 'N/A'}\n`;
+            docContent += `Uploaded: ${doc.uploadedAt.toISOString().split('T')[0]}\n`;
+            if (doc.strategicInsights) docContent += `Strategic Insight: ${doc.strategicInsights}\n`;
+            if (doc.userNotes) docContent += `User Notes: ${doc.userNotes}\n`;
+            docContent += `---\n\n`;
+        }
+
+        await ingestText('sys_compliance_documents', 'Institutional Compliance Documents', docContent);
+        console.log('[RAG Auto-Sync] ✓ Compliance Documents');
+    } catch (error: any) {
+        console.error('[RAG Auto-Sync] Error syncing Compliance Documents:', error.message);
+    }
+}
+
 // ============================================================================
 // CRM
 // ============================================================================
@@ -432,13 +463,18 @@ export async function syncCRMDeals() {
 
 export async function syncInvoices() {
     try {
+        const settings = await prisma.companySettings.findFirst();
+        const startDate = settings?.lastFYEndDate
+            ? new Date(settings.lastFYEndDate)
+            : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+
         const invoices = await prisma.invoice.findMany({
+            where: { date: { gte: startDate } },
             include: { organization: true, items: true },
-            orderBy: { date: 'desc' },
-            take: 100
+            orderBy: { date: 'desc' }
         });
 
-        let invContent = "INVOICES\n========\n\n";
+        let invContent = `INVOICES ISSUED (SINCE ${startDate.toLocaleDateString()})\n====================================\n\n`;
 
         for (const inv of invoices) {
             invContent += `Invoice #${inv.number} | ${inv.organization.name}\n`;
@@ -447,8 +483,8 @@ export async function syncInvoices() {
             invContent += `---\n\n`;
         }
 
-        await ingestText('sys_invoices', 'Invoices', invContent);
-        console.log('[RAG Auto-Sync] ✓ Invoices');
+        await ingestText('sys_invoices', 'Institutional Invoicing History', invContent);
+        console.log('[RAG Auto-Sync] ✓ Invoices History');
     } catch (error: any) {
         console.error('[RAG Auto-Sync] Error syncing Invoices:', error.message);
     }

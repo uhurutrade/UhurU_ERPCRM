@@ -9,7 +9,7 @@ export async function getFinancialContext() {
             ? new Date(settings.lastFYEndDate)
             : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
 
-        const [transactions, invoices, obligations] = await Promise.all([
+        const [transactions, invoices, obligations, recentDocs, bankAccounts, cryptoWallets] = await Promise.all([
             prisma.bankTransaction.findMany({
                 where: {
                     date: { gte: startDate }
@@ -27,7 +27,22 @@ export async function getFinancialContext() {
             prisma.taxObligation.findMany({
                 where: { status: 'PENDING' },
                 orderBy: { dueDate: 'asc' }
-            })
+            }),
+            prisma.complianceDocument.findMany({
+                orderBy: { uploadedAt: 'desc' },
+                take: 10,
+                select: {
+                    filename: true,
+                    documentDate: true,
+                    documentType: true,
+                    strategicInsights: true,
+                    uploadedAt: true
+                }
+            }),
+            prisma.bankAccount.findMany({
+                include: { bank: true }
+            }),
+            prisma.cryptoWallet.findMany()
         ]);
 
         // Calculate basic totals for the AI context
@@ -49,6 +64,13 @@ COMPANY PROFILE:
 - Predicted Next confirmation Statement: ${settings?.nextConfirmationStatementDue?.toLocaleDateString() || 'N/A'}
 - Predicted Next Annual Accounts: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
 
+CURRENT LIQUIDITY & ASSETS:
+BANK ACCOUNTS:
+${bankAccounts.map(a => `- ${a.accountName} (${a.bank.bankName}): ${a.currentBalance} ${a.currency}`).join('\n')}
+
+CRYPTO WALLETS:
+${cryptoWallets.map(w => `- ${w.walletName} (${w.asset}): ${w.currentBalance} ${w.asset} (approx. $${w.balanceUSD} USD)`).join('\n')}
+
 PERIOD FINANCIAL SUMMARY (LIVE DATA):
 - Inbound (Current Period): £${totals.totalInbound.toLocaleString()}
 - Outbound (Current Period): £${totals.totalOutbound.toLocaleString()}
@@ -64,6 +86,11 @@ INVOICES ISSUED:
 ${invoices.length > 0
                 ? invoices.map(i => `- [${i.date.toLocaleDateString()}] ${i.number} to ${i.organization.name}: ${i.total} ${i.currency} (Status: ${i.status})`).join('\n')
                 : 'No invoices found in this period.'}
+
+INSTITUTIONAL DOCUMENTS & STRATEGIC INTELLIGENCE (LATEST):
+${recentDocs.length > 0
+                ? recentDocs.map(d => `- [${d.uploadedAt.toLocaleDateString()}] Doc: ${d.filename} (${d.documentDate ? d.documentDate.toLocaleDateString() : 'No date'}). Type: ${d.documentType || 'General'}. Insight: ${d.strategicInsights || 'No strategic summary available yet.'}`).join('\n')
+                : 'No compliance documents uploaded yet.'}
 
 UPCOMING COMPLIANCE & TAX OBLIGATIONS:
 ${obligations.map(o => `- ${o.type}: Due ${o.dueDate.toLocaleDateString()} (${o.amountActual || o.amountEstimated ? (o.amountActual || o.amountEstimated) + ' GBP' : 'Amount TBD'})`).join('\n')}
