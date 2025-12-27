@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Activity, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface AIStatus {
     provider: string;
@@ -46,39 +46,46 @@ export function AIStatusBadge({ forcedProvider }: { forcedProvider?: string }) {
         );
     }
 
-    const isOnline = status?.status === "online";
+    if (!status) return null;
+
+    const isOnline = status.status === "online";
 
     return (
-        <div className="flex flex-col items-end gap-1">
-            <div
-                className={`
-                    flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-500
-                    ${isOnline
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                        : 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]'
-                    }
-                `}
-                onClick={checkStatus}
-                title={status?.message}
-            >
-                {isOnline ? <CheckCircle2 size={14} /> : <ShieldAlert size={14} />}
-                <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                    SYSTEM {isOnline ? 'ONLINE' : 'OFFLINE'}
-                </span>
-                <span className="flex h-2 w-2 relative">
-                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isOnline ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                    <span className={`relative inline-flex rounded-full h-2 w-2 ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+        <button
+            onClick={checkStatus}
+            disabled={loading}
+            className={`group relative flex flex-col items-center justify-center px-4 py-2 rounded-xl border transition-all duration-500 hover:scale-105 active:scale-95 ${isOnline
+                ? "bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] text-emerald-400"
+                : "bg-rose-500/5 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)] text-rose-400"
+                }`}
+        >
+            <div className="flex items-center gap-2">
+                <div className="relative flex items-center justify-center">
+                    <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500" : "bg-rose-500"}`} />
+                    {isOnline && (
+                        <div className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75" />
+                    )}
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
+                    System {isOnline ? "Online" : "Offline"}
                 </span>
             </div>
 
-            {status && (
-                <div className="flex items-center gap-2 px-2">
-                    <Activity size={10} className={isOnline ? "text-emerald-500" : "text-rose-500"} />
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
-                        {status.provider} • {status.model}
-                    </span>
+            <div className="flex items-center gap-1.5 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+                    {status.provider} •
+                </span>
+                <span className="text-[8px] font-mono text-indigo-400 font-medium">
+                    {status.model}
+                </span>
+            </div>
+
+            {/* Tooltip on hover if offline */}
+            {!isOnline && status.message && (
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-48 p-2 bg-slate-900 border border-slate-800 rounded-lg text-[9px] text-slate-400 z-50 text-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity shadow-2xl">
+                    {status.message}
                 </div>
             )}
-        </div>
+        </button>
     );
 }

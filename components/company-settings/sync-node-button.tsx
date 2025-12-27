@@ -46,7 +46,7 @@ export default function SyncNodeButton() {
                     id: toastId,
                     description: (
                         <div className="space-y-1">
-                            <p>⚖️ <b>Legal Audit:</b> Dual-AI Consensus (${data.provider}) confirmed.</p>
+                            <p>⚖️ <b>Legal Audit:</b> Dual-AI Consensus: {data.provider} confirmed.</p>
                             <p>🧠 <b>System Sync:</b> Background RAG vectorization started for all modules.</p>
                             <p className="text-[10px] opacity-70 italic mt-1">{changeLog}</p>
                         </div>
