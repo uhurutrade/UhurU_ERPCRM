@@ -8,9 +8,10 @@ export async function GET() {
     try {
         const docs = await prisma.complianceDocument.findMany({
             where: {
-                NOT: {
-                    documentType: 'SYSTEM'
-                }
+                OR: [
+                    { documentType: 'BASKET' },
+                    { documentType: 'TAX_UPLOAD' }
+                ]
             },
             orderBy: { uploadedAt: 'desc' },
             select: {

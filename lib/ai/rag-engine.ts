@@ -303,10 +303,14 @@ export async function ingestText(docId: string, title: string, text: string) {
                 }
             });
         } else {
-            // Update timestamp
+            // Update timestamp and Ensure it's marked as SYSTEM to avoid showing up in UI
             await prisma.complianceDocument.update({
                 where: { id: docId },
-                data: { updatedAt: new Date(), isProcessed: true }
+                data: {
+                    updatedAt: new Date(),
+                    isProcessed: true,
+                    documentType: 'SYSTEM'
+                }
             });
         }
 
