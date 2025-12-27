@@ -1,7 +1,6 @@
-
-import { prisma } from "@/lib/prisma";
-import { getAIClient } from "@/lib/ai/ai-service";
-import { getFinancialContext } from "@/lib/ai/financial-context";
+import { prisma } from "../prisma";
+import { getAIClient } from "./ai-service";
+import { getFinancialContext } from "./financial-context";
 
 /**
  * Recalculates all UK compliance deadlines using AI without user intervention.
