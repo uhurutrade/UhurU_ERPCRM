@@ -477,18 +477,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-[11px] font-bold text-indigo-300 italic">Next Confirmation Due</label>
-                                    <button
-                                        type="button"
-                                        onClick={handleAIRefresh}
-                                        disabled={isRefreshingAI}
-                                        className="text-indigo-400 hover:text-white transition-colors p-0.5"
-                                        title="Force AI Refresh for this date"
-                                    >
-                                        <RefreshCw size={10} className={isRefreshingAI ? "animate-spin" : ""} />
-                                    </button>
-                                </div>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next Confirmation Due</label>
                                 <input
                                     type="date"
                                     name="nextConfirmationStatementDue"
