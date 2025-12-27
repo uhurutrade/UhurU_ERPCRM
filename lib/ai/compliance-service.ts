@@ -63,8 +63,8 @@ export async function recalculateComplianceDeadlines() {
             }
         });
 
-        console.log("[Compliance-Service] ✅ Deadlines updated successfully via AI.");
-        return deadlines;
+        console.log(`[Compliance-Service] ✅ Deadlines updated successfully via AI (${ai.provider}).`);
+        return { deadlines, provider: ai.provider };
 
     } catch (error: any) {
         console.error("[Compliance-Service] ❌ Failed to auto-recalculate deadlines:", error.message);

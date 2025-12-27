@@ -250,14 +250,6 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
         <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-emerald-400">Upcoming Compliance Deadlines</h2>
-                <button
-                    onClick={handleRefresh}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20 transition-all active:scale-95 disabled:opacity-50"
-                >
-                    {isRefreshing ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                    {isRefreshing ? "Calculating..." : "AI Refresh"}
-                </button>
             </div>
             <div className="space-y-3">
                 {deadlines.map((deadline, index) => (

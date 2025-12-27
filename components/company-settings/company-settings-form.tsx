@@ -404,19 +404,6 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                         <h2 className="text-xl font-bold text-emerald-400">Financial Year & Deadlines</h2>
                         <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">UK Filing Lifecycle Matrix</p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleAIRefresh}
-                        disabled={isRefreshingAI}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
-                    >
-                        {isRefreshingAI ? (
-                            <RefreshCw size={14} className="animate-spin" />
-                        ) : (
-                            <Sparkles size={14} />
-                        )}
-                        Recalculate with AI
-                    </button>
                 </div>
 
                 <div className="space-y-6">

@@ -29,17 +29,26 @@ export function triggerSync(moduleName: string, syncFn: () => Promise<void>) {
  */
 export async function triggerComplianceSync() {
     triggerSync('COMPLIANCE_AND_SETTINGS', async () => {
-        // 1. Sync RAG first
-        await syncCompanySettings();
-
-        // 2. Recalculate Compliance Deadlines via AI
-        try {
-            const { recalculateComplianceDeadlines } = await import("./compliance-service");
-            await recalculateComplianceDeadlines();
-        } catch (e) {
-            console.error("[RAG Auto-Sync] ❌ AI Recalculation failed:", e);
-        }
+        await syncComplianceAndReturnProvider();
     });
+}
+
+/**
+ * Versión bloqueante para APIs que requieren respuesta inmediata del proveedor de IA
+ */
+export async function syncComplianceAndReturnProvider() {
+    // 1. Sync RAG first
+    await syncCompanySettings();
+
+    // 2. Recalculate Compliance Deadlines via AI
+    try {
+        const { recalculateComplianceDeadlines } = await import("./compliance-service");
+        const result = await recalculateComplianceDeadlines();
+        return result?.provider || 'unknown';
+    } catch (e) {
+        console.error("[RAG Auto-Sync] ❌ AI Recalculation failed:", e);
+        return 'failed';
+    }
 }
 
 /**

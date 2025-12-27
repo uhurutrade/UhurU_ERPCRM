@@ -1,12 +1,28 @@
 import { NextResponse } from 'next/server';
 import { triggerComplianceSync } from '@/lib/ai/auto-sync-rag';
 
-export async function POST() {
+export async function POST(req: Request) {
     try {
-        await triggerComplianceSync();
+        const body = await req.json().catch(() => ({}));
+        const isFullSync = body.fullSync === true;
+
+        let provider = 'unknown';
+
+        if (isFullSync) {
+            const { syncAllSystemData } = await import('@/lib/ai/auto-sync-rag');
+            syncAllSystemData();
+            // Full sync also triggers compliance, but we want the provider back
+            const { syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
+            provider = await syncComplianceAndReturnProvider();
+        } else {
+            const { syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
+            provider = await syncComplianceAndReturnProvider();
+        }
+
         return NextResponse.json({
             success: true,
-            message: "AI Refresh triggered in background. The dates will be updated in a few seconds."
+            provider,
+            message: isFullSync ? "Full Intelligence Sync triggered" : "AI Refresh triggered"
         });
     } catch (error: any) {
         return NextResponse.json({
