@@ -45,7 +45,7 @@ export async function recalculateComplianceDeadlines() {
         }
         `;
 
-        const { getConsensusAI } = await import("@/lib/ai/ai-service");
+        const { getConsensusAI } = await import("./ai-service");
         const ai = await getConsensusAI();
         const responses = await ai.chat(prompt, "You are a UK Compliance Expert. Use strict UK legal terminology.");
 

@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../prisma';
 
 export async function getGmailClient(userId: string) {
     const account = await prisma.account.findFirst({
