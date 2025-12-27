@@ -41,7 +41,8 @@ export async function recalculateComplianceDeadlines() {
             "nextAccountsCompaniesHouseDue": "YYYY-MM-DD",
             "nextAccountsHMRCDue": "YYYY-MM-DD",
             "nextFYEndDate": "YYYY-MM-DD",
-            "justification": "EXHAUSTIVE BILINGUAL LOGIC. Format: [ES] [Explicación detallada de cada ajuste, citando fechas de documentos encontrados en el RAG y normativas UK aplicadas. Explica el PORQUÉ del recalculo paso a paso.] [EN] [Exhaustive point-by-point logic in English explaining document triggers and regulatory reasons for these specific dates]. Be extremely detailed (up to 1200 chars)."
+            "analysis_en": "STRATEGIC AUDIT SUMMARY. Provide a perfectly argued, human-readable explanation. 1. TRIGGER: Identify the exact document or data delta that prompted this change. 2. LOGIC: Explain the step-by-step regulatory reasoning (UK law). 3. CONSEQUENCE: Detail the impact on company liquidity and compliance standing. Tone: Executive, precise, and highly professional.",
+            "analysis_es": "RESUMEN ESTRATÉGICO DE AUDITORÍA. Proporcione una explicación perfectamente argumentada y humanamente comprensible. 1. DISPARADOR: Identifique el documento o cambio de datos exacto que motivó este ajuste. 2. LÓGICA: Explique el razonamiento normativo paso a paso. 3. CONSECUENCIA: Detalle el impacto en la liquidez y situación de cumplimiento de la empresa. Tono: Ejecutivo, preciso y profesional."
         }
         `;
 
@@ -103,7 +104,9 @@ export async function recalculateComplianceDeadlines() {
             nextFYEndDate: settings.nextFYEndDate?.toISOString().split('T')[0]
         };
 
-        const justification = dataGE?.justification || dataOA?.justification || "No explicit justification provided by AI.";
+        const analysis_en = dataGE?.analysis_en || dataOA?.analysis_en || "No English analysis provided.";
+        const analysis_es = dataGE?.analysis_es || dataOA?.analysis_es || "No Spanish analysis provided.";
+        const justification = JSON.stringify({ en: analysis_en, es: analysis_es });
 
         // Update Database
         await prisma.companySettings.update({

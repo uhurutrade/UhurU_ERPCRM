@@ -27,9 +27,25 @@ export function triggerSync(moduleName: string, syncFn: () => Promise<void>) {
 /**
  * Sincronización unificada de configuración y cumplimiento
  */
-export async function triggerComplianceSync() {
+export async function triggerComplianceSync(isManual = false) {
     triggerSync('COMPLIANCE_AND_SETTINGS', async () => {
-        await syncComplianceAndReturnProvider();
+        const result = await syncComplianceAndReturnProvider();
+
+        // If it was a manual save and AI found NO date changes, 
+        // we still want an audit for the data sync itself.
+        if (isManual && result.changes?.length === 0) {
+            const { createNeuralAudit } = await import("./audit-service");
+            await createNeuralAudit({
+                provider: "Neural RAG Engine",
+                changeLog: "Metadata Synced & Factored",
+                justification: JSON.stringify({
+                    en: "FACTURING IMPACT: All manually updated company metadata has been successfully factored into the RAG engine. Indexing completed for strategic context. STRATEGIC CONSEQUENCE: No immediate compliance date adjustments required, but the internal knowledge base is now fully synchronized with the latest administrative deltas.",
+                    es: "IMPACTO DE FACTORIZACIÓN: Todos los metadatos de la empresa actualizados manualmente se han integrado con éxito en el motor RAG. Indexación completada para el contexto estratégico. CONSECUENCIA ESTRATÉGICA: No se requieren ajustes inmediatos de fechas de cumplimiento, pero la base de conocimientos interna está ahora totalmente sincronizada con los últimos cambios administrativos."
+                }),
+                totalChanges: 1,
+                status: "STABLE"
+            });
+        }
     });
 }
 

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         // Unified Auto-Sync & Compliance Recalculation (Async)
         try {
             const { triggerComplianceSync } = await import("@/lib/ai/auto-sync-rag");
-            triggerComplianceSync();
+            triggerComplianceSync(true);
         } catch (e) { console.error("Sync Error:", e); }
 
         return NextResponse.json(companySettings);
@@ -103,7 +103,7 @@ export async function PUT(req: NextRequest) {
         // Unified Auto-Sync & Compliance Recalculation (Async)
         try {
             const { triggerComplianceSync } = await import("@/lib/ai/auto-sync-rag");
-            triggerComplianceSync();
+            triggerComplianceSync(true);
         } catch (e) { /* Silent fail */ }
 
         return NextResponse.json(companySettings);

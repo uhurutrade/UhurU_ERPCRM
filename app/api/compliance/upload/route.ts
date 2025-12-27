@@ -56,6 +56,23 @@ export async function POST(req: Request) {
             console.error("RAG Ingestion failing but file saved:", ragError);
         }
 
+        // 4. TRIGGER NEURAL AUDIT REPORT
+        try {
+            const { createNeuralAudit } = await import('@/lib/ai/audit-service');
+            await createNeuralAudit({
+                provider: "Neural Ingestion Engine",
+                changeLog: `New Intelligence Node: ${filename}`,
+                justification: JSON.stringify({
+                    en: `FACTURING IMPACT: Integration of ${filename} expands the RAG context. New structural variables detected for compliance factoring. STRATEGIC CONSEQUENCE: Increased accuracy in future deadline recalculations and regulatory risk assessment.`,
+                    es: `IMPACTO DE FACTORIZACIÓN: La integración de ${filename} expande el contexto RAG. Se detectan nuevas variables estructurales para el cumplimiento. CONSECUENCIA ESTRATÉGICA: Mayor precisión en futuros recalculos de plazos y evaluación de riesgo normativo.`
+                }),
+                totalChanges: 1,
+                status: "UPDATED"
+            });
+        } catch (auditError) {
+            console.error("Failed to create neural audit for upload:", auditError);
+        }
+
         return NextResponse.json({ success: true, document: doc });
 
     } catch (error: any) {

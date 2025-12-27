@@ -140,6 +140,23 @@ export function NeuralAuditHistory() {
         }
     };
 
+    const parseJustification = (justification: string | null) => {
+        if (!justification) return { en: "No strategic logic provided by Neural Consensus.", es: "No se proporcionó lógica estratégica por Consenso Neural." };
+        try {
+            // Check if it's JSON
+            if (justification.startsWith('{')) {
+                const parsed = JSON.parse(justification);
+                return {
+                    en: parsed.en || parsed.analysis_en || justification,
+                    es: parsed.es || parsed.analysis_es || ""
+                };
+            }
+            return { en: justification, es: "" };
+        } catch {
+            return { en: justification, es: "" };
+        }
+    };
+
     const generatePDF = (audit: Audit) => {
         const doc = new jsPDF() as any;
         const timestampStr = format(new Date(audit.timestamp), "yyyyMMdd_HHmm");
@@ -205,40 +222,65 @@ export function NeuralAuditHistory() {
             alternateRowStyles: { fillColor: [248, 250, 252] },
             styles: { fontSize: 9, cellPadding: 4 }
         });
-
         const finalY = (doc as any).lastAutoTable.finalY + 20;
+        const { en, es: esText } = parseJustification(audit.justification);
 
-        // Justification Section (Bilingual Deep Logic)
-        doc.setTextColor(16, 185, 129);
-        doc.setFontSize(14);
+        // --- English Analysis (Primary) ---
         doc.setFont("helvetica", "bold");
-        doc.text("STRATEGIC JUSTIFICATION & LOGIC", 20, finalY);
-        doc.setFontSize(10);
-        doc.text("JUSTIFICACIÓN ESTRATÉGICA Y LÓGICA DE NEGOCIO", 20, finalY + 7);
+        doc.setTextColor(16, 185, 129);
+        doc.setFontSize(13);
+        doc.text("STRATEGIC IMPACT ANALYSIS (ENGLISH)", 20, finalY);
 
         doc.setDrawColor(16, 185, 129);
-        doc.line(20, finalY + 10, 190, finalY + 10);
+        doc.setLineWidth(0.8);
+        doc.line(20, finalY + 2.5, 190, finalY + 2.5);
 
-        doc.setTextColor(51, 65, 85);
-        doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
-        const splitText = doc.splitTextToSize(audit.justification || "No justification provided.", 175);
+        doc.setTextColor(30, 41, 59);
+        doc.setFontSize(9.5);
+        const splitEN = doc.splitTextToSize(en, 175);
 
-        let textY = finalY + 18;
-        splitText.forEach((line: string) => {
-            if (textY > 260) {
-                doc.addPage();
-                textY = 20;
-            }
-            doc.text(line, 20, textY);
-            textY += 5;
+        let currentY = finalY + 12;
+        splitEN.forEach((line: string) => {
+            if (currentY > 275) { doc.addPage(); currentY = 20; doc.setFont("helvetica", "normal"); }
+            doc.text(line, 20, currentY);
+            currentY += 5.5; // Increased line height for legibility
         });
 
-        // Watermark
-        doc.setTextColor(241, 245, 249);
-        doc.setFontSize(40);
-        doc.setFont("helvetica", "bold");
-        doc.text("UHURU ERP", 105, 240, { align: 'center', angle: 45, opacity: 0.1 });
+        // --- Spanish Translation (Secondary) ---
+        if (esText) {
+            currentY += 8;
+            if (currentY > 270) { doc.addPage(); currentY = 20; }
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(100, 116, 139);
+            doc.setFontSize(10);
+            doc.text("RESUMEN ESTRATÉGICO (ESPAÑOL)", 20, currentY);
+
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineWidth(0.4);
+            doc.line(20, currentY + 2, 85, currentY + 2);
+
+            currentY += 10;
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105);
+            doc.setFontSize(8); // Explicitly smaller as requested
+            const splitES = doc.splitTextToSize(esText, 175);
+
+            splitES.forEach((line: string) => {
+                if (currentY > 275) { doc.addPage(); currentY = 20; doc.setFont("helvetica", "normal"); }
+                doc.text(line, 20, currentY);
+                currentY += 4.5;
+            });
+        }
+
+        // Watermark on first page only if there is space
+        if (currentY < 230) {
+            doc.setTextColor(241, 245, 249);
+            doc.setFontSize(40);
+            doc.setFont("helvetica", "bold");
+            doc.text("UHURU ERP", 105, 240, { align: 'center', angle: 45, opacity: 0.1 });
+        }
 
         // Footer
         const pageCount = doc.internal.getNumberOfPages();
@@ -246,6 +288,7 @@ export function NeuralAuditHistory() {
             doc.setPage(i);
             doc.setFontSize(8);
             doc.setTextColor(148, 163, 184); // Slate-400
+            doc.setFont("helvetica", "normal");
             doc.text(`Certified by UhurU Neural Engine Core v1.0 • Secure Ledger Hash: 0x${audit.id.slice(0, 12)}... • Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
         }
 
@@ -396,9 +439,9 @@ export function NeuralAuditHistory() {
                         </div>
 
                         <div className="flex-1 px-0 sm:px-6 relative z-10">
-                            <div className="bg-slate-950/40 p-3 rounded-xl border border-white/5 opacity-80 group-hover:opacity-100 transition-all">
-                                <p className="text-[11px] text-slate-300 italic line-clamp-2">
-                                    {audit.justification}
+                            <div className={`bg-slate-950/40 p-3 rounded-xl border border-white/5 ${!audit.isRead ? 'border-emerald-500/30 bg-emerald-500/5' : 'opacity-80'} group-hover:opacity-100 transition-all`}>
+                                <p className={`text-[11px] italic line-clamp-2 ${!audit.isRead ? 'text-white font-bold' : 'text-slate-300'}`}>
+                                    {parseJustification(audit.justification).en}
                                 </p>
                             </div>
                         </div>
