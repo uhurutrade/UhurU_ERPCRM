@@ -44,7 +44,8 @@ export default function SyncNodeButton() {
 
                 toast.success("Intelligence Synchronized", {
                     id: toastId,
-                    description: `Neural nodes verified via Dual-AI Consensus (${data.provider}). ${changeLog}`
+                    description: `Neural nodes verified via Dual-AI Consensus (${data.provider}). ${changeLog}`,
+                    duration: 10000
                 });
                 // Wait a bit and refresh
                 setTimeout(() => router.refresh(), 2000);
@@ -55,7 +56,8 @@ export default function SyncNodeButton() {
             console.error("Sync Error:", error);
             toast.error("Audit Failed", {
                 id: toastId,
-                description: "The neural node could not be fully synchronized."
+                description: "The neural node could not be fully synchronized.",
+                duration: 8000
             });
         } finally {
             setIsSyncing(false);

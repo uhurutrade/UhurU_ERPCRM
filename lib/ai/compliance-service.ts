@@ -90,8 +90,8 @@ export async function recalculateComplianceDeadlines() {
 
         // Summary of providers that successfully contributed
         const successfulProviders: string[] = [];
-        if (dataOA) successfulProviders.push("OpenAI");
-        if (dataGE) successfulProviders.push("Gemini");
+        if (dataOA) successfulProviders.push("OpenAI (4o-Mini)");
+        if (dataGE) successfulProviders.push("Gemini (2.0-Flash)");
         const providerSummary = successfulProviders.join(" & ");
 
         // Capture old values for comparison

@@ -164,11 +164,13 @@ OPERATIONAL IDENTITY:
 
             if (syncData.success) {
                 toast.success("Neural Consensus Reached", {
-                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider} completed successfully.`
+                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider} completed successfully.`,
+                    duration: 10000
                 });
             } else {
                 toast.success("Settings Saved", {
-                    description: "Initial data saved, but AI recalculation is currently queued."
+                    description: "Initial data saved, but AI recalculation is currently queued.",
+                    duration: 5000
                 });
             }
 
