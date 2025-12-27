@@ -15,7 +15,6 @@ import {
     JapaneseYen,
     Banknote
 } from "lucide-react";
-export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { serializeData } from "@/lib/serialization";
 
