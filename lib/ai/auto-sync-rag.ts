@@ -58,6 +58,7 @@ export function syncAllSystemData() {
         await syncBankingOverview();
         await syncRecentTransactions();
         await syncCryptoWallets();
+        await syncCryptoTransactions();
 
         // DOCUMENTS & COMPLIANCE
         await syncComplianceDocuments();
@@ -353,6 +354,48 @@ export async function syncCryptoWallets() {
         console.log('[RAG Auto-Sync] ✓ Crypto Wallets');
     } catch (error: any) {
         console.error('[RAG Auto-Sync] Error syncing Crypto:', error.message);
+    }
+}
+
+export async function syncCryptoTransactions() {
+    try {
+        const settings = await prisma.companySettings.findFirst();
+        const startDate = settings?.lastFYEndDate
+            ? new Date(settings.lastFYEndDate)
+            : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+
+        const transactions = await prisma.cryptoTransaction.findMany({
+            where: { timestamp: { gte: startDate } },
+            orderBy: { timestamp: 'desc' },
+            select: {
+                timestamp: true,
+                type: true,
+                amount: true,
+                asset: true,
+                amountUSD: true,
+                fromAddress: true,
+                toAddress: true,
+                status: true,
+                txHash: true,
+                description: true,
+                wallet: { select: { walletName: true } }
+            }
+        });
+
+        let cryptoTxContent = `CRYPTO TRANSACTIONS (SINCE ${startDate.toLocaleDateString()})\n====================================\n\n`;
+
+        for (const tx of transactions) {
+            cryptoTxContent += `${tx.timestamp.toISOString().split('T')[0]} | ${tx.type} | ${tx.amount} ${tx.asset} (${tx.status})\n`;
+            cryptoTxContent += `Value: $${tx.amountUSD || 'N/A'} | Wallet: ${tx.wallet.walletName}\n`;
+            if (tx.description) cryptoTxContent += `Notes: ${tx.description}\n`;
+            cryptoTxContent += `Hash: ${tx.txHash}\n`;
+            cryptoTxContent += `---\n\n`;
+        }
+
+        await ingestText('sys_crypto_recent_transactions', 'Crypto Movemements Ledger', cryptoTxContent);
+        console.log('[RAG Auto-Sync] ✓ Crypto Transactions Ledger');
+    } catch (error: any) {
+        console.error('[RAG Auto-Sync] Error syncing Crypto Transactions:', error.message);
     }
 }
 
