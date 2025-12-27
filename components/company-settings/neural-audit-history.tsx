@@ -172,15 +172,27 @@ export function NeuralAuditHistory() {
         doc.setTextColor(16, 185, 129);
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("STRATEGIC JUSTIFICATION & LOGIC / JUSTIFICACIÓN ESTRATÉGICA", 20, finalY);
+        doc.text("STRATEGIC JUSTIFICATION & LOGIC", 20, finalY);
+        doc.setFontSize(10);
+        doc.text("JUSTIFICACIÓN ESTRATÉGICA Y LÓGICA DE NEGOCIO", 20, finalY + 7);
 
-        doc.line(20, finalY + 3, 190, finalY + 3);
+        doc.setDrawColor(16, 185, 129);
+        doc.line(20, finalY + 10, 190, finalY + 10);
 
         doc.setTextColor(51, 65, 85);
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
-        const splitText = doc.splitTextToSize(audit.justification || "No justification provided.", 170);
-        doc.text(splitText, 20, finalY + 12);
+        const splitText = doc.splitTextToSize(audit.justification || "No justification provided.", 175);
+
+        let textY = finalY + 18;
+        splitText.forEach((line: string) => {
+            if (textY > 260) {
+                doc.addPage();
+                textY = 20;
+            }
+            doc.text(line, 20, textY);
+            textY += 5;
+        });
 
         // Watermark
         doc.setTextColor(241, 245, 249);
