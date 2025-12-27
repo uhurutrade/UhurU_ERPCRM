@@ -26,7 +26,7 @@ export default function SyncNodeButton() {
     const handleFullSync = async () => {
         setIsSyncing(true);
         const toastId = toast.loading("Executing Neural Audit...", {
-            description: "Sincronizando todos los nodos de la compañía y recalculando plazos..."
+            description: "Synchronizing all company nodes and recalculating deadlines..."
         });
 
         try {
@@ -39,12 +39,12 @@ export default function SyncNodeButton() {
 
             if (data.success) {
                 const changeLog = data.changes && data.changes.length > 0
-                    ? `Actualizado: ${data.changes.join(", ")}.`
-                    : "No se requieren ajustes - Sistema en máxima precisión.";
+                    ? `Updated: ${data.changes.join(", ")}.`
+                    : "No adjustments needed - System at peak precision.";
 
-                toast.success("Inteligencia Sincronizada", {
+                toast.success("Intelligence Synchronized", {
                     id: toastId,
-                    description: `Nodos verificados mediante Consenso Dual-AI (${data.provider?.toUpperCase()}). ${changeLog}`
+                    description: `Neural nodes verified via Dual-AI Consensus (${data.provider?.toUpperCase()}). ${changeLog}`
                 });
                 // Wait a bit and refresh
                 setTimeout(() => router.refresh(), 2000);
@@ -55,7 +55,7 @@ export default function SyncNodeButton() {
             console.error("Sync Error:", error);
             toast.error("Audit Failed", {
                 id: toastId,
-                description: "El nodo neuronal no pudo ser sincronizado completamente."
+                description: "The neural node could not be fully synchronized."
             });
         } finally {
             setIsSyncing(false);

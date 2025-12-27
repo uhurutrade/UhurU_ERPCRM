@@ -163,12 +163,12 @@ OPERATIONAL IDENTITY:
             window.dispatchEvent(new Event('settings-saved'));
 
             if (syncData.success) {
-                toast.success("Consenso Neuronal Alcanzado", {
-                    description: `Ajustes guardados y vectorizados. Verificación Dual-AI mediante ${syncData.provider.toUpperCase()} completada con éxito. Listo para operar.`
+                toast.success("Neural Consensus Reached", {
+                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider.toUpperCase()} completed successfully. System ready.`
                 });
             } else {
-                toast.success("Ajustes Guardados", {
-                    description: "Los datos se han guardado, pero la recalculación por IA está en cola."
+                toast.success("Settings Saved", {
+                    description: "Initial data saved, but AI recalculation is currently queued."
                 });
             }
 
