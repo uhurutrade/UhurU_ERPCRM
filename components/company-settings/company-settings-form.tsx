@@ -431,7 +431,6 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                 <div className="space-y-6">
                     {/* Row 1: Last Filed Status */}
                     <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 px-1">Row 1: Last Filed (Manual Entry)</label>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-[11px] font-bold text-slate-300 mb-2">CompaniesHouse Confirmation Statement</label>
@@ -480,10 +479,6 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
 
                     {/* Row 2: Future Deadlines */}
                     <div>
-                        <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3 px-1 flex items-center gap-2">
-                            Row 2: Future Deadlines (AI Predicted)
-                            <div className="px-2 py-0.5 bg-indigo-500/10 rounded-full text-[8px]">UK LAW COMPLIANT</div>
-                        </label>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next Confirmation Due</label>
