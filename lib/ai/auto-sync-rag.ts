@@ -148,7 +148,11 @@ Phone: ${settings.contactPhone || 'N/A'}
 Website: ${settings.website || 'N/A'}
 Accounting Software: ${settings.accountingSoftware || 'N/A'}
 Accounting Method: ${settings.accountingMethod || 'N/A'}
-AI Provider: ${settings.aiProvider || 'openai'}
+STRATEGIC NEURAL CENTER (AI PROMPTS)
+---------------------------------
+System Identity: ${settings.aiSystemPrompt || 'N/A'}
+Strategic Directives: ${settings.aiStrategicDirectives || 'N/A'}
+Adaptive Memory / Log: ${settings.aiMemoryPrompt || 'N/A'}
 
 NOTES
 -----

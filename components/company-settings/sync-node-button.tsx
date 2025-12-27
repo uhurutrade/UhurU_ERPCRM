@@ -26,7 +26,7 @@ export default function SyncNodeButton() {
     const handleFullSync = async () => {
         setIsSyncing(true);
         const toastId = toast.loading("Executing Neural Audit...", {
-            description: "Synchronizing all company nodes and recalculating compliance..."
+            description: "Sincronizando todos los nodos de la compañía y recalculando plazos..."
         });
 
         try {
@@ -39,12 +39,12 @@ export default function SyncNodeButton() {
 
             if (data.success) {
                 const changeLog = data.changes && data.changes.length > 0
-                    ? `Updated: ${data.changes.join(", ")}.`
-                    : "No adjustments needed - System at peak precision.";
+                    ? `Actualizado: ${data.changes.join(", ")}.`
+                    : "No se requieren ajustes - Sistema en máxima precisión.";
 
-                toast.success("Intelligence Synchronized", {
+                toast.success("Inteligencia Sincronizada", {
                     id: toastId,
-                    description: `Neural nodes verified via ${data.provider?.toUpperCase()}. ${changeLog}`
+                    description: `Nodos verificados mediante Consenso Dual-AI (${data.provider?.toUpperCase()}). ${changeLog}`
                 });
                 // Wait a bit and refresh
                 setTimeout(() => router.refresh(), 2000);
@@ -55,7 +55,7 @@ export default function SyncNodeButton() {
             console.error("Sync Error:", error);
             toast.error("Audit Failed", {
                 id: toastId,
-                description: "The neural node could not be fully synchronized."
+                description: "El nodo neuronal no pudo ser sincronizado completamente."
             });
         } finally {
             setIsSyncing(false);
@@ -67,8 +67,8 @@ export default function SyncNodeButton() {
             onClick={handleFullSync}
             disabled={isSyncing || isDirty}
             className={`group relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r ${isDirty
-                    ? 'from-slate-700 to-slate-800 cursor-not-allowed'
-                    : 'from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'
+                ? 'from-slate-700 to-slate-800 cursor-not-allowed'
+                : 'from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'
                 } disabled:opacity-50 text-white rounded-2xl shadow-xl transition-all active:scale-95 overflow-hidden`}
         >
             {/* Background glow effect on hover */}
