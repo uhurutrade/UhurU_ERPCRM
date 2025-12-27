@@ -11,9 +11,13 @@ export async function POST(req: Request) {
 
         if (isFullSync) {
             const { syncAllSystemData, syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
-            syncAllSystemData();
+            // Foreground: Get consensus for legal dates immediately to return to user
             result = await syncComplianceAndReturnProvider();
             provider = result.provider;
+
+            // Background: Trigger full system RAG sync (banking, crm, etc.)
+            // We pass true to skip compliance since we just did it in foreground
+            syncAllSystemData(true);
         } else {
             const { syncComplianceAndReturnProvider } = await import('@/lib/ai/auto-sync-rag');
             result = await syncComplianceAndReturnProvider();

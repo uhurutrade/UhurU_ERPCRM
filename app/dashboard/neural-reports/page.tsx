@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { BrainCircuit } from "lucide-react";
 import { NeuralAuditHistory } from "@/components/company-settings/neural-audit-history";
+import { AIStatusBadge } from "@/components/ai/status-badge";
 
 export default function NeuralReportsPage() {
     return (
@@ -16,9 +17,7 @@ export default function NeuralReportsPage() {
                     <p className="text-uhuru-text-muted mt-2 uppercase text-[10px] font-bold tracking-[0.2em]">Autonomous Audit Feed & Strategic Reports</p>
                 </div>
                 <div className="flex gap-3">
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                        Neural Core v1.0 Active
-                    </span>
+                    <AIStatusBadge />
                 </div>
             </header>
 

@@ -67,10 +67,15 @@ export async function syncComplianceAndReturnProvider() {
 /**
  * Sincroniza TODA la base de datos al RAG de forma asíncrona
  */
-export function syncAllSystemData() {
+export function syncAllSystemData(skipCompliance = false) {
     triggerSync('FULL_SYSTEM_SYNC', async () => {
         // CORE BUSINESS DATA
-        await triggerComplianceSync(); // Includes RAG sync + AI Dates
+        if (!skipCompliance) {
+            await triggerComplianceSync(); // Includes RAG sync + AI Dates
+        } else {
+            // If skipping AI dates, at least sync the base company settings to RAG
+            await syncCompanySettings();
+        }
         await triggerBankingSync();
         await triggerCRMSync();
         await triggerInvoiceSync();

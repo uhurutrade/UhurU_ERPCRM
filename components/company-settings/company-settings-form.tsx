@@ -6,6 +6,7 @@ import { FinancialCategoriesGuide } from "./financial-categories-guide";
 import { RefreshCw, Sparkles, AlertTriangle, BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/providers/modal-provider";
+import { AIStatusBadge } from "@/components/ai/status-badge";
 
 interface CompanySettingsFormProps {
     initialData: any;
@@ -806,10 +807,7 @@ OPERATIONAL IDENTITY:
                         <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.25em] mt-1 ml-11">Core Behavioral Engine</p>
                     </div>
                     <div className="flex gap-2">
-                        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-tighter">RAG Memory Active</span>
-                        </div>
+                        <AIStatusBadge forcedProvider={formData.aiProvider} />
                     </div>
                 </div>
 
@@ -852,7 +850,7 @@ OPERATIONAL IDENTITY:
                                 </div>
                                 <div className="text-left">
                                     <p className="text-xs font-black uppercase tracking-widest opacity-60">Google</p>
-                                    <p className="text-sm font-bold">Gemini 1.5 Flash</p>
+                                    <p className="text-sm font-bold">Gemini 2.0 Flash</p>
                                 </div>
                             </button>
                         </div>
@@ -861,7 +859,7 @@ OPERATIONAL IDENTITY:
                     <div className="p-5 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 flex flex-col justify-center">
                         <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3">Multi-Model Protocol</p>
                         <p className="text-xs text-slate-400 leading-relaxed italic">
-                            The system now operates under a "Safe Consensus" logic. Both neural nodes are consulted for compliance and the most restrictive date is chosen automatically.
+                            Legal deadlines are calculated via "Safe Consensus" (OpenAI + Gemini) to ensure maximum compliance. Other operational tasks use your selected infrastructure.
                         </p>
                     </div>
                 </div>
