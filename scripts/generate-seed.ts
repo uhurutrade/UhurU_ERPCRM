@@ -5,7 +5,7 @@ const fs = require('fs');
 const prisma = new PrismaClient();
 
 async function main() {
-  const isFullExport = process.env.FULL_EXPORT === 'true';
+  const isFullExport = true; // Forzamos exportación completa para el rescate
 
   console.log(`🔄 Iniciando extracción DINÁMICA... [Modo: ${isFullExport ? 'BACKUP TOTAL' : 'SOLO INFRAESTRUCTURA'}]`);
 
@@ -33,7 +33,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  const fullMode = ${isFullExport};
+  const fullMode = false; // Mantenemos false para evitar borrados accidentales en el VPS
   console.log('🌱 Ejecutando Seed de Seguridad UhurU v2.0');
   console.log('Generado: ${new Date().toISOString()}');
 

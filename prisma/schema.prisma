@@ -61,10 +61,10 @@ model Organization {
   isBillable Boolean   @default(false)
   legalName  String?
   taxId      String?
-  email      String?
-  phone      String?
   city       String?
   country    String?
+  email      String?
+  phone      String?
   postcode   String?
   contacts   Contact[]
   deals      Deal[]
@@ -100,11 +100,11 @@ model Lead {
   name          String
   email         String?
   source        String?
-  status        String   @default("NEW") // NEW, DISCARDED, CONVERTED
+  status        String   @default("NEW")
   notes         String?
-  gmailThreadId String?  @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  gmailThreadId String?  @unique
 }
 
 model Deal {
@@ -183,12 +183,12 @@ model BankAccount {
   routingNumber     String?
   sortCode          String?
   swiftBic          String?
-  paymentDetails    String?           @db.Text
   order             Int               @default(0)
   wireRoutingNumber String?
+  paymentDetails    String?
   bank              Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
-  invoices          Invoice[]
   transactions      BankTransaction[]
+  invoices          Invoice[]
 
   @@index([bankId])
   @@index([currency])
@@ -272,9 +272,9 @@ model BankTransaction {
   exchangeRate    Decimal?       @db.Decimal(15, 8)
   type            String?
   attachments     Attachment[]
-  invoices        Invoice[]
   bankAccount     BankAccount    @relation(fields: [bankAccountId], references: [id])
   bankStatement   BankStatement? @relation(fields: [bankStatementId], references: [id])
+  invoices        Invoice[]
 }
 
 model BankStatement {
@@ -344,30 +344,30 @@ model ComplianceEvent {
 }
 
 model Invoice {
-  id             String        @id @default(cuid())
-  number         String        @unique
-  date           DateTime      @default(now())
-  dueDate        DateTime
-  status         String        @default("DRAFT")
-  subtotal       Decimal       @db.Decimal(15, 2)
-  taxRate        Decimal       @default(0) @db.Decimal(5, 2)
-  taxAmount      Decimal       @db.Decimal(15, 2)
-  total          Decimal       @db.Decimal(15, 2)
-  currency       String        @default("GBP")
+  id                String           @id @default(cuid())
+  number            String           @unique
+  date              DateTime         @default(now())
+  dueDate           DateTime
+  status            String           @default("DRAFT")
+  subtotal          Decimal          @db.Decimal(15, 2)
+  taxRate           Decimal          @default(0) @db.Decimal(5, 2)
+  taxAmount         Decimal          @db.Decimal(15, 2)
+  total             Decimal          @db.Decimal(15, 2)
+  currency          String           @default("GBP")
   organizationId    String
-  bankTransactionId String?
-  notes             String?
-  footerNote        String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
   bankAccountId     String?
   cryptoWalletId    String?
   deletedAt         DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  items             InvoiceItem[]
-  bankAccount       BankAccount?  @relation(fields: [bankAccountId], references: [id])
-  cryptoWallet      CryptoWallet? @relation(fields: [cryptoWalletId], references: [id])
+  footerNote        String?
+  notes             String?
+  bankTransactionId String?
+  bankAccount       BankAccount?     @relation(fields: [bankAccountId], references: [id])
   bankTransaction   BankTransaction? @relation(fields: [bankTransactionId], references: [id])
+  cryptoWallet      CryptoWallet?    @relation(fields: [cryptoWalletId], references: [id])
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items             InvoiceItem[]
 }
 
 model InvoiceItem {
@@ -381,62 +381,57 @@ model InvoiceItem {
 }
 
 model CompanySettings {
-  id                      String    @id @default(cuid())
-  companyName             String
-  companyNumber           String    @unique
-  incorporationDate       DateTime
-  registeredAddress       String
-  registeredCity          String
-  registeredPostcode      String
-  registeredCountry       String    @default("United Kingdom")
-  tradingAddress          String?
-  tradingCity             String?
-  tradingPostcode         String?
-  companyType             String
-  sicCodes                String?
-  financialYearEnd        String
-  accountsNextDueDate     DateTime?
-  confirmationNextDueDate DateTime?
-  
-  // UK Filing Matrix - Row 1: Last Filed
-  lastConfirmationStatementDate DateTime?
+  id                             String    @id @default(cuid())
+  companyName                    String
+  companyNumber                  String    @unique
+  incorporationDate              DateTime
+  registeredAddress              String
+  registeredCity                 String
+  registeredPostcode             String
+  registeredCountry              String    @default("United Kingdom")
+  tradingAddress                 String?
+  tradingCity                    String?
+  tradingPostcode                String?
+  companyType                    String
+  sicCodes                       String?
+  financialYearEnd               String
+  accountsNextDueDate            DateTime?
+  confirmationNextDueDate        DateTime?
+  vatRegistered                  Boolean   @default(false)
+  vatNumber                      String?
+  vatRegistrationDate            DateTime?
+  vatScheme                      String?
+  vatReturnFrequency             String?
+  payeReference                  String?
+  corporationTaxReference        String?
+  utr                            String?
+  directors                      String?
+  companySecretary               String?
+  shareCapital                   Decimal?  @db.Decimal(15, 2)
+  numberOfShares                 Int?
+  accountingSoftware             String?
+  accountingMethod               String?
+  contactEmail                   String?
+  contactPhone                   String?
+  website                        String?
+  notes                          String?
+  createdAt                      DateTime  @default(now())
+  updatedAt                      DateTime  @updatedAt
+  aiProvider                     String    @default("openai")
+  invoicePrefix                  String    @default("INV-")
+  nextInvoiceNumber              Int       @default(1)
+  aiCustomInstructions           String?
+  lastAccountsHMRCDate           DateTime?
+  lastConfirmationStatementDate  DateTime?
+  lastFYEndDate                  DateTime?
+  nextAccountsHMRCDue            DateTime?
+  nextConfirmationStatementDue   DateTime?
+  nextFYEndDate                  DateTime?
   lastAccountsCompaniesHouseDate DateTime?
-  lastAccountsHMRCDate          DateTime?
-  lastFYEndDate                 DateTime?
-
-  // UK Filing Matrix - Row 2: Next Deadlines (AI Calculated)
-  nextConfirmationStatementDue DateTime?
-  nextAccountsCompaniesHouseDue DateTime?
-  nextAccountsHMRCDue          DateTime?
-  nextFYEndDate                DateTime?
-
-  vatRegistered           Boolean   @default(false)
-  vatNumber               String?
-  vatRegistrationDate     DateTime?
-  vatScheme               String?
-  vatReturnFrequency      String?
-  payeReference           String?
-  corporationTaxReference String?
-  utr                     String?
-  directors               String?
-  companySecretary        String?
-  shareCapital            Decimal?  @db.Decimal(15, 2)
-  numberOfShares          Int?
-  accountingSoftware      String?
-  accountingMethod        String?
-  contactEmail            String?
-  contactPhone            String?
-  website                 String?
-  notes                   String?
-  invoicePrefix           String    @default("INV-")
-  nextInvoiceNumber       Int       @default(1)
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @updatedAt
-  aiProvider              String    @default("openai")
-  aiCustomInstructions    String?   @db.Text
-  aiSystemPrompt         String?   @db.Text
-  aiStrategicDirectives   String?   @db.Text
-  aiMemoryPrompt          String?   @db.Text
+  nextAccountsCompaniesHouseDue  DateTime?
+  aiMemoryPrompt                 String?
+  aiStrategicDirectives          String?
+  aiSystemPrompt                 String?
 }
 
 model DeletedTransaction {
@@ -479,10 +474,10 @@ model ComplianceDocument {
   fileHash          String?
   isSuperseded      Boolean         @default(false)
   strategicInsights String?
-  userNotes         String?
   supersededById    String?
+  userNotes         String?
+  updatedAt         DateTime        @default(now()) @updatedAt
   chunks            DocumentChunk[]
-  updatedAt         DateTime        @updatedAt @default(now())
 }
 
 model DocumentChunk {
@@ -501,8 +496,8 @@ model NeuralAudit {
   timestamp     DateTime @default(now())
   provider      String
   changeLog     String?
-  justification String?  @db.Text
+  justification String?
   totalChanges  Int      @default(0)
-  status        String   @default("STABLE") // STABLE, UPDATED, FAILED
+  status        String   @default("STABLE")
   isRead        Boolean  @default(false)
 }
