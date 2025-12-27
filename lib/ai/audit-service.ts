@@ -19,24 +19,21 @@ export async function recordStrategicAudit(action: string, details: string, type
 
         const prompt = `
             You are a Data Auditor for UhurU ERP. 
-            Event: ${action}
-            Technical Details: ${details}
+            User Action: ${action}
+            Data Change Detail (JSON): ${details}
             
             Task:
-            1. Provide a CRITICAL and CONCISE summary of WHAT changed and WHY it matters for the data records.
-            2. Max 1-2 very short sentences. Avoid fluff or formal greetings.
-            3. Must return a JSON object with "en" and "es" keys.
+            1. Analyze the JSON data which contains 'changedFields' and 'values'.
+            2. Provide a single, HIGHLY PROFESSIONAL sentence in English and Spanish.
+            3. Focus on WHAT was modified and the business context.
+            4. If it's a creation, mention the new entity. If it's an update, mention what fields changed.
             
-            Example Content: "Created lead 'Raul' for CRM tracking. Essential for sales pipeline visibility."
+            Example: "User updated contact 'John Doe' changing email and phone number. Ensures CRM data accuracy."
             
-            JSON Structure:
-            {
-                "en": "Short text...",
-                "es": "Texto corto..."
-            }
+            Return JSON: {"en": "...", "es": "..."}
         `;
 
-        const response = await ai.chat(prompt, "You are a senior business intelligence consultant.");
+        const response = await ai.chat(prompt, "You are a senior data governance expert.");
 
         try {
             // Clean up possible markdown decorators like ```json

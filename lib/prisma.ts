@@ -3,8 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prismaClient = new PrismaClient()
 // Unified Prisma Client with Strategic AI Auditing Extension
 
-// MODÈLES À SURVEILLER (Solo acciones de negocio directas del usuario)
-// Excluimos tablas técnicas de alta frecuencia o ruido interno
+// MODÈLES À IGNORER COMPLETAMENTE (RUIDO TÉCNICO PURO)
 const EXCLUDE_MODELS = [
     'NeuralAudit',
     'ActivityLog',
@@ -13,10 +12,7 @@ const EXCLUDE_MODELS = [
     'VerificationToken',
     'User',
     'DocumentChunk',
-    'BankTransaction',
-    'CryptoTransaction',
-    'Activity',
-    'BankStatement'
+    'Activity'
 ];
 
 export const prisma = prismaClient.$extends({
@@ -32,12 +28,41 @@ export const prisma = prismaClient.$extends({
                         try {
                             const { recordStrategicAudit } = await import('./ai/audit-service');
 
-                            // Analysis of the payload to extract a human-legible label
-                            const data = (args as any).data || (args as any).update || (args as any).where || {};
-                            const name = data.name || data.title || data.number || data.accountName || data.filename || data.description;
+                            const dataArg = (args as any).data || (args as any).update || (args as any).where || {};
 
-                            // Avoid auditing empty updates or internal flags
-                            const isMinor = Object.keys(data).length === 1 && (data.isRead !== undefined || data.lastLogin !== undefined);
+                            // 🛑 FILTER NOISE: Ignore individual transactions created during a bulk statement upload
+                            if (model === 'BankTransaction' && operation === 'create' && (dataArg.bankStatementId || dataArg.externalId)) {
+                                return;
+                            }
+
+                            // 🛑 FILTER NOISE: Ignore bulk operations that aren't manual (summarize them later if needed)
+                            if (['createMany', 'updateMany', 'deleteMany'].includes(operation)) {
+                                const count = (args as any).data?.length || "multiple";
+                                await recordStrategicAudit(
+                                    `BULK ${operation.toUpperCase()}: ${model}`,
+                                    `Multiple records (${count}) affected by system process or bulk action.`,
+                                    "BULK_OPERATION"
+                                );
+                                return;
+                            }
+
+                            // Redact sensitive or noisy data from the audit log
+                            const redact = (obj: any) => {
+                                const clean: any = {};
+                                const ignoreKeys = ['id', 'createdAt', 'updatedAt', 'userId', 'token', 'password', 'hash', 'fileHash'];
+                                for (const key in obj) {
+                                    if (!ignoreKeys.includes(key)) {
+                                        clean[key] = obj[key];
+                                    }
+                                }
+                                return clean;
+                            };
+
+                            const cleanData = redact(dataArg);
+                            const name = cleanData.name || cleanData.title || cleanData.number || cleanData.accountName || cleanData.filename || cleanData.description;
+
+                            // Avoid auditing trivial updates
+                            const isMinor = Object.keys(cleanData).length === 1 && (cleanData.isRead !== undefined || cleanData.lastLogin !== undefined);
 
                             if (!isMinor) {
                                 let actionLabel = `${operation.toUpperCase()}: ${model}`;
@@ -45,8 +70,13 @@ export const prisma = prismaClient.$extends({
 
                                 await recordStrategicAudit(
                                     actionLabel,
-                                    `Operation: ${operation}. Parameters detected: ${Object.keys(data).join(", ")}. Data integrity verified by Prisma Core.`,
-                                    "AUTO_LEDGER"
+                                    JSON.stringify({
+                                        operation,
+                                        model,
+                                        changedFields: Object.keys(cleanData),
+                                        values: cleanData
+                                    }),
+                                    "USER_ACTION"
                                 );
                             }
                         } catch (e) {
