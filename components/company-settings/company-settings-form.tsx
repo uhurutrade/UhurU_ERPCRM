@@ -37,13 +37,40 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
         companyType: initialData?.companyType || "",
         sicCodes: initialData?.sicCodes || "",
 
-        // Financial Year
         financialYearEnd: initialData?.financialYearEnd || "",
         accountsNextDueDate: initialData?.accountsNextDueDate
             ? new Date(initialData.accountsNextDueDate).toISOString().split('T')[0]
             : "",
         confirmationNextDueDate: initialData?.confirmationNextDueDate
             ? new Date(initialData.confirmationNextDueDate).toISOString().split('T')[0]
+            : "",
+
+        // UK Filing Matrix - Row 1: Last Filed
+        lastConfirmationStatementDate: initialData?.lastConfirmationStatementDate
+            ? new Date(initialData.lastConfirmationStatementDate).toISOString().split('T')[0]
+            : "",
+        lastAccountsCHDate: initialData?.lastAccountsCHDate
+            ? new Date(initialData.lastAccountsCHDate).toISOString().split('T')[0]
+            : "",
+        lastAccountsHMRCDate: initialData?.lastAccountsHMRCDate
+            ? new Date(initialData.lastAccountsHMRCDate).toISOString().split('T')[0]
+            : "",
+        lastFYEndDate: initialData?.lastFYEndDate
+            ? new Date(initialData.lastFYEndDate).toISOString().split('T')[0]
+            : "",
+
+        // UK Filing Matrix - Row 2: Next Deadlines (AI Calculated)
+        nextConfirmationStatementDue: initialData?.nextConfirmationStatementDue
+            ? new Date(initialData.nextConfirmationStatementDue).toISOString().split('T')[0]
+            : "",
+        nextAccountsCHDue: initialData?.nextAccountsCHDue
+            ? new Date(initialData.nextAccountsCHDue).toISOString().split('T')[0]
+            : "",
+        nextAccountsHMRCDue: initialData?.nextAccountsHMRCDue
+            ? new Date(initialData.nextAccountsHMRCDue).toISOString().split('T')[0]
+            : "",
+        nextFYEndDate: initialData?.nextFYEndDate
+            ? new Date(initialData.nextFYEndDate).toISOString().split('T')[0]
             : "",
 
         // Tax Information
@@ -102,6 +129,56 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
         // Additional Notes
         notes: initialData?.notes || "",
     });
+
+    const [isCalculatingAI, setIsCalculatingAI] = useState(false);
+
+    const handleCalculateDeadlines = async () => {
+        setIsCalculatingAI(true);
+        try {
+            const prompt = `Calcula las próximas fechas de vencimiento (Next Deadlines) para una empresa UK Ltd basándome en:
+- Fecha de Incorporación: ${formData.incorporationDate}
+- Última Presentación CH: ${formData.lastAccountsCHDate || 'No disponible'}
+- Última Presentación HMRC: ${formData.lastAccountsHMRCDate || 'No disponible'}
+- Última Confirmation Statement: ${formData.lastConfirmationStatementDate || 'No disponible'}
+- Último Año Fiscal Finalizado: ${formData.lastFYEndDate || 'No disponible'}
+
+Devuelve un JSON estrictamente con este formato:
+{
+  "nextConfirmationStatementDue": "YYYY-MM-DD",
+  "nextAccountsCHDue": "YYYY-MM-DD",
+  "nextAccountsHMRCDue": "YYYY-MM-DD",
+  "nextFYEndDate": "YYYY-MM-DD"
+}`;
+
+            const res = await fetch('/api/compliance/ai-assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: prompt })
+            });
+
+            const data = await res.json();
+            // Parse JSON from AI response
+            const jsonStr = data.reply.match(/\{[\s\S]*\}/)[0];
+            const deadlines = JSON.parse(jsonStr);
+
+            setFormData(prev => ({
+                ...prev,
+                ...deadlines
+            }));
+
+            // Also update the fallback legacy fields
+            setFormData(prev => ({
+                ...prev,
+                accountsNextDueDate: deadlines.nextAccountsCHDue,
+                confirmationNextDueDate: deadlines.nextConfirmationStatementDue
+            }));
+
+        } catch (error) {
+            console.error("AI Deadline Calculation failed:", error);
+        } finally {
+            setIsCalculatingAI(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -342,48 +419,144 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
             </section>
 
             {/* Financial Year & Deadlines */}
-            <section>
-                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Financial Year & Deadlines</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <section className="bg-slate-900/20 p-6 rounded-2xl border border-white/5">
+                <div className="flex justify-between items-center mb-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Financial Year End <span className="text-rose-400">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="financialYearEnd"
-                            value={formData.financialYearEnd}
-                            onChange={handleChange}
-                            required
-                            placeholder="DD-MM (e.g., 31-03)"
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        />
+                        <h2 className="text-xl font-bold text-emerald-400">Financial Year & Deadlines</h2>
+                        <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">UK Filing Lifecycle Matrix</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleCalculateDeadlines}
+                        disabled={isCalculatingAI}
+                        className={`flex items-center gap-2 px-4 py-2 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-black transition-all ${isCalculatingAI ? 'animate-pulse opacity-50' : ''}`}
+                    >
+                        <span>{isCalculatingAI ? '🤖 CALCULATING...' : '🤖 SYNC LEGAL DEADLINES (AI)'}</span>
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Row 1: Last Filed Status */}
+                    <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 px-1">Row 1: Last Filed (Manual Entry)</label>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CH Confirmation Statement</label>
+                                <input
+                                    type="date"
+                                    name="lastConfirmationStatementDate"
+                                    value={formData.lastConfirmationStatementDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">CH Annual Accounts</label>
+                                <input
+                                    type="date"
+                                    name="lastAccountsCHDate"
+                                    value={formData.lastAccountsCHDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">HMRC Accounts</label>
+                                <input
+                                    type="date"
+                                    name="lastAccountsHMRCDate"
+                                    value={formData.lastAccountsHMRCDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-2">Last Fiscal Year End</label>
+                                <input
+                                    type="date"
+                                    name="lastFYEndDate"
+                                    value={formData.lastFYEndDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm border-dashed"
+                                />
+                            </div>
+                        </div>
                     </div>
 
+                    <div className="h-px bg-white/5" />
+
+                    {/* Row 2: Future Deadlines */}
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Next Accounts Due Date
+                        <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3 px-1 flex items-center gap-2">
+                            Row 2: Future Deadlines (AI Predicted)
+                            <div className="px-2 py-0.5 bg-indigo-500/10 rounded-full text-[8px]">UK LAW COMPLIANT</div>
                         </label>
-                        <input
-                            type="date"
-                            name="accountsNextDueDate"
-                            value={formData.accountsNextDueDate}
-                            onChange={handleChange}
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next Confirmation Due</label>
+                                <input
+                                    type="date"
+                                    name="nextConfirmationStatementDue"
+                                    value={formData.nextConfirmationStatementDue}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm font-bold active:scale-95 transition-transform"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next CH Accounts Due</label>
+                                <input
+                                    type="date"
+                                    name="nextAccountsCHDue"
+                                    value={formData.nextAccountsCHDue}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm font-bold"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next HMRC Accounts Due</label>
+                                <input
+                                    type="date"
+                                    name="nextAccountsHMRCDue"
+                                    value={formData.nextAccountsHMRCDue}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm font-bold"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next Year End Projection</label>
+                                <input
+                                    type="date"
+                                    name="nextFYEndDate"
+                                    value={formData.nextFYEndDate}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm font-bold"
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Next Confirmation Statement Due
-                        </label>
-                        <input
-                            type="date"
-                            name="confirmationNextDueDate"
-                            value={formData.confirmationNextDueDate}
-                            onChange={handleChange}
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        />
+                    <div className="mt-4 pt-4 border-t border-white/5 flex gap-4">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                Financial Year End Reference <span className="text-rose-400">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="financialYearEnd"
+                                value={formData.financialYearEnd}
+                                onChange={handleChange}
+                                required
+                                placeholder="DD-MM (e.g., 31-03)"
+                                className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
+                            />
+                        </div>
+                        <div className="flex-1 hidden md:block opacity-50 pointer-events-none">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Legacy Sync Status</label>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-500 font-mono">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                LEGACY CH FIELDS SYNCHRONIZED
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

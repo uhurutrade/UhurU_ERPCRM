@@ -397,6 +397,19 @@ model CompanySettings {
   financialYearEnd        String
   accountsNextDueDate     DateTime?
   confirmationNextDueDate DateTime?
+  
+  // UK Filing Matrix - Row 1: Last Filed
+  lastConfirmationStatementDate DateTime?
+  lastAccountsCHDate            DateTime?
+  lastAccountsHMRCDate          DateTime?
+  lastFYEndDate                 DateTime?
+
+  // UK Filing Matrix - Row 2: Next Deadlines (AI Calculated)
+  nextConfirmationStatementDue DateTime?
+  nextAccountsCHDue            DateTime?
+  nextAccountsHMRCDue          DateTime?
+  nextFYEndDate                DateTime?
+
   vatRegistered           Boolean   @default(false)
   vatNumber               String?
   vatRegistrationDate     DateTime?

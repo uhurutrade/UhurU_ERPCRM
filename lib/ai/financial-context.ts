@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function getFinancialContext() {
     try {
-        const [transactions, invoices, obligations] = await Promise.all([
+        const [transactions, invoices, obligations, settings] = await Promise.all([
             prisma.bankTransaction.findMany({
                 orderBy: { date: 'desc' },
                 take: 50, // Recent relevant transactions
@@ -16,7 +16,8 @@ export async function getFinancialContext() {
             prisma.taxObligation.findMany({
                 where: { status: 'PENDING' },
                 orderBy: { dueDate: 'asc' }
-            })
+            }),
+            prisma.companySettings.findFirst()
         ]);
 
         // Calculate some basic totals for the AI
@@ -28,6 +29,13 @@ export async function getFinancialContext() {
         }, { totalInbound: 0, totalOutbound: 0 });
 
         const context = `
+COMPANY PROFILE (UK COMPLIANCE):
+- Company: ${settings?.companyName || 'N/A'} (No. ${settings?.companyNumber || 'N/A'})
+- Incorporation Date: ${settings?.incorporationDate?.toLocaleDateString() || 'N/A'}
+- Financial Year End: ${settings?.financialYearEnd || 'N/A'}
+- Next CH Accounts Due: ${settings?.nextAccountsCHDue?.toLocaleDateString() || 'N/A'}
+- Last CH Accounts Filed: ${settings?.lastAccountsCHDate?.toLocaleDateString() || 'N/A'}
+
 FINANCIAL SUMMARY (GENERAL LEDGER):
 - Total Recent Inbound: £${totals.totalInbound.toLocaleString()}
 - Total Recent Outbound: £${totals.totalOutbound.toLocaleString()}
