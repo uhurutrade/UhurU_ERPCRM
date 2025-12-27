@@ -108,7 +108,44 @@ export function syncAllSystemData() {
 
 export async function syncCompanySettings() {
     try {
-        const settings = await prisma.companySettings.findFirst();
+        const settings = await prisma.companySettings.findFirst({
+            select: {
+                companyName: true,
+                companyNumber: true,
+                incorporationDate: true,
+                registeredAddress: true,
+                registeredCity: true,
+                registeredPostcode: true,
+                registeredCountry: true,
+                tradingAddress: true,
+                companyType: true,
+                sicCodes: true,
+                financialYearEnd: true,
+                accountsNextDueDate: true,
+                confirmationNextDueDate: true,
+                vatRegistered: true,
+                vatNumber: true,
+                vatRegistrationDate: true,
+                vatScheme: true,
+                vatReturnFrequency: true,
+                utr: true,
+                corporationTaxReference: true,
+                payeReference: true,
+                directors: true,
+                companySecretary: true,
+                shareCapital: true,
+                numberOfShares: true,
+                contactEmail: true,
+                contactPhone: true,
+                website: true,
+                accountingSoftware: true,
+                accountingMethod: true,
+                aiSystemPrompt: true,
+                aiStrategicDirectives: true,
+                aiMemoryPrompt: true,
+                notes: true
+            }
+        });
         if (!settings) return;
 
         const content = `
@@ -173,7 +210,35 @@ ${settings.notes || 'None'}
 
 export async function syncBankingOverview() {
     try {
-        const banks = await prisma.bank.findMany({ include: { accounts: true } });
+        const banks = await prisma.bank.findMany({
+            select: {
+                bankName: true,
+                bankType: true,
+                swiftBic: true,
+                bankCode: true,
+                website: true,
+                supportEmail: true,
+                supportPhone: true,
+                bankAddress: true,
+                bankCity: true,
+                bankPostcode: true,
+                isActive: true,
+                accounts: {
+                    select: {
+                        accountName: true,
+                        accountType: true,
+                        currency: true,
+                        currentBalance: true,
+                        iban: true,
+                        accountNumber: true,
+                        sortCode: true,
+                        paymentDetails: true,
+                        isActive: true,
+                        isPrimary: true
+                    }
+                }
+            }
+        });
         let bankContent = "BANKING INTELLIGENCE\n====================\n\n";
 
         for (const bank of banks) {
@@ -217,7 +282,21 @@ export async function syncRecentTransactions() {
         const transactions = await prisma.bankTransaction.findMany({
             where: { date: { gte: startDate } },
             orderBy: { date: 'desc' },
-            include: { bankAccount: { include: { bank: true } } }
+            select: {
+                date: true,
+                description: true,
+                amount: true,
+                currency: true,
+                type: true,
+                counterparty: true,
+                category: true,
+                bankAccount: {
+                    select: {
+                        accountName: true,
+                        bank: { select: { bankName: true } }
+                    }
+                }
+            }
         });
 
         let txContent = `BANK TRANSACTIONS (SINCE ${startDate.toLocaleDateString()})\n====================================\n\n`;
@@ -245,7 +324,18 @@ export async function syncRecentTransactions() {
 export async function syncCryptoWallets() {
     try {
         const wallets = await prisma.cryptoWallet.findMany({
-            include: { transactions: { take: 20, orderBy: { timestamp: 'desc' } } }
+            select: {
+                walletName: true,
+                walletType: true,
+                blockchain: true,
+                network: true,
+                asset: true,
+                currentBalance: true,
+                balanceUSD: true,
+                walletAddress: true,
+                isActive: true,
+                isMultiSig: true
+            }
         });
 
         let cryptoContent = "CRYPTO WALLETS & ASSETS\n=======================\n\n";
@@ -274,7 +364,13 @@ export async function syncTaxObligations() {
     try {
         const obligations = await prisma.taxObligation.findMany({
             orderBy: { dueDate: 'asc' },
-            include: { fiscalYear: true }
+            select: {
+                type: true,
+                status: true,
+                dueDate: true,
+                amountEstimated: true,
+                amountActual: true
+            }
         });
 
         let taxContent = "TAX OBLIGATIONS\n===============\n\n";
@@ -370,7 +466,20 @@ export async function syncComplianceDocuments() {
 export async function syncCRMOrganizations() {
     try {
         const organizations = await prisma.organization.findMany({
-            include: { contacts: true, deals: true, invoices: true }
+            select: {
+                name: true,
+                sector: true,
+                email: true,
+                phone: true,
+                address: true,
+                city: true,
+                postcode: true,
+                isBillable: true,
+                taxId: true,
+                contacts: { select: { id: true } },
+                deals: { select: { id: true } },
+                invoices: { select: { id: true } }
+            }
         });
 
         let crmContent = "CRM ORGANIZATIONS\n=================\n\n";
@@ -395,7 +504,14 @@ export async function syncCRMOrganizations() {
 export async function syncCRMContacts() {
     try {
         const contacts = await prisma.contact.findMany({
-            include: { organization: true }
+            select: {
+                name: true,
+                role: true,
+                email: true,
+                phone: true,
+                isClient: true,
+                organization: { select: { name: true } }
+            }
         });
 
         let contactContent = "CRM CONTACTS\n============\n\n";
@@ -437,8 +553,15 @@ export async function syncCRMLeads() {
 export async function syncCRMDeals() {
     try {
         const deals = await prisma.deal.findMany({
-            include: { organization: true },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            select: {
+                title: true,
+                amount: true,
+                currency: true,
+                stage: true,
+                closeDate: true,
+                organization: { select: { name: true } }
+            }
         });
 
         let dealContent = "CRM DEALS\n=========\n\n";
@@ -470,8 +593,16 @@ export async function syncInvoices() {
 
         const invoices = await prisma.invoice.findMany({
             where: { date: { gte: startDate } },
-            include: { organization: true, items: true },
-            orderBy: { date: 'desc' }
+            orderBy: { date: 'desc' },
+            select: {
+                number: true,
+                date: true,
+                dueDate: true,
+                total: true,
+                currency: true,
+                status: true,
+                organization: { select: { name: true } }
+            }
         });
 
         let invContent = `INVOICES ISSUED (SINCE ${startDate.toLocaleDateString()})\n====================================\n\n`;
@@ -497,8 +628,13 @@ export async function syncInvoices() {
 export async function syncTasks() {
     try {
         const tasks = await prisma.task.findMany({
-            include: { assignedTo: true },
-            orderBy: { dueDate: 'asc' }
+            orderBy: { dueDate: 'asc' },
+            select: {
+                title: true,
+                dueDate: true,
+                completed: true,
+                assignedTo: { select: { name: true } }
+            }
         });
 
         let taskContent = "TASKS\n=====\n\n";
@@ -519,9 +655,14 @@ export async function syncTasks() {
 export async function syncActivities() {
     try {
         const activities = await prisma.activity.findMany({
-            include: { contact: true },
             orderBy: { date: 'desc' },
-            take: 100
+            take: 100,
+            select: {
+                date: true,
+                type: true,
+                notes: true,
+                contact: { select: { name: true } }
+            }
         });
 
         let actContent = "ACTIVITIES\n==========\n\n";
@@ -545,7 +686,16 @@ export async function syncActivities() {
 
 export async function syncAssets() {
     try {
-        const assets = await prisma.asset.findMany({ orderBy: { purchaseDate: 'desc' } });
+        const assets = await prisma.asset.findMany({
+            orderBy: { purchaseDate: 'desc' },
+            select: {
+                name: true,
+                type: true,
+                purchaseDate: true,
+                cost: true,
+                currency: true
+            }
+        });
 
         let assetContent = "ASSETS\n======\n\n";
 
@@ -570,7 +720,15 @@ export async function syncDeletedTransactions() {
     try {
         const deleted = await prisma.deletedTransaction.findMany({
             orderBy: { deletedAt: 'desc' },
-            take: 50
+            take: 50,
+            select: {
+                date: true,
+                description: true,
+                amount: true,
+                currency: true,
+                deletedAt: true,
+                reason: true
+            }
         });
 
         let delContent = "DELETED TRANSACTIONS LOG\n========================\n\n";

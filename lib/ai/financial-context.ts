@@ -11,26 +11,42 @@ export async function getFinancialContext() {
 
         const [transactions, invoices, obligations, recentDocs, bankAccounts, cryptoWallets] = await Promise.all([
             prisma.bankTransaction.findMany({
-                where: {
-                    date: { gte: startDate }
-                },
+                where: { date: { gte: startDate } },
                 orderBy: { date: 'desc' },
-                include: { bankAccount: true }
+                select: {
+                    date: true,
+                    description: true,
+                    amount: true,
+                    currency: true,
+                    category: true,
+                    bankAccount: { select: { accountName: true } }
+                }
             }),
             prisma.invoice.findMany({
-                where: {
-                    date: { gte: startDate }
-                },
+                where: { date: { gte: startDate } },
                 orderBy: { date: 'desc' },
-                include: { organization: true }
+                select: {
+                    number: true,
+                    date: true,
+                    total: true,
+                    currency: true,
+                    status: true,
+                    organization: { select: { name: true } }
+                }
             }),
             prisma.taxObligation.findMany({
                 where: { status: 'PENDING' },
-                orderBy: { dueDate: 'asc' }
+                orderBy: { dueDate: 'asc' },
+                select: {
+                    type: true,
+                    dueDate: true,
+                    amountEstimated: true,
+                    amountActual: true
+                }
             }),
             prisma.complianceDocument.findMany({
                 orderBy: { uploadedAt: 'desc' },
-                take: 10,
+                take: 12,
                 select: {
                     filename: true,
                     documentDate: true,
@@ -40,9 +56,21 @@ export async function getFinancialContext() {
                 }
             }),
             prisma.bankAccount.findMany({
-                include: { bank: true }
+                select: {
+                    accountName: true,
+                    currentBalance: true,
+                    currency: true,
+                    bank: { select: { bankName: true } }
+                }
             }),
-            prisma.cryptoWallet.findMany()
+            prisma.cryptoWallet.findMany({
+                select: {
+                    walletName: true,
+                    asset: true,
+                    currentBalance: true,
+                    balanceUSD: true
+                }
+            })
         ]);
 
         // Calculate basic totals for the AI context
