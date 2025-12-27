@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FinancialCategoriesGuide } from "./financial-categories-guide";
+import { RefreshCw, Sparkles, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/providers/modal-provider";
 
 interface CompanySettingsFormProps {
     initialData: any;
 }
 
-import { useConfirm } from "@/components/providers/modal-provider";
-
 export default function CompanySettingsForm({ initialData }: CompanySettingsFormProps) {
     const router = useRouter();
     const { confirm } = useConfirm();
     const [loading, setLoading] = useState(false);
+    const [isRefreshingAI, setIsRefreshingAI] = useState(false);
     const [formData, setFormData] = useState({
         // Basic Company Information
         companyName: initialData?.companyName || "",
@@ -174,6 +176,33 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
             ...prev,
             [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
         }));
+    };
+
+    const handleAIRefresh = async () => {
+        setIsRefreshingAI(true);
+        try {
+            const response = await fetch("/api/compliance/refresh-dates", {
+                method: "POST",
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success("AI Recalculation started", {
+                    description: "The dates will update in a few seconds. Refresh the page to see changes."
+                });
+                // Wait a bit and refresh
+                setTimeout(() => router.refresh(), 3000);
+            } else {
+                throw new Error(data.error || "Failed to trigger AI refresh");
+            }
+        } catch (error: any) {
+            console.error("AI Refresh Error:", error);
+            toast.error("AI Refresh failed", {
+                description: error.message
+            });
+        } finally {
+            setIsRefreshingAI(false);
+        }
     };
 
     return (
@@ -375,6 +404,19 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                         <h2 className="text-xl font-bold text-emerald-400">Financial Year & Deadlines</h2>
                         <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">UK Filing Lifecycle Matrix</p>
                     </div>
+                    <button
+                        type="button"
+                        onClick={handleAIRefresh}
+                        disabled={isRefreshingAI}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                    >
+                        {isRefreshingAI ? (
+                            <RefreshCw size={14} className="animate-spin" />
+                        ) : (
+                            <Sparkles size={14} />
+                        )}
+                        Recalculate with AI
+                    </button>
                 </div>
 
                 <div className="space-y-6">
@@ -435,7 +477,18 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label className="block text-[11px] font-bold text-indigo-300 mb-2 italic">Next Confirmation Due</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-[11px] font-bold text-indigo-300 italic">Next Confirmation Due</label>
+                                    <button
+                                        type="button"
+                                        onClick={handleAIRefresh}
+                                        disabled={isRefreshingAI}
+                                        className="text-indigo-400 hover:text-white transition-colors p-0.5"
+                                        title="Force AI Refresh for this date"
+                                    >
+                                        <RefreshCw size={10} className={isRefreshingAI ? "animate-spin" : ""} />
+                                    </button>
+                                </div>
                                 <input
                                     type="date"
                                     name="nextConfirmationStatementDue"

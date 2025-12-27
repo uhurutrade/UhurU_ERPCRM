@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { RefreshCw, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 interface ComplianceDeadline {
     type: string;
@@ -13,6 +15,7 @@ interface ComplianceDeadline {
 export default function ComplianceOverview({ initialData }: { initialData?: any }) {
     const [deadlines, setDeadlines] = useState<ComplianceDeadline[]>([]);
     const [loading, setLoading] = useState(!initialData);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -35,6 +38,35 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
         }
     };
 
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            const response = await fetch("/api/compliance/refresh-dates", {
+                method: "POST",
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success("AI Recalculation started", {
+                    description: "Updating dates via institutional AI..."
+                });
+                // Wait for the background process and fetch fresh data
+                setTimeout(async () => {
+                    await fetchComplianceData();
+                    setIsRefreshing(false);
+                }, 3000);
+            } else {
+                throw new Error(data.error || "Failed to trigger AI refresh");
+            }
+        } catch (error: any) {
+            console.error("Refresh Error:", error);
+            toast.error("Refresh failed", {
+                description: error.message
+            });
+            setIsRefreshing(false);
+        }
+    };
+
     const processSettings = (settings: any) => {
         if (!settings) {
             setLoading(false);
@@ -54,7 +86,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Annual Accounts Filing",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
             });
         }
 
@@ -68,7 +100,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Confirmation Statement",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil < 14 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
             });
         }
 
@@ -82,7 +114,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Corporation Tax Filing & Payment",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
             });
         } else if (settings.financialYearEnd) {
             // Fallback to manual calculation if AI field is not set
@@ -94,7 +126,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                     description: "Corporation Tax Payment (Estimated)",
                     dueDate: ctDueDate.toLocaleDateString("en-GB"),
                     daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+                    status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
                 });
             }
         }
@@ -110,7 +142,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                     description: `VAT Return (${settings.vatReturnFrequency})`,
                     dueDate: vatDueDate.toLocaleDateString("en-GB"),
                     daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil < 7 ? "urgent" : "upcoming",
+                    status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
                 });
             }
         }
@@ -216,7 +248,17 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
 
     return (
         <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-            <h2 className="text-xl font-semibold mb-4 text-emerald-400">Upcoming Compliance Deadlines</h2>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-emerald-400">Upcoming Compliance Deadlines</h2>
+                <button
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-500/20 transition-all active:scale-95 disabled:opacity-50"
+                >
+                    {isRefreshing ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                    {isRefreshing ? "Calculating..." : "AI Refresh"}
+                </button>
+            </div>
             <div className="space-y-3">
                 {deadlines.map((deadline, index) => (
                     <div

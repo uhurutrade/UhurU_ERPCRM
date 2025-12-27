@@ -73,10 +73,15 @@ export function TaskList({ tasks }: { tasks: any[] }) {
                                 <div className="text-uhuru-text-dim text-xs mt-0.5">{task.description}</div>
                             </td>
                             <td className="py-4 px-6">
-                                <span className={`text-[11px] font-bold ${!task.completed && task.dueDate && new Date(task.dueDate) < new Date()
-                                    ? 'text-rose-400'
-                                    : 'text-slate-500'
-                                    } uppercase`}>
+                                <span className={`text-[11px] font-bold ${(() => {
+                                    if (task.completed || !task.dueDate) return 'text-slate-500';
+                                    const dueDate = new Date(task.dueDate);
+                                    const now = new Date();
+                                    const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                    if (daysUntil < 0) return 'text-rose-400';
+                                    if (daysUntil <= 30) return 'text-amber-400';
+                                    return 'text-white';
+                                })()} uppercase`}>
                                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No Deadline'}
                                 </span>
                             </td>

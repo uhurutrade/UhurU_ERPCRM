@@ -144,11 +144,13 @@ export default async function CompliancePage() {
                             <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                 <div className={`
                                     px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2
-                                    ${ob.daysLeft < 30
+                                    ${ob.daysLeft < 0
                                         ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-                                        : 'bg-slate-900/60 text-slate-400 border border-white/5'}
+                                        : ob.daysLeft <= 30
+                                            ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                                            : 'bg-slate-900/60 text-slate-400 border border-white/5'}
                                 `}>
-                                    <Clock size={14} className={ob.daysLeft < 30 ? 'animate-pulse' : ''} />
+                                    <Clock size={14} className={ob.daysLeft <= 30 ? 'animate-pulse' : ''} />
                                     {ob.daysLeft < 0 ? 'Overdue' : `${ob.daysLeft} Operational Days`}
                                 </div>
 
