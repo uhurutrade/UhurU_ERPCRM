@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 
         // 2. Archive transactions to DeletedTransaction (Audit Log)
         // We do this in a transaction to ensure atomicity
-        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        await prisma.$transaction(async (tx) => {
             // a. Create audit records
             for (const t of transactionsToDelete) {
                 await tx.deletedTransaction.create({
