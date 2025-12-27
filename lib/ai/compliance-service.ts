@@ -20,12 +20,17 @@ export async function recalculateComplianceDeadlines() {
         const prompt = `
         As an expert UK Tax & Compliance Assistant, recalculate the NEXT due dates for this company.
         
-        RULES:
-        1. Confirmation Statement: Anniversary of incorporation + 12 months. Deadline is anniversary + 14 days.
-        2. Annual Accounts (CompaniesHouse): Usually 9 months after Financial Year End.
-        3. HMRC Accounts: Usually 12 months after Financial Year End (filing) and 9 months + 1 day (payment).
-        4. If a 'Last Filed' date is provided in the context and it belongs to the CURRENT cycle, roll forward to the NEXT year.
-        5. Current Date for reference: ${new Date().toISOString().split('T')[0]}
+        STRICT RULES:
+        1. Confirmation Statement: Due every 12 months. Calculation: Anniversary of incorporation + 1 year from the last filed statement period, or next anniversary after Today. Deadline (Filing) is anniversary + 14 days.
+        2. Annual Accounts (CompaniesHouse): Usually 9 months after Financial Year End (FYE).
+        3. HMRC Accounts: Usually 12 months after FYE for filing, and 9 months + 1 day for payment.
+        
+        INTELLIGENCE LOGIC:
+        - TODAY IS: ${new Date().toISOString().split('T')[0]}
+        - IMPORTANT: If the 'Last Filed' date provided in the context is RECENT (within the last 6-12 months) and logically covers the current cycle, you MUST roll forward the 'Next Due' to the FOLLOWING year.
+        - ABSOLUTE REQUIREMENT: The 'Next Due' dates returned MUST BE IN THE FUTURE (after ${new Date().toISOString().split('T')[0]}). 
+        - Never return a 'Next Due' date that is BEFORE or EQUAL to the 'Last Filed' date.
+        - If a 'Last Filed' date exists, the 'Next Due' should be approximately 1 year after that filing's period reference.
 
         CONTEXT:
         ${financialContext}

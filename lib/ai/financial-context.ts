@@ -32,9 +32,13 @@ export async function getFinancialContext() {
 COMPANY PROFILE (UK COMPLIANCE):
 - Company: ${settings?.companyName || 'N/A'} (No. ${settings?.companyNumber || 'N/A'})
 - Incorporation Date: ${settings?.incorporationDate?.toLocaleDateString() || 'N/A'}
-- Financial Year End: ${settings?.financialYearEnd || 'N/A'}
-- Next CompaniesHouse Accounts Due: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
+- Financial Year End Reference: ${settings?.financialYearEnd || 'N/A'}
+- Last CompaniesHouse Confirmation Filed: ${settings?.lastConfirmationStatementDate?.toLocaleDateString() || 'N/A'}
 - Last CompaniesHouse Accounts Filed: ${settings?.lastAccountsCompaniesHouseDate?.toLocaleDateString() || 'N/A'}
+- Last HMRC Accounts Filed: ${settings?.lastAccountsHMRCDate?.toLocaleDateString() || 'N/A'}
+- Last Fiscal Year End: ${settings?.lastFYEndDate?.toLocaleDateString() || 'N/A'}
+- Current Predicted Next Confirmation: ${settings?.nextConfirmationStatementDue?.toLocaleDateString() || 'N/A'}
+- Current Predicted Next Accounts: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
 
 FINANCIAL SUMMARY (GENERAL LEDGER):
 - Total Recent Inbound: £${totals.totalInbound.toLocaleString()}
