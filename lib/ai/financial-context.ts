@@ -2,25 +2,35 @@ import { prisma } from '@/lib/prisma';
 
 export async function getFinancialContext() {
     try {
-        const [transactions, invoices, obligations, settings] = await Promise.all([
+        const settings = await prisma.companySettings.findFirst();
+
+        // Define the start date: Last Fiscal Year End or 1 year ago as fallback
+        const startDate = settings?.lastFYEndDate
+            ? new Date(settings.lastFYEndDate)
+            : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+
+        const [transactions, invoices, obligations] = await Promise.all([
             prisma.bankTransaction.findMany({
+                where: {
+                    date: { gte: startDate }
+                },
                 orderBy: { date: 'desc' },
-                take: 50, // Recent relevant transactions
                 include: { bankAccount: true }
             }),
             prisma.invoice.findMany({
+                where: {
+                    date: { gte: startDate }
+                },
                 orderBy: { date: 'desc' },
-                take: 20,
                 include: { organization: true }
             }),
             prisma.taxObligation.findMany({
                 where: { status: 'PENDING' },
                 orderBy: { dueDate: 'asc' }
-            }),
-            prisma.companySettings.findFirst()
+            })
         ]);
 
-        // Calculate some basic totals for the AI
+        // Calculate basic totals for the AI context
         const totals = transactions.reduce((acc: any, tx) => {
             const amt = Number(tx.amount);
             if (amt > 0) acc.totalInbound += amt;
@@ -29,28 +39,33 @@ export async function getFinancialContext() {
         }, { totalInbound: 0, totalOutbound: 0 });
 
         const context = `
-COMPANY PROFILE (UK COMPLIANCE):
+# FULL FISCAL PERIOD CONTEXT (SINCE ${startDate.toLocaleDateString()}):
+This context includes EVERY transaction and invoice recorded since the last Fiscal Year End (FYE).
+The goal is to provide a complete picture for UK Corporation Tax, VAT, and Spanish DLA/Tax residency compliance.
+
+COMPANY PROFILE:
 - Company: ${settings?.companyName || 'N/A'} (No. ${settings?.companyNumber || 'N/A'})
-- Incorporation Date: ${settings?.incorporationDate?.toLocaleDateString() || 'N/A'}
-- Financial Year End Reference: ${settings?.financialYearEnd || 'N/A'}
-- Last CompaniesHouse Confirmation Filed: ${settings?.lastConfirmationStatementDate?.toLocaleDateString() || 'N/A'}
-- Last CompaniesHouse Accounts Filed: ${settings?.lastAccountsCompaniesHouseDate?.toLocaleDateString() || 'N/A'}
-- Last HMRC Accounts Filed: ${settings?.lastAccountsHMRCDate?.toLocaleDateString() || 'N/A'}
 - Last Fiscal Year End: ${settings?.lastFYEndDate?.toLocaleDateString() || 'N/A'}
-- Current Predicted Next Confirmation: ${settings?.nextConfirmationStatementDue?.toLocaleDateString() || 'N/A'}
-- Current Predicted Next Accounts: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
+- Predicted Next confirmation Statement: ${settings?.nextConfirmationStatementDue?.toLocaleDateString() || 'N/A'}
+- Predicted Next Annual Accounts: ${settings?.nextAccountsCompaniesHouseDue?.toLocaleDateString() || 'N/A'}
 
-FINANCIAL SUMMARY (GENERAL LEDGER):
-- Total Recent Inbound: £${totals.totalInbound.toLocaleString()}
-- Total Recent Outbound: £${totals.totalOutbound.toLocaleString()}
+PERIOD FINANCIAL SUMMARY (LIVE DATA):
+- Inbound (Current Period): £${totals.totalInbound.toLocaleString()}
+- Outbound (Current Period): £${totals.totalOutbound.toLocaleString()}
+- Net Flow: £${(totals.totalInbound - totals.totalOutbound).toLocaleString()}
 
-RECENT TRANSACTIONS:
-${transactions.map(t => `- ${t.date.toLocaleDateString()}: ${t.description} (${t.currency} ${Number(t.amount).toLocaleString()})`).join('\n')}
+DETAILED LEDGER (CURRENT FISCAL PERIOD):
+TRANSACTIONS:
+${transactions.length > 0
+                ? transactions.map(t => `- [${t.date.toLocaleDateString()}] ${t.description}: ${t.currency} ${Number(t.amount).toLocaleString()}`).join('\n')
+                : 'No transactions found in this period.'}
 
-RECENT ISSUED INVOICES:
-${invoices.map(i => `- ${i.date.toLocaleDateString()}: ${i.number} to ${i.organization.name} (${i.total} ${i.currency}) - Status: ${i.status}`).join('\n')}
+INVOICES ISSUED:
+${invoices.length > 0
+                ? invoices.map(i => `- [${i.date.toLocaleDateString()}] ${i.number} to ${i.organization.name}: ${i.total} ${i.currency} (Status: ${i.status})`).join('\n')
+                : 'No invoices found in this period.'}
 
-UPCOMING TAX OBLIGATIONS:
+UPCOMING COMPLIANCE & TAX OBLIGATIONS:
 ${obligations.map(o => `- ${o.type}: Due ${o.dueDate.toLocaleDateString()} (${o.amountActual || o.amountEstimated ? (o.amountActual || o.amountEstimated) + ' GBP' : 'Amount TBD'})`).join('\n')}
         `;
 

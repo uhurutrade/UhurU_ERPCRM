@@ -873,7 +873,7 @@ OPERATIONAL IDENTITY:
                                 name="aiSystemPrompt"
                                 value={formData.aiSystemPrompt}
                                 onChange={handleChange}
-                                rows={6}
+                                rows={3}
                                 placeholder="Define who the AI is (e.g., Strategic CFO)..."
                                 className="w-full px-4 py-3 bg-slate-950/40 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 text-indigo-100 text-xs font-mono leading-relaxed"
                             />
@@ -888,9 +888,9 @@ OPERATIONAL IDENTITY:
                                 name="aiStrategicDirectives"
                                 value={formData.aiStrategicDirectives}
                                 onChange={handleChange}
-                                rows={10}
+                                rows={6}
                                 placeholder="Define business rules, compliance logic, and operational constraints..."
-                                className="w-full px-4 py-3 bg-slate-950/40 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-purple-100 text-xs font-mono leading-relaxed"
+                                className="w-full px-4 py-2 bg-slate-950/40 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-purple-100 text-xs font-mono leading-relaxed"
                             />
                         </div>
                     </div>
@@ -921,14 +921,14 @@ OPERATIONAL IDENTITY:
                             </button>
                         </div>
 
-                        <div className="relative h-full min-h-[400px]">
+                        <div className="relative h-full">
                             <textarea
                                 name="aiMemoryPrompt"
                                 value={formData.aiMemoryPrompt}
                                 onChange={handleChange}
-                                rows={22}
+                                rows={11}
                                 placeholder="Neural Trash Box: Dump everything you want me to remember here (rules, context, style)..."
-                                className="w-full h-full px-4 py-4 bg-slate-950/60 border border-amber-500/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-amber-50/90 text-sm font-mono leading-relaxed placeholder:opacity-20"
+                                className="w-full h-full px-4 py-3 bg-slate-950/60 border border-amber-500/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-amber-50/90 text-[13px] font-mono leading-relaxed placeholder:opacity-20"
                             />
                         </div>
 
