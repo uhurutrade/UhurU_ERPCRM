@@ -106,25 +106,22 @@ export default function CompanySettingsForm({ initialData }: CompanySettingsForm
 
         // AI Preferences
         aiProvider: initialData?.aiProvider || "openai",
-        aiCustomInstructions: initialData?.aiCustomInstructions || `Actúa como el Chief Financial Officer (CFO) y Consultor Estratégico Senior de esta compañía Private Limited (LTD) del Reino Unido.
+        aiSystemPrompt: initialData?.aiSystemPrompt || `Actúa como el Chief Financial Officer (CFO) y Consultor Estratégico Senior de esta compañía Private Limited (LTD) del Reino Unido.
 
 IDENTIDAD OPERATIVA:
 - Entidad: UK Ltd (Sujeta a Companies House y HMRC).
 - Director: Único accionista, de nacionalidad española y residente fiscal en España (Modelo 100/720 en España).
-- Modelos de Negocio: Consultoría de servicios profesionales IT/Estratégica y Venta Retail Multicanal (Amazon FBA, Shopify, Stripe).
-
-PROTOCOLOS DE COMPORTAMIENTO (SYSTEM PROMPT):
+- Modelos de Negocio: Consultoría de servicios profesionales IT/Estrategica y Venta Retail Multicanal (Amazon FBA, Shopify, Stripe).`,
+        aiStrategicDirectives: initialData?.aiStrategicDirectives || `PROTOCOLOS DE COMPORTAMIENTO (SYSTEM PROMPT):
 1. PERSPECTIVA DUAL (UK-ES): Cada vez que analices un gasto o ingreso, considera no solo su deducibilidad en el Reino Unido (Corporation Tax), sino también las implicaciones del Convenio para evitar la Doble Imposición (CDI) entre UK y España.
 2. FOCO EN AMAZON FBA: Entiende la estructura de los informes de Amazon (fees, removals, storage, VAT en destino). Ayuda a conciliar los Settlements con las transacciones bancarias.
 3. CUMPLIMIENTO FISCAL (VAT/TAX): Sé extremadamente riguroso con los umbrales de IVA (VAT thresholds) y las reglas de "Place of Supply" para servicios. Alerta proactivamente sobre fechas de "Confirmation Statement" y "Annual Accounts".
-4. TONO Y LENGUAJE: Dirígete a mí SIEMPRE en Español, ya que soy español. Aunque el sistema y los documentos estén en inglés y podamos tratar conceptos técnicos en ese idioma, tu comunicación conmigo debe ser en castellano profesional y directo. Usa terminología técnica inglesa cuando sea necesario (e.g., "Shareholders Agreement", "Capital Allowance") pero siempre explicada o integrada en una respuesta en español.
-
-OBJETIVOS DEL RAG (USER EXPECTATIONS):
+4. TONO Y LENGUAJE: Dirígete a mí SIEMPRE en Español, ya que soy español. Aunque el sistema y los documentos estén en inglés y podamos tratar conceptos técnicos en ese idioma, tu comunicación conmigo debe ser en castellano profesional y directo.`,
+        aiMemoryPrompt: initialData?.aiMemoryPrompt || `OBJETIVOS DEL RAG (USER EXPECTATIONS):
 - Al recuperar datos financieros, no te limites a listar transacciones; sintetiza la salud de la tesorería.
 - Si detectas una factura de un proveedor español, recuerda la importancia del IVA intracomunitario (VIES) o la posible retención si aplica.
-- Evalúa los movimientos entre la cuenta de la empresa y la cuenta personal del director como "Director's Loan Account" o dividendos, advirtiendo sobre las implicaciones fiscales según las leyes de UK y la residencia en España.
-
-Tu misión es transformar los datos crudos en inteligencia de negocio para minimizar la carga fiscal de forma legal y maximizar la rentabilidad operativa.`,
+- Evalúa los movimientos entre la cuenta de la empresa y la cuenta personal del director como "Director's Loan Account" o dividendos, advirtiendo sobre las implicaciones fiscales según las leyes de UK y la residencia en España.`,
+        aiCustomInstructions: initialData?.aiCustomInstructions || "",
 
         // Additional Notes
         notes: initialData?.notes || "",
@@ -864,16 +861,50 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="flex justify-between items-end">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left Column: Core Identity & Rules */}
+                    <div className="space-y-6">
                         <div>
-                            <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-1 flex items-center gap-2">
-                                <BrainCircuit size={14} className="text-indigo-400" />
-                                Neural Directives & Strategic Memory
+                            <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <Sparkles size={14} className="text-indigo-400" />
+                                1. System Identity & Role
                             </label>
-                            <p className="text-[10px] text-slate-500 font-medium">Inject operational rules, day-to-day behaviors, and business logic (ES/EN).</p>
+                            <textarea
+                                name="aiSystemPrompt"
+                                value={formData.aiSystemPrompt}
+                                onChange={handleChange}
+                                rows={6}
+                                placeholder="Define who the AI is (e.g., Strategic CFO)..."
+                                className="w-full px-4 py-3 bg-slate-950/40 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 text-indigo-100 text-xs font-mono leading-relaxed"
+                            />
                         </div>
-                        <div className="flex gap-2">
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <BrainCircuit size={14} className="text-purple-400" />
+                                2. Strategic Directives
+                            </label>
+                            <textarea
+                                name="aiStrategicDirectives"
+                                value={formData.aiStrategicDirectives}
+                                onChange={handleChange}
+                                rows={10}
+                                placeholder="Define business rules, compliance logic, and operational constraints..."
+                                className="w-full px-4 py-3 bg-slate-950/40 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-purple-100 text-xs font-mono leading-relaxed"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Right Column: Adaptive Memory (Dumping Ground) */}
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <label className="block text-xs font-bold text-amber-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                    <RefreshCw size={14} className="animate-spin-slow" />
+                                    3. Adaptive Memory (Trash Box / Log)
+                                </label>
+                                <p className="text-[10px] text-slate-500 font-medium">Throw here day-to-day notes for the AI to learn from you.</p>
+                            </div>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -881,50 +912,45 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                                     const directive = `\n[DIRECTIVA ${timestamp}]: `;
                                     setFormData(prev => ({
                                         ...prev,
-                                        aiCustomInstructions: (prev.aiCustomInstructions || "") + directive
+                                        aiMemoryPrompt: (prev.aiMemoryPrompt || "") + directive
                                     }));
                                 }}
-                                className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all active:scale-95"
+                                className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-lg text-[9px] font-bold text-amber-400 uppercase tracking-widest transition-all active:scale-95"
                             >
                                 + Nueva Directiva
                             </button>
                         </div>
-                    </div>
 
-                    <div className="relative group/textarea">
-                        <div className="absolute top-4 left-4 w-1 h-full bg-indigo-500/20 rounded-full group-focus-within/textarea:bg-indigo-500 transition-colors" />
-                        <textarea
-                            name="aiCustomInstructions"
-                            value={formData.aiCustomInstructions}
-                            onChange={handleChange}
-                            rows={20}
-                            placeholder="Vuelca aquí todo: [DIRECTIVA]: No me preguntes más por el IVA de los envíos de Amazon. [MEMORIA]: En 2024 cambiamos de oficina..."
-                            className="w-full pl-8 pr-4 py-4 bg-slate-950/70 border border-indigo-500/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-indigo-100 text-sm font-mono leading-relaxed placeholder:opacity-40 scrollbar-hide shadow-inner"
-                        />
-                        <div className="absolute bottom-4 right-4 text-[10px] font-mono text-slate-600 pointer-events-none">
-                            SECURE_STORAGE_LAYER_V2
+                        <div className="relative h-full min-h-[400px]">
+                            <textarea
+                                name="aiMemoryPrompt"
+                                value={formData.aiMemoryPrompt}
+                                onChange={handleChange}
+                                rows={22}
+                                placeholder="Cubo de basura neural: Vuelca aquí todo lo que quieras que recuerde..."
+                                className="w-full h-full px-4 py-4 bg-slate-950/60 border border-amber-500/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-amber-50/90 text-sm font-mono leading-relaxed placeholder:opacity-20"
+                            />
                         </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tighter self-center mr-2">Quick Injectors:</span>
-                        {["Residente Fiscal ES", "Bilingue ES/EN", "Foco en Cashflow", "Strict Compliance"].map((chip) => (
-                            <button
-                                key={chip}
-                                type="button"
-                                onClick={() => {
-                                    const directive = `\n# POLICY: ${chip.toUpperCase()}\n- Act strictly following ${chip} perspective.`;
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        aiCustomInstructions: (prev.aiCustomInstructions || "") + directive
-                                    }));
-                                    window.dispatchEvent(new Event('settings-dirty'));
-                                }}
-                                className="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-md text-[9px] font-medium text-slate-400 transition-colors"
-                            >
-                                {chip}
-                            </button>
-                        ))}
+                        <div className="flex flex-wrap gap-2 pt-2">
+                            {["Residente Fiscal ES", "Bilingue ES/EN", "Foco en Cashflow"].map((chip) => (
+                                <button
+                                    key={chip}
+                                    type="button"
+                                    onClick={() => {
+                                        const directive = `\n# MEMORY: ${chip.toUpperCase()}`;
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            aiMemoryPrompt: (prev.aiMemoryPrompt || "") + directive
+                                        }));
+                                        window.dispatchEvent(new Event('settings-dirty'));
+                                    }}
+                                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-md text-[9px] font-medium text-slate-500 transition-colors"
+                                >
+                                    {chip}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

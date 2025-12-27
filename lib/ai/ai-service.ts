@@ -45,8 +45,19 @@ async function getCompanyContext() {
         const settings = await prisma.companySettings.findFirst();
         if (!settings) return "";
 
+        const combinedInstructions = [
+            "# IDENTITY & SYSTEM ROLE:",
+            settings.aiSystemPrompt || "You are the official Strategic AI Assistant.",
+            "\n# STRATEGIC DIRECTIVES & BUSINESS LOGIC:",
+            settings.aiStrategicDirectives || "Follow standard UK compliance and business best practices.",
+            "\n# ADAPTIVE MEMORY & USER BEHAVIOR:",
+            settings.aiMemoryPrompt || "Adjust to user style over time.",
+            "\n# LEGACY CONTEXT:",
+            (settings as any).aiCustomInstructions || "N/A"
+        ].join('\n');
+
         return `# DIRECTIVA PRIMARIA DE COMPORTAMIENTO (OBLIGATORIO):
-${(settings as any).aiCustomInstructions || 'Actúas como el asistente de IA oficial. Tu tono debe ser profesional y eficiente.'}
+${combinedInstructions}
 
 # POLÍTICA DE IDIOMA:
 - Tu idioma de comunicación con el Director es SIEMPRE el ESPAÑOL (Castellano).

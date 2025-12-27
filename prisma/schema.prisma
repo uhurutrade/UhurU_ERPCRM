@@ -434,6 +434,9 @@ model CompanySettings {
   updatedAt               DateTime  @updatedAt
   aiProvider              String    @default("openai")
   aiCustomInstructions    String?   @db.Text
+  aiSystemPrompt         String?   @db.Text
+  aiStrategicDirectives   String?   @db.Text
+  aiMemoryPrompt          String?   @db.Text
 }
 
 model DeletedTransaction {
