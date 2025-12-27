@@ -86,7 +86,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Annual Accounts Filing",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 60 ? "urgent" : "upcoming",
             });
         }
 
@@ -100,7 +100,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Confirmation Statement",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 60 ? "urgent" : "upcoming",
             });
         }
 
@@ -114,7 +114,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                 description: "Corporation Tax Filing & Payment",
                 dueDate: dueDate.toLocaleDateString("en-GB"),
                 daysUntil,
-                status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
+                status: daysUntil < 0 ? "overdue" : daysUntil <= 60 ? "urgent" : "upcoming",
             });
         } else if (settings.financialYearEnd) {
             // Fallback to manual calculation if AI field is not set
@@ -126,7 +126,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                     description: "Corporation Tax Payment (Estimated)",
                     dueDate: ctDueDate.toLocaleDateString("en-GB"),
                     daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
+                    status: daysUntil < 0 ? "overdue" : daysUntil <= 60 ? "urgent" : "upcoming",
                 });
             }
         }
@@ -142,7 +142,7 @@ export default function ComplianceOverview({ initialData }: { initialData?: any 
                     description: `VAT Return (${settings.vatReturnFrequency})`,
                     dueDate: vatDueDate.toLocaleDateString("en-GB"),
                     daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil <= 30 ? "urgent" : "upcoming",
+                    status: daysUntil < 0 ? "overdue" : daysUntil <= 60 ? "urgent" : "upcoming",
                 });
             }
         }

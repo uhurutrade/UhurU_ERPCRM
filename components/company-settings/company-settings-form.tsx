@@ -152,8 +152,28 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                 throw new Error("Failed to save company settings");
             }
 
+            // After saving, trigger the AI sync to recalculate deadlines based on new data
+            const syncResponse = await fetch("/api/compliance/refresh-dates", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullSync: false }) // Just compliance sync for speed
+            });
+            const syncData = await syncResponse.json();
+
             // Artificial delay for better UX as requested
             await new Promise(resolve => setTimeout(resolve, 1000));
+
+            window.dispatchEvent(new Event('settings-saved'));
+
+            if (syncData.success) {
+                toast.success("Settings Saved & AI Recalculated", {
+                    description: `Dates updated via ${syncData.provider?.toUpperCase()}.`
+                });
+            } else {
+                toast.success("Settings Saved", {
+                    description: "Note: AI Recalculation pending."
+                });
+            }
 
             router.refresh();
         } catch (error) {
@@ -176,6 +196,8 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
             ...prev,
             [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
         }));
+        // Notify siblings that there are unsaved changes
+        window.dispatchEvent(new Event('settings-dirty'));
     };
 
     const handleAIRefresh = async () => {

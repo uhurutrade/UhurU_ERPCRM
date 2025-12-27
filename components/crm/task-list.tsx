@@ -79,7 +79,7 @@ export function TaskList({ tasks }: { tasks: any[] }) {
                                     const now = new Date();
                                     const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
                                     if (daysUntil < 0) return 'text-rose-400';
-                                    if (daysUntil <= 30) return 'text-amber-400';
+                                    if (daysUntil <= 60) return 'text-amber-400';
                                     return 'text-white';
                                 })()} uppercase`}>
                                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No Deadline'}
