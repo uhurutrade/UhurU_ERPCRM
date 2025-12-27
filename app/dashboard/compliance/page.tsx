@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Landmark, FileCheck, Briefcase, MoreVertical, Calendar, Clock, Bot } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CompliancePage() {
     // 1. Fetch Company Settings and Obligations from DB
     const settings = await prisma.companySettings.findFirst();
@@ -122,10 +124,11 @@ export default async function CompliancePage() {
                         </button>
 
                         <div className="flex flex-col h-full space-y-8 relative z-10">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border border-white/5 shadow-2xl transition-transform group-hover:scale-110 
+                            <div className={`w - 16 h - 16 rounded - 2xl flex items - center justify - center border border - white / 5 shadow - 2xl transition - transform group - hover: scale - 110 
                                 ${ob.type.includes('TAX') ? 'bg-emerald-500/10 text-emerald-400 shadow-emerald-500/10' :
                                     ob.type.includes('ACC') ? 'bg-blue-500/10 text-blue-400 shadow-blue-500/10' :
-                                        'bg-amber-500/10 text-amber-400 shadow-amber-500/10'}`}
+                                        'bg-amber-500/10 text-amber-400 shadow-amber-500/10'
+                                } `}
                             >
                                 {ob.type.includes('TAX') ? <Landmark size={32} /> :
                                     ob.type.includes('ACC') ? <FileCheck size={32} /> :
@@ -143,13 +146,14 @@ export default async function CompliancePage() {
 
                             <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                 <div className={`
-                                    px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2
+px - 4 py - 2 rounded - xl text - [10px] font - black uppercase tracking - widest flex items - center gap - 2
                                     ${ob.daysLeft < 0
                                         ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
                                         : ob.daysLeft <= 60
                                             ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                                            : 'bg-slate-900/60 text-slate-400 border border-white/5'}
-                                `}>
+                                            : 'bg-slate-900/60 text-slate-400 border border-white/5'
+                                    }
+`}>
                                     <Clock size={14} className={ob.daysLeft <= 60 ? 'animate-pulse' : ''} />
                                     {ob.daysLeft < 0 ? 'Overdue' : `${ob.daysLeft} Operational Days`}
                                 </div>

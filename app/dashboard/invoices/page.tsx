@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Plus, FileText, ArrowUpRight, Upload, Check, Trash2, Download } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { InvoiceUploadButton } from '@/components/invoices/invoice-upload-button';
 import { DeleteAttachmentButton, LinkAttachmentButton, LinkInvoiceButton, ViewAttachmentButton, DownloadAttachmentButton } from '@/components/invoices/invoice-actions';
