@@ -25,12 +25,30 @@ export function triggerSync(moduleName: string, syncFn: () => Promise<void>) {
 }
 
 /**
+ * Sincronización unificada de configuración y cumplimiento
+ */
+export async function triggerComplianceSync() {
+    triggerSync('COMPLIANCE_AND_SETTINGS', async () => {
+        // 1. Sync RAG first
+        await syncCompanySettings();
+
+        // 2. Recalculate Compliance Deadlines via AI
+        try {
+            const { recalculateComplianceDeadlines } = await import("./compliance-service");
+            await recalculateComplianceDeadlines();
+        } catch (e) {
+            console.error("[RAG Auto-Sync] ❌ AI Recalculation failed:", e);
+        }
+    });
+}
+
+/**
  * Sincroniza TODA la base de datos al RAG de forma asíncrona
  */
 export function syncAllSystemData() {
     triggerSync('FULL_SYSTEM_SYNC', async () => {
         // CORE BUSINESS DATA
-        await syncCompanySettings();
+        await triggerComplianceSync(); // Includes RAG sync + AI Dates
         await syncBankingOverview();
         await syncRecentTransactions();
         await syncCryptoWallets();

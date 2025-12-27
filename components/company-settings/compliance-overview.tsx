@@ -10,13 +10,17 @@ interface ComplianceDeadline {
     status: "upcoming" | "urgent" | "overdue";
 }
 
-export default function ComplianceOverview() {
+export default function ComplianceOverview({ initialData }: { initialData?: any }) {
     const [deadlines, setDeadlines] = useState<ComplianceDeadline[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialData);
 
     useEffect(() => {
-        fetchComplianceData();
-    }, []);
+        if (initialData) {
+            processSettings(initialData);
+        } else {
+            fetchComplianceData();
+        }
+    }, [initialData]);
 
     const fetchComplianceData = async () => {
         try {
@@ -24,79 +28,97 @@ export default function ComplianceOverview() {
             if (!response.ok) throw new Error("Failed to fetch company settings");
 
             const settings = await response.json();
-            if (!settings) {
-                setLoading(false);
-                return;
-            }
-
-            const calculatedDeadlines: ComplianceDeadline[] = [];
-            const today = new Date();
-
-            // Accounts filing deadline
-            if (settings.accountsNextDueDate) {
-                const dueDate = new Date(settings.accountsNextDueDate);
-                const daysUntil = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                calculatedDeadlines.push({
-                    type: "Companies House",
-                    description: "Annual Accounts Filing",
-                    dueDate: dueDate.toLocaleDateString("en-GB"),
-                    daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
-                });
-            }
-
-            // Confirmation statement deadline
-            if (settings.confirmationNextDueDate) {
-                const dueDate = new Date(settings.confirmationNextDueDate);
-                const daysUntil = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                calculatedDeadlines.push({
-                    type: "Companies House",
-                    description: "Confirmation Statement",
-                    dueDate: dueDate.toLocaleDateString("en-GB"),
-                    daysUntil,
-                    status: daysUntil < 0 ? "overdue" : daysUntil < 14 ? "urgent" : "upcoming",
-                });
-            }
-
-            // VAT return (if registered)
-            if (settings.vatRegistered && settings.vatReturnFrequency) {
-                // Calculate next VAT return based on frequency
-                const vatDueDate = calculateNextVATReturn(settings.vatReturnFrequency, settings.vatRegistrationDate);
-                if (vatDueDate) {
-                    const daysUntil = Math.ceil((vatDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                    calculatedDeadlines.push({
-                        type: "HMRC - VAT",
-                        description: `VAT Return (${settings.vatReturnFrequency})`,
-                        dueDate: vatDueDate.toLocaleDateString("en-GB"),
-                        daysUntil,
-                        status: daysUntil < 0 ? "overdue" : daysUntil < 7 ? "urgent" : "upcoming",
-                    });
-                }
-            }
-
-            // Corporation Tax (9 months after year end)
-            if (settings.financialYearEnd) {
-                const ctDueDate = calculateCorporationTaxDeadline(settings.financialYearEnd);
-                if (ctDueDate) {
-                    const daysUntil = Math.ceil((ctDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                    calculatedDeadlines.push({
-                        type: "HMRC - Corporation Tax",
-                        description: "Corporation Tax Payment",
-                        dueDate: ctDueDate.toLocaleDateString("en-GB"),
-                        daysUntil,
-                        status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
-                    });
-                }
-            }
-
-            // Sort by days until due
-            calculatedDeadlines.sort((a, b) => a.daysUntil - b.daysUntil);
-            setDeadlines(calculatedDeadlines);
-            setLoading(false);
+            processSettings(settings);
         } catch (error) {
             console.error("Error fetching compliance data:", error);
             setLoading(false);
         }
+    };
+
+    const processSettings = (settings: any) => {
+        if (!settings) {
+            setLoading(false);
+            return;
+        }
+
+        const calculatedDeadlines: ComplianceDeadline[] = [];
+        const today = new Date();
+
+        // 1. Companies House - Annual Accounts
+        const accountsDate = settings.nextAccountsCompaniesHouseDue || settings.accountsNextDueDate;
+        if (accountsDate) {
+            const dueDate = new Date(accountsDate);
+            const daysUntil = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            calculatedDeadlines.push({
+                type: "Companies House",
+                description: "Annual Accounts Filing",
+                dueDate: dueDate.toLocaleDateString("en-GB"),
+                daysUntil,
+                status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+            });
+        }
+
+        // 2. Companies House - Confirmation Statement
+        const confirmationDate = settings.nextConfirmationStatementDue || settings.confirmationNextDueDate;
+        if (confirmationDate) {
+            const dueDate = new Date(confirmationDate);
+            const daysUntil = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            calculatedDeadlines.push({
+                type: "Companies House",
+                description: "Confirmation Statement",
+                dueDate: dueDate.toLocaleDateString("en-GB"),
+                daysUntil,
+                status: daysUntil < 0 ? "overdue" : daysUntil < 14 ? "urgent" : "upcoming",
+            });
+        }
+
+        // 3. HMRC - Corporation Tax
+        const hmrcDate = settings.nextAccountsHMRCDue;
+        if (hmrcDate) {
+            const dueDate = new Date(hmrcDate);
+            const daysUntil = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            calculatedDeadlines.push({
+                type: "HMRC - Corporation Tax",
+                description: "Corporation Tax Filing & Payment",
+                dueDate: dueDate.toLocaleDateString("en-GB"),
+                daysUntil,
+                status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+            });
+        } else if (settings.financialYearEnd) {
+            // Fallback to manual calculation if AI field is not set
+            const ctDueDate = calculateCorporationTaxDeadline(settings.financialYearEnd);
+            if (ctDueDate) {
+                const daysUntil = Math.ceil((ctDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                calculatedDeadlines.push({
+                    type: "HMRC - Corporation Tax",
+                    description: "Corporation Tax Payment (Estimated)",
+                    dueDate: ctDueDate.toLocaleDateString("en-GB"),
+                    daysUntil,
+                    status: daysUntil < 0 ? "overdue" : daysUntil < 30 ? "urgent" : "upcoming",
+                });
+            }
+        }
+
+        // 4. VAT return (if registered)
+        if (settings.vatRegistered && settings.vatReturnFrequency) {
+            // Calculate next VAT return based on frequency
+            const vatDueDate = calculateNextVATReturn(settings.vatReturnFrequency, settings.vatRegistrationDate);
+            if (vatDueDate) {
+                const daysUntil = Math.ceil((vatDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                calculatedDeadlines.push({
+                    type: "HMRC - VAT",
+                    description: `VAT Return (${settings.vatReturnFrequency})`,
+                    dueDate: vatDueDate.toLocaleDateString("en-GB"),
+                    daysUntil,
+                    status: daysUntil < 0 ? "overdue" : daysUntil < 7 ? "urgent" : "upcoming",
+                });
+            }
+        }
+
+        // Sort by days until due
+        calculatedDeadlines.sort((a, b) => a.daysUntil - b.daysUntil);
+        setDeadlines(calculatedDeadlines);
+        setLoading(false);
     };
 
     const calculateNextVATReturn = (frequency: string, registrationDate: string | null) => {

@@ -119,30 +119,32 @@ export default async function UhuruWallPage() {
                 <div className="md:col-span-2 space-y-4">
                     <h2 className="text-[10px] font-black text-uhuru-text-dim uppercase tracking-[0.2em] mb-4">Strategic Notice Wall</h2>
 
-                    {/* Notice 1 */}
-                    <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/40 transition-all">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <TrendingUp size={80} />
-                        </div>
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400">
-                                <AlertCircle size={24} />
+                    {/* Notice 1 - VAT (Only if registered) */}
+                    {companySettings.vatRegistered && (
+                        <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/40 transition-all">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <TrendingUp size={80} />
                             </div>
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 bg-indigo-500/20 text-[10px] font-bold text-indigo-400 rounded uppercase">Urgent</span>
-                                    <h3 className="font-bold text-white">Upcoming VAT Quarter End</h3>
+                            <div className="flex items-start gap-4">
+                                <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400">
+                                    <AlertCircle size={24} />
                                 </div>
-                                <p className="text-sm text-slate-300 leading-relaxed">
-                                    Based on your current transaction volume in the General Ledger, your estimated VAT liability for the period ending March 31st is <strong className="text-white">£12,450.20</strong>. Ensure all invoices are linked before submission.
-                                </p>
-                                <div className="pt-3 flex gap-4">
-                                    <div className="text-[10px] font-bold text-uhuru-text-dim uppercase tracking-widest">Due in 12 days</div>
-                                    <div className="text-[10px] font-bold text-uhuru-text-dim uppercase tracking-widest">Source: Companies House Feed</div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-0.5 bg-indigo-500/20 text-[10px] font-bold text-indigo-400 rounded uppercase">Urgent</span>
+                                        <h3 className="font-bold text-white">Upcoming VAT Quarter End</h3>
+                                    </div>
+                                    <p className="text-sm text-slate-300 leading-relaxed">
+                                        Based on your current transaction volume in the General Ledger, your estimated VAT liability for the period ending March 31st is <strong className="text-white">£12,450.20</strong>. Ensure all invoices are linked before submission.
+                                    </p>
+                                    <div className="pt-3 flex gap-4">
+                                        <div className="text-[10px] font-bold text-uhuru-text-dim uppercase tracking-widest">Due in 12 days</div>
+                                        <div className="text-[10px] font-bold text-uhuru-text-dim uppercase tracking-widest">Source: HMRC Sync</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Real Doc Basket Insights */}
                     {strategicDocs.length > 0 ? (

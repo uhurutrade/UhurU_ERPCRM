@@ -128,55 +128,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
         notes: initialData?.notes || "",
     });
 
-    const [isCalculatingAI, setIsCalculatingAI] = useState(false);
 
-    const handleCalculateDeadlines = async () => {
-        setIsCalculatingAI(true);
-        try {
-            const prompt = `Calcula las próximas fechas de vencimiento (Next Deadlines) para una empresa UK Ltd basándome en:
-- Fecha de Incorporación: ${formData.incorporationDate}
-- Última Presentación CompaniesHouse: ${formData.lastAccountsCompaniesHouseDate || 'No disponible'}
-- Última Presentación HMRC: ${formData.lastAccountsHMRCDate || 'No disponible'}
-- Última Confirmation Statement: ${formData.lastConfirmationStatementDate || 'No disponible'}
-- Último Año Fiscal Finalizado: ${formData.lastFYEndDate || 'No disponible'}
-
-Devuelve un JSON estrictamente con este formato:
-{
-  "nextConfirmationStatementDue": "YYYY-MM-DD",
-  "nextAccountsCompaniesHouseDue": "YYYY-MM-DD",
-  "nextAccountsHMRCDue": "YYYY-MM-DD",
-  "nextFYEndDate": "YYYY-MM-DD"
-}`;
-
-            const res = await fetch('/api/compliance/ai-assistant', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: prompt })
-            });
-
-            const data = await res.json();
-            // Parse JSON from AI response
-            const jsonStr = data.reply.match(/\{[\s\S]*\}/)[0];
-            const deadlines = JSON.parse(jsonStr);
-
-            setFormData(prev => ({
-                ...prev,
-                ...deadlines
-            }));
-
-            // Also update the fallback legacy fields
-            setFormData(prev => ({
-                ...prev,
-                accountsNextDueDate: deadlines.nextAccountsCompaniesHouseDue,
-                confirmationNextDueDate: deadlines.nextConfirmationStatementDue
-            }));
-
-        } catch (error) {
-            console.error("AI Deadline Calculation failed:", error);
-        } finally {
-            setIsCalculatingAI(false);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -423,14 +375,6 @@ Devuelve un JSON estrictamente con este formato:
                         <h2 className="text-xl font-bold text-emerald-400">Financial Year & Deadlines</h2>
                         <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">UK Filing Lifecycle Matrix</p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleCalculateDeadlines}
-                        disabled={isCalculatingAI}
-                        className={`flex items-center gap-2 px-4 py-2 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-black transition-all ${isCalculatingAI ? 'animate-pulse opacity-50' : ''}`}
-                    >
-                        <span>{isCalculatingAI ? '🤖 CALCULATING...' : '🤖 SYNC LEGAL DEADLINES (AI)'}</span>
-                    </button>
                 </div>
 
                 <div className="space-y-6">

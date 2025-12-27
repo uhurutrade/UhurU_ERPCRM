@@ -17,7 +17,7 @@ export default async function CompanySettingsPage() {
             </div>
 
             {/* Compliance Overview */}
-            <ComplianceOverview />
+            <ComplianceOverview initialData={serializeData(companySettings)} />
 
             <div className="bg-gradient-card backdrop-blur-xl rounded-xl border border-slate-800 p-6">
                 <CompanySettingsForm initialData={serializeData(companySettings)} />

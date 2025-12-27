@@ -38,11 +38,11 @@ export async function POST(req: NextRequest) {
             data: processedData,
         });
 
-        // Trigger RAG Auto-Sync (Async)
+        // Unified Auto-Sync & Compliance Recalculation (Async)
         try {
-            const { syncCompanySettings } = await import("@/lib/ai/auto-sync-rag");
-            syncCompanySettings().catch(err => console.error("RAG Auto-Sync Error:", err));
-        } catch (e) { console.error("RAG Import Error:", e); }
+            const { triggerComplianceSync } = await import("@/lib/ai/auto-sync-rag");
+            triggerComplianceSync();
+        } catch (e) { console.error("Sync Error:", e); }
 
         return NextResponse.json(companySettings);
     } catch (error) {
@@ -100,11 +100,11 @@ export async function PUT(req: NextRequest) {
             data: processedData,
         });
 
-        // Trigger RAG Auto-Sync (Async - No bloqueante)
+        // Unified Auto-Sync & Compliance Recalculation (Async)
         try {
-            const { syncCompanySettings } = await import("@/lib/ai/auto-sync-rag");
-            syncCompanySettings(); // Fire and forget
-        } catch (e) { /* Silent fail - no afecta al usuario */ }
+            const { triggerComplianceSync } = await import("@/lib/ai/auto-sync-rag");
+            triggerComplianceSync();
+        } catch (e) { /* Silent fail */ }
 
         return NextResponse.json(companySettings);
     } catch (error) {
@@ -119,12 +119,22 @@ export async function PUT(req: NextRequest) {
 export async function GET() {
     try {
         const companySettings = await prisma.companySettings.findFirst();
+
+        // AUTO-RECALCULATE if stale (once per day or if never calculated)
+        if (companySettings) {
+            const lastUpdate = companySettings.updatedAt || new Date(0);
+            const today = new Date();
+            const isStale = lastUpdate.toDateString() !== today.toDateString();
+
+            if (isStale) {
+                console.log("[Compliance] Data is stale. Triggering background refresh...");
+                import("@/lib/ai/compliance-service").then(m => m.recalculateComplianceDeadlines());
+            }
+        }
+
         return NextResponse.json(companySettings);
     } catch (error) {
         console.error("Error fetching company settings:", error);
-        return NextResponse.json(
-            { error: "Failed to fetch company settings" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Failed to fetch company settings" }, { status: 500 });
     }
 }
