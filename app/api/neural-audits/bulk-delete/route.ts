@@ -5,7 +5,9 @@ export async function POST(req: Request) {
     try {
         const { ids } = await req.json();
 
-        if (ids && Array.isArray(ids)) {
+        if (ids === 'ALL') {
+            await prisma.neuralAudit.deleteMany({});
+        } else if (ids && Array.isArray(ids)) {
             await prisma.neuralAudit.deleteMany({
                 where: { id: { in: ids } }
             });

@@ -3,9 +3,20 @@ import { PrismaClient } from '@prisma/client'
 const prismaClient = new PrismaClient()
 // Unified Prisma Client with Strategic AI Auditing Extension
 
-// MODÈLES À SURVEILLER (Business Impact Models)
-// We include everything except internal/auth noise and high-frequency technical segments
-const EXCLUDE_MODELS = ['NeuralAudit', 'ActivityLog', 'Session', 'Account', 'VerificationToken', 'User', 'DocumentChunk'];
+// MODÈLES À SURVEILLER (Solo acciones de negocio directas del usuario)
+// Excluimos tablas técnicas de alta frecuencia o ruido interno
+const EXCLUDE_MODELS = [
+    'NeuralAudit',
+    'ActivityLog',
+    'Session',
+    'Account',
+    'VerificationToken',
+    'User',
+    'DocumentChunk',
+    'BankTransaction',
+    'CryptoTransaction',
+    'Activity'
+];
 
 export const prisma = prismaClient.$extends({
     query: {

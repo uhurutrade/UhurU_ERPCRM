@@ -22,14 +22,29 @@ interface Audit {
 export function NeuralAuditHistory() {
     const [audits, setAudits] = useState<Audit[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalAudits, setTotalAudits] = useState(0);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [allSelectedInDB, setAllSelectedInDB] = useState(false);
     const { confirm: systemConfirm } = useConfirm();
 
     const fetchAudits = async () => {
         try {
-            const response = await fetch("/api/neural-audits");
+            setLoading(true);
+            const response = await fetch(`/api/neural-audits?page=${page}&limit=20`);
             const data = await response.json();
-            setAudits(data);
+
+            // Handle if data is paginated or old format
+            if (data.audits) {
+                setAudits(data.audits);
+                setTotalPages(data.totalPages);
+                setTotalAudits(data.total);
+            } else {
+                setAudits(data);
+                setTotalPages(1);
+                setTotalAudits(data.length);
+            }
 
             // Notify sidebar to update unread count
             window.dispatchEvent(new CustomEvent('unread-audits-updated'));
@@ -42,8 +57,9 @@ export function NeuralAuditHistory() {
 
     useEffect(() => {
         fetchAudits();
+    }, [page]);
 
-        const handleSync = () => fetchAudits();
+    useEffect(() => {
         window.addEventListener('settings-saved', handleSync);
         return () => window.removeEventListener('settings-saved', handleSync);
     }, []);
@@ -92,12 +108,16 @@ export function NeuralAuditHistory() {
         try {
             const response = await fetch("/api/neural-audits/bulk-delete", {
                 method: 'POST',
-                body: JSON.stringify({ ids: Array.from(selectedIds) })
+                body: JSON.stringify({
+                    ids: allSelectedInDB ? 'ALL' : Array.from(selectedIds)
+                })
             });
 
             if (response.ok) {
-                toast.success(`${selectedIds.size} reports deleted.`);
+                toast.success(allSelectedInDB ? "All reports deleted." : `${selectedIds.size} reports deleted.`);
                 setSelectedIds(new Set());
+                setAllSelectedInDB(false);
+                setPage(1);
                 fetchAudits();
             }
         } catch (error) {
@@ -107,16 +127,20 @@ export function NeuralAuditHistory() {
 
     const handleMarkAsRead = async (ids?: string[]) => {
         const targetIds = ids || Array.from(selectedIds);
-        if (targetIds.length === 0) return;
+        if (targetIds.length === 0 && !allSelectedInDB) return;
 
         try {
             const response = await fetch("/api/neural-audits/mark-read", {
                 method: 'POST',
-                body: JSON.stringify({ ids: targetIds })
+                body: JSON.stringify({
+                    ids: allSelectedInDB ? [] : targetIds,
+                    all: allSelectedInDB
+                })
             });
 
             if (response.ok) {
                 setSelectedIds(new Set());
+                setAllSelectedInDB(false);
                 fetchAudits();
             }
         } catch (error) {
@@ -132,11 +156,17 @@ export function NeuralAuditHistory() {
     };
 
     const toggleSelectAll = () => {
-        if (selectedIds.size === audits.length) {
+        if (selectedIds.size === audits.length || allSelectedInDB) {
             setSelectedIds(new Set());
+            setAllSelectedInDB(false);
         } else {
             setSelectedIds(new Set(audits.map(a => a.id)));
         }
+    };
+
+    const selectEntireDatabase = () => {
+        setAllSelectedInDB(true);
+        setSelectedIds(new Set(audits.map(a => a.id))); // Visual feedback for current page
     };
 
     const parseJustification = (justification: string | null) => {
@@ -403,6 +433,30 @@ export function NeuralAuditHistory() {
                 </div>
             </div>
 
+            {audits.length > 0 && selectedIds.size === audits.length && !allSelectedInDB && totalAudits > audits.length && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-center gap-4 animate-in fade-in slide-in-from-top-2">
+                    <p className="text-emerald-400 text-xs font-medium">All {audits.length} reports on this page are selected.</p>
+                    <button
+                        onClick={selectEntireDatabase}
+                        className="text-white text-xs font-black uppercase tracking-widest hover:underline decoration-emerald-500 underline-offset-4"
+                    >
+                        Select all {totalAudits} reports in history
+                    </button>
+                </div>
+            )}
+
+            {allSelectedInDB && (
+                <div className="bg-emerald-500 border border-emerald-400/50 p-3 rounded-xl flex items-center justify-center gap-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                    <p className="text-white text-xs font-bold">All {totalAudits} reports in history are selected.</p>
+                    <button
+                        onClick={() => { setSelectedIds(new Set()); setAllSelectedInDB(false); }}
+                        className="text-emerald-950 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                        Clear Selection
+                    </button>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 gap-3">
                 {audits.map((audit) => (
                     <div
@@ -481,6 +535,37 @@ export function NeuralAuditHistory() {
                     </div>
                 ))}
             </div>
+
+            {/* Pagination UI */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-white/5">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 bg-slate-800 disabled:opacity-30 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all hover:bg-slate-700"
+                    >
+                        Previous
+                    </button>
+                    <div className="flex items-center gap-2 px-4">
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setPage(i + 1)}
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${page === i + 1 ? 'bg-emerald-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="px-4 py-2 bg-slate-800 disabled:opacity-30 text-white rounded-xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all hover:bg-slate-700"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </section>
     );
 }
