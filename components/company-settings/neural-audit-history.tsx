@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BrainCircuit, Download, FileText, CheckCircle2 } from "lucide-react";
+import { BrainCircuit, Download, Trash2, ShieldCheck, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { toast } from "sonner";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface Audit {
     id: string;
@@ -36,11 +37,30 @@ export function NeuralAuditHistory() {
     useEffect(() => {
         fetchAudits();
 
-        // Refresh when a sync is completed
         const handleSync = () => fetchAudits();
         window.addEventListener('settings-saved', handleSync);
         return () => window.removeEventListener('settings-saved', handleSync);
     }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("¿Estás seguro de que deseas eliminar este reporte de auditoría? Esta acción es irreversible.")) return;
+
+        try {
+            const response = await fetch(`/api/neural-audits/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                toast.success("Audit deleted successfully");
+                fetchAudits();
+            } else {
+                toast.error("Failed to delete audit");
+            }
+        } catch (error) {
+            console.error("Error deleting audit:", error);
+            toast.error("An error occurred while deleting the audit");
+        }
+    };
 
     const generatePDF = (audit: Audit) => {
         const doc = new jsPDF() as any;
@@ -91,7 +111,7 @@ export function NeuralAuditHistory() {
         const changeLabels = (audit.changeLog || "").split(", ");
         const tableData = changeLabels.map(label => [label, "AI Adjusted", "Regulatory Compliance"]);
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: 115,
             head: [["Affected Field", "Action", "Context"]],
             body: tableData,
@@ -192,14 +212,23 @@ export function NeuralAuditHistory() {
                                     </span>
                                 ))}
                             </div>
-                            <button
-                                onClick={() => generatePDF(audit)}
-                                className="flex items-center gap-2 bg-slate-950 hover:bg-emerald-600 border border-white/10 hover:border-emerald-500 p-3 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg active:scale-90"
-                                title="Download Audit PDF"
-                            >
-                                <Download size={18} />
-                                <span className="text-[10px] font-black uppercase tracking-widest sm:hidden">Report</span>
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => generatePDF(audit)}
+                                    className="flex items-center gap-2 bg-slate-950 hover:bg-emerald-600 border border-white/10 hover:border-emerald-500 p-3 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg active:scale-90"
+                                    title="Download Audit PDF"
+                                >
+                                    <Download size={18} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest sm:hidden">Report</span>
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(audit.id)}
+                                    className="flex items-center gap-2 bg-slate-950 hover:bg-rose-600 border border-white/10 hover:border-rose-500 p-3 rounded-xl text-slate-400 hover:text-white transition-all shadow-lg active:scale-90"
+                                    title="Delete Audit"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
