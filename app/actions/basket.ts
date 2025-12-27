@@ -6,6 +6,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { createHash } from 'crypto';
 import { getAIClient } from '@/lib/ai/ai-service';
+import { recordStrategicAudit } from '@/lib/ai/audit-service';
 
 export async function uploadToBasket(formData: FormData) {
     try {
@@ -164,22 +165,12 @@ export async function uploadToBasket(formData: FormData) {
 
             results.push(doc.id);
 
-            // --- TRIGGER NEURAL AUDIT REPORT ---
-            try {
-                const { createNeuralAudit } = await import('@/lib/ai/audit-service');
-                await createNeuralAudit({
-                    provider: "Neural Ingestion Engine",
-                    changeLog: `New Strategic Node: ${file.name}`,
-                    justification: JSON.stringify({
-                        en: `INTELLIGENCE SYNC: Document "${file.name}" has been successfully vectorized. ${notes ? 'User-provided context notes have been factored into the semantic embedding.' : 'Raw document structure mapped.'} CONSEQUENCE: The RAG engine now has expanded situational awareness regarding "${analysis.docTopic || 'General Business'}".`,
-                        es: `SINCRONIZACIÓN DE INTELIGENCIA: El documento "${file.name}" ha sido vectorizado con éxito. ${notes ? 'Las notas de contexto del usuario han sido factorizadas en el embedding semántico.' : 'Estructura bruta del documento mapeada.'} CONSECUENCIA: El motor RAG tiene ahora una mayor conciencia situacional sobre "${analysis.docTopic || 'Negocios Generales'}".`
-                    }),
-                    totalChanges: 1,
-                    status: "UPDATED"
-                });
-            } catch (auditError) {
-                console.error("Failed to create neural audit for basket upload:", auditError);
-            }
+            // --- STRATEGIC AUDIT ---
+            recordStrategicAudit(
+                `Institutional Knowledge Ingested: ${file.name}`,
+                `Topic: ${analysis.docTopic || 'General'}. Insights: ${analysis.strategicInsightEN || 'Raw data ingested'}. Factoring into company IQ.`,
+                "DOC_INGESTION"
+            );
         }
 
         revalidatePath('/dashboard/doc-basket');
@@ -235,22 +226,12 @@ export async function removeFromBasket(id: string) {
             where: { id }
         });
 
-        // --- TRIGGER NEURAL AUDIT REPORT (DE-FACTORIZATION) ---
-        try {
-            const { createNeuralAudit } = await import('@/lib/ai/audit-service');
-            await createNeuralAudit({
-                provider: "Neural RAG Engine",
-                changeLog: `De-factoring Intelligence: ${doc.filename}`,
-                justification: JSON.stringify({
-                    en: `REVERSE VECTORIZATION: The document "${doc.filename}" and its semantic chunks have been permanently removed from the RAG core. CONSEQUENCE: The system's contextual memory has been reduced/cleaned to avoid bias from outdated or irrelevant data.`,
-                    es: `VECTORIZACIÓN INVERSA: El documento "${doc.filename}" y sus fragmentos semánticos han sido eliminados de forma permanente del núcleo RAG. CONSECUENCIA: La memoria contextual del sistema ha sido reducida/limpiada para evitar sesgos de datos obsoletos o irrelevantes.`
-                }),
-                totalChanges: 1,
-                status: "UPDATED"
-            });
-        } catch (auditError) {
-            console.error("Failed to create neural audit for de-factorization:", auditError);
-        }
+        // --- STRATEGIC AUDIT ---
+        recordStrategicAudit(
+            `Knowledge Node Purged: ${doc.filename}`,
+            `Manual removal of document. Cleaning RAG vectors to maintain semantic relevance.`,
+            "DOC_PURGE"
+        );
 
         revalidatePath('/dashboard/doc-basket');
         revalidatePath('/dashboard/wall');

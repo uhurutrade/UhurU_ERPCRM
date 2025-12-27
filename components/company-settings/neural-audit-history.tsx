@@ -438,10 +438,17 @@ export function NeuralAuditHistory() {
                         </div>
 
                         <div className="flex-1 px-0 sm:px-6 relative z-10">
-                            <div className={`bg-slate-950/40 p-3 rounded-xl border border-white/5 ${!audit.isRead ? 'border-emerald-500/30 bg-emerald-500/5' : 'opacity-80'} group-hover:opacity-100 transition-all`}>
-                                <p className={`text-[11px] italic line-clamp-2 ${!audit.isRead ? 'text-white font-bold' : 'text-slate-300'}`}>
+                            <div className={`bg-slate-950/40 p-4 rounded-2xl border border-white/5 ${!audit.isRead ? 'border-emerald-500/30 bg-emerald-500/5' : 'opacity-80'} group-hover:opacity-100 transition-all space-y-3`}>
+                                <p className={`text-[12px] leading-relaxed ${!audit.isRead ? 'text-white font-bold' : 'text-slate-200'}`}>
                                     {parseJustification(audit.justification).en}
                                 </p>
+                                {parseJustification(audit.justification).es && (
+                                    <div className="pt-2 border-t border-white/5">
+                                        <p className="text-[10px] text-slate-500 italic leading-relaxed">
+                                            {parseJustification(audit.justification).es}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

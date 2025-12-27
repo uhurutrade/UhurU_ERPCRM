@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordStrategicAudit } from "@/lib/ai/audit-service";
 
 export async function POST(req: NextRequest) {
     try {
