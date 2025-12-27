@@ -729,47 +729,7 @@ Tu misión es transformar los datos crudos en inteligencia de negocio para minim
                 </div>
             </section>
 
-            {/* Accounting Software & Methods */}
-            <section>
-                <h2 className="text-xl font-semibold mb-4 text-emerald-400">Accounting Software & Methods</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Accounting Software
-                        </label>
-                        <select
-                            name="accountingSoftware"
-                            value={formData.accountingSoftware}
-                            onChange={handleChange}
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        >
-                            <option value="">Select software...</option>
-                            <option value="Xero">Xero</option>
-                            <option value="QuickBooks">QuickBooks</option>
-                            <option value="Sage">Sage</option>
-                            <option value="FreeAgent">FreeAgent</option>
-                            <option value="Manual">Manual</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Accounting Method
-                        </label>
-                        <select
-                            name="accountingMethod"
-                            value={formData.accountingMethod}
-                            onChange={handleChange}
-                            className="w-full px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-xs sm:text-sm"
-                        >
-                            <option value="">Select method...</option>
-                            <option value="Cash Basis">Cash Basis</option>
-                            <option value="Accrual Basis">Accrual Basis</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
 
             {/* Contact Information */}
             <section>
