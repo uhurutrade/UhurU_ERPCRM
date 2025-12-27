@@ -168,19 +168,19 @@ export function NeuralAuditHistory() {
 
         const finalY = (doc as any).lastAutoTable.finalY + 20;
 
-        // Justification Section
+        // Justification Section (Bilingual Deep Logic)
         doc.setTextColor(16, 185, 129);
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("STRATEGIC JUSTIFICATION", 20, finalY);
+        doc.text("STRATEGIC JUSTIFICATION & LOGIC / JUSTIFICACIÓN ESTRATÉGICA", 20, finalY);
 
         doc.line(20, finalY + 3, 190, finalY + 3);
 
         doc.setTextColor(51, 65, 85);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "italic");
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
         const splitText = doc.splitTextToSize(audit.justification || "No justification provided.", 170);
-        doc.text(splitText, 20, finalY + 15);
+        doc.text(splitText, 20, finalY + 12);
 
         // Watermark
         doc.setTextColor(241, 245, 249);

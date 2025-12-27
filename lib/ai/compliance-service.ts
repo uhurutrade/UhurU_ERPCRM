@@ -41,7 +41,7 @@ export async function recalculateComplianceDeadlines() {
             "nextAccountsCompaniesHouseDue": "YYYY-MM-DD",
             "nextAccountsHMRCDue": "YYYY-MM-DD",
             "nextFYEndDate": "YYYY-MM-DD",
-            "justification": "Professional explanation in SPANISH of why you updated these specific dates based on the financial and document context provided (max 400 chars)."
+            "justification": "Detailed bilingual logic. Start with [ES] for Spanish and then [EN] for English. Detail the EXACT motivation, calculation logic, and UK regulatory adherence for the specific dates chosen (max 1000 chars)."
         }
         `;
 
