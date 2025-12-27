@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   const fullMode = false;
   console.log('🌱 Ejecutando Seed de ' + (fullMode ? 'RESTAURACIÓN TOTAL' : 'INFRAESTRUCTURA'));
-  console.log('Generado en VPS: 2025-12-27T07:58:30.082Z');
+  console.log('Generado en VPS: 2025-12-27T08:02:27.291Z');
 
   if (fullMode) {
     console.log('⚠️ LIMPIEZA DE SEGURIDAD: Borrando datos actuales para restauración...');
