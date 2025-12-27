@@ -17,6 +17,7 @@ interface Audit {
     justification: string | null;
     totalChanges: number;
     status: string;
+    isRead: boolean;
 }
 
 export function NeuralAuditHistory() {
