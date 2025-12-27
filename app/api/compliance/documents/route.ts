@@ -43,6 +43,23 @@ export async function DELETE(req: Request) {
         // 2. Eliminar de la base de datos
         await prisma.complianceDocument.delete({ where: { id } });
 
+        // --- TRIGGER NEURAL AUDIT REPORT (DE-FACTORIZATION) ---
+        try {
+            const { createNeuralAudit } = await import('@/lib/ai/audit-service');
+            createNeuralAudit({
+                provider: "Neural RAG Engine",
+                changeLog: `De-factoring Compliance: ${doc.filename}`,
+                justification: JSON.stringify({
+                    en: `REVERSE VECTORIZATION: The compliance document "${doc.filename}" has been purged from the intelligence ledger. CONSEQUENCE: The system has lost context regarding this specific regulatory file to maintain a clean knowledge base.`,
+                    es: `VECTORIZACIÓN INVERSA: El documento de cumplimiento "${doc.filename}" ha sido purgado del registro de inteligencia. CONSECUENCIA: El sistema ha perdido el contexto relativo a este archivo normativo específico para mantener una base de conocimientos limpia.`
+                }),
+                totalChanges: 1,
+                status: "UPDATED"
+            });
+        } catch (auditError) {
+            console.error("Failed to create neural audit for compliance de-factorization:", auditError);
+        }
+
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
