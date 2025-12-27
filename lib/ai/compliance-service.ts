@@ -88,9 +88,11 @@ export async function recalculateComplianceDeadlines() {
             nextFYEndDate: consensus.nextFYEndDate.date
         };
 
-        // Summary of who won
-        const providersUsed = Array.from(new Set(Object.values(consensus).map(c => c.provider.toUpperCase())));
-        const providerSummary = providersUsed.join(" & ");
+        // Summary of providers that successfully contributed
+        const successfulProviders: string[] = [];
+        if (dataOA) successfulProviders.push("OpenAI");
+        if (dataGE) successfulProviders.push("Gemini");
+        const providerSummary = successfulProviders.join(" & ");
 
         // Capture old values for comparison
         const oldDeadlines = {

@@ -164,7 +164,7 @@ OPERATIONAL IDENTITY:
 
             if (syncData.success) {
                 toast.success("Neural Consensus Reached", {
-                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider.toUpperCase()} completed successfully. System ready.`
+                    description: `Settings saved and vectorized. Dual-AI verification via ${syncData.provider} completed successfully.`
                 });
             } else {
                 toast.success("Settings Saved", {

@@ -44,7 +44,7 @@ export default function SyncNodeButton() {
 
                 toast.success("Intelligence Synchronized", {
                     id: toastId,
-                    description: `Neural nodes verified via Dual-AI Consensus (${data.provider?.toUpperCase()}). ${changeLog}`
+                    description: `Neural nodes verified via Dual-AI Consensus (${data.provider}). ${changeLog}`
                 });
                 // Wait a bit and refresh
                 setTimeout(() => router.refresh(), 2000);
